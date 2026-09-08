@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Arabic RTL — custom overrides */
+[x-cloak] {
+    display: none !important;
+}
