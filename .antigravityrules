@@ -86,4 +86,43 @@ When provided with an error, stack trace, or log:
 - **Multi-File Response Mandate:** When a feature requires both backend changes and frontend/CSS changes, output them as completely separate code blocks with distinct file paths:
   ```php
   // app/Http/Controllers/UserController.php
-  ```
+  ```
+
+## 13. Strict Security Quarantine & Mandatory Developer Verification (System Module)
+- **High-Security Quarantine (`resources/views/system/**`, `app/Http/Controllers/SystemTableController.php`, `app/Services/SystemTableService.php`, `system-tables.*` routes):**
+  - This module is strictly private, confidential, and security-critical for system forensics, audit trails, and infrastructure inspection.
+  - **Zero Code Mixing with Standard Pages:** It must remain completely isolated from public pages, user dashboards, and everyday application features. Never leak or embed system tables, background queue details, or raw forensic logs into regular user interfaces.
+  - **Mandatory Developer Pre-Approval for Any Additions:** Any new feature, route, query, or view modification involving or touching this security module must be done under the explicit supervision of the developer.
+  - **Mandatory Agent Check Question:** Before adding or modifying any feature that interacts with system tables or security data, the AI agent **MUST explicitly ask the developer**:
+    > *"هل هذه الإضافة تنتمي إلى هذا الملف/القسم الأمني السري أم لا؟"* ("Does this addition belong to this private security module or not?")
+    and await developer clarification and explicit approval before modifying or creating files.
+
+## 14. Mandatory Unified Button & Semantic Color System (Strict UI Rule)
+- Primary: `<x-primary-button>` (Safety Orange: `bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 text-white`).
+- Secondary: `<x-secondary-button>` (Bordered Gray: `bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600`).
+- Danger: `<x-danger-button>` (Rose Red: `bg-rose-600 hover:bg-rose-700 dark:bg-rose-600 text-white`).
+- Success: `<x-success-button>` (Emerald Green: `bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 text-white`).
+- Warning: `<x-warning-button>` (Amber Yellow: `bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 text-white`).
+- Info: `<x-info-button>` (Indigo Blue: `bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 text-white`).
+- Strict Prohibition of Ad-Hoc Buttons: Never write raw `<button>` elements with arbitrary styles.
+
+## 15. Mandatory Unified Table Component Architecture (Strict UI Rule)
+- Root Table: `<x-table>` (rounded-xl, border, light/dark mode, slots: `toolbar`, `header`, default, `pagination`).
+- Table Header: `<x-table.th>` (uppercase font, bold tracking, start alignment, uniform padding).
+- Table Row: `<x-table.tr>` (subtle hover state transitions in light and dark modes).
+- Table Cell: `<x-table.td>` (uniform typography, responsive alignment, vertical centering).
+- Table Empty State: `<x-table.empty>` (centered SVG icon, customizable `colspan`, translated fallback message).
+- Table Actions Wrapper: `<x-table.actions>` (`inline-flex items-center gap-1.5 whitespace-nowrap`).
+- Table Action Buttons: `<x-table.action>` (polymorphic `<a>` or `<button>` with themes, icons, and tooltips), `<x-table.action-view>` (Indigo/eye), `<x-table.action-edit>` (Amber/pencil), `<x-table.action-delete>` (Rose/trash).
+- Strict Prohibition of Ad-Hoc Tables & Action Buttons: Never write raw HTML `<table>` elements or ad-hoc raw buttons with inline SVGs for row operations.
+
+## 16. Mandatory Trilingual Localization Across All Views (Strict Rule)
+- Zero Hardcoded Strings: All user-facing text, buttons, labels, and messages in `resources/views/**` and `resources/js/**` must strictly use `__('...')` or `@lang('...')`.
+- Complete Trilingual Parity: Every translation key MUST be added and accurately translated into all 3 language files simultaneously:
+  - `lang/ar.json` (Arabic)
+  - `lang/en.json` (English)
+  - `lang/fr.json` (French)
+- Zero Missing Keys & Fallbacks: Exact 1-to-1 key parity across all 3 files is strictly required. No English fallbacks in Arabic or French views.
+- Pre-Completion Verification: A feature is incomplete until verified that 0 translation keys are missing in any of the 3 languages.
+
+

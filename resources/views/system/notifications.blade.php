@@ -1,0 +1,147 @@
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h2 class="font-bold text-2xl text-gray-900 dark:text-white leading-tight">
+                    {{ __('Notifications') }}
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                    {{ __('Internal database notifications, recipient targeting, and delivery payloads') }}
+                </p>
+            </div>
+            <span class="inline-flex items-center px-3 py-1 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/20 text-xs font-semibold">
+                {{ $notifications->total() }} {{ __('Total Notifications') }}
+            </span>
+        </div>
+    </x-slot>
+
+    <div class="py-8" x-data="{ modalOpen: false, modalTitle: '', modalPayload: null }">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row gap-6 items-start">
+                <!-- Sidebar Navigation -->
+                <aside class="w-full lg:w-64 shrink-0">
+                    <x-system-tabs active="notifications" />
+                </aside>
+
+                <!-- Main Content -->
+                <main class="flex-1 w-full min-w-0 space-y-6">
+
+            <x-table>
+                <!-- Toolbar -->
+                <x-slot:toolbar>
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        <span>{{ __('Database Notifications') }} (<code>notifications</code>)</span>
+                    </h3>
+
+                    <!-- Status Filter -->
+                    <x-global-filter
+                        :action="route('system-tables.notifications')"
+                        :search="false"
+                        :show-submit="false">
+                        <x-global-filter.select
+                            name="status"
+                            :placeholder="__('All Statuses')"
+                            :value="$status"
+                            :auto-submit="true"
+                            :options="[
+                                'unread' => __('Unread'),
+                                'read' => __('Read')
+                            ]"
+                        />
+                    </x-global-filter>
+                </x-slot:toolbar>
+
+                <x-slot:header>
+                    <x-table.th>{{ __('UUID') }}</x-table.th>
+                    <x-table.th>{{ __('Type') }}</x-table.th>
+                    <x-table.th>{{ __('Recipient') }}</x-table.th>
+                    <x-table.th>{{ __('Status') }}</x-table.th>
+                    <x-table.th>{{ __('Date') }}</x-table.th>
+                    <x-table.th class="text-end">{{ __('Actions') }}</x-table.th>
+                </x-slot:header>
+
+                @forelse($notifications as $notif)
+                    @php
+                        $data = json_decode($notif->data ?? '{}', true);
+                    @endphp
+                    <x-table.tr>
+                        <x-table.td class="font-mono text-gray-400 dark:text-gray-500">
+                            {{ substr($notif->id, 0, 8) }}...
+                        </x-table.td>
+                        <x-table.td class="font-semibold text-gray-900 dark:text-white">
+                            {{ class_basename($notif->type) }}
+                        </x-table.td>
+                        <x-table.td class="font-mono text-xs">
+                            {{ class_basename($notif->notifiable_type) }} #{{ $notif->notifiable_id }}
+                        </x-table.td>
+                        <x-table.td>
+                            @if($notif->read_at)
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                                    {{ __('Read') }} ({{ \Carbon\Carbon::parse($notif->read_at)->diffForHumans() }})
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                    {{ __('Unread') }}
+                                </span>
+                            @endif
+                        </x-table.td>
+                        <x-table.td class="whitespace-nowrap">
+                            {{ \Carbon\Carbon::parse($notif->created_at)->format('Y-m-d H:i') }}
+                        </x-table.td>
+                        <x-table.td class="whitespace-nowrap text-end">
+                            <x-table.actions class="justify-end">
+                                <x-table.action-view
+                                    @click="modalOpen = true; modalTitle = '{{ class_basename($notif->type) }}'; modalPayload = {{ json_encode($data) }}"
+                                    :title="__('View Payload')">
+                                    {{ __('View Payload') }}
+                                </x-table.action-view>
+                                <x-table.action-delete :title="__('Delete Notification')" />
+                            </x-table.actions>
+                        </x-table.td>
+                    </x-table.tr>
+                @empty
+                    <x-table.empty colspan="6" />
+                @endforelse
+
+                @if($notifications->hasPages())
+                    <x-slot:pagination>
+                        {{ $notifications->links() }}
+                    </x-slot:pagination>
+                @endif
+            </x-table>
+                </main>
+            </div>
+        </div>
+
+        <!-- Alpine Payload Modal -->
+        <div x-show="modalOpen"
+             x-cloak
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
+             @keydown.escape.window="modalOpen = false">
+            <div class="relative w-full max-w-lg rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-xl border border-gray-200 dark:border-gray-700"
+                 @click.outside="modalOpen = false">
+                <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-700">
+                    <h4 class="text-base font-bold text-gray-900 dark:text-white" x-text="modalTitle"></h4>
+                    <button type="button" @click="modalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <div class="py-4 max-h-80 overflow-y-auto">
+                    <div class="rounded-lg bg-gray-50 dark:bg-gray-900/50 p-4 border border-gray-200 dark:border-gray-700">
+                        <pre class="text-xs font-mono text-gray-800 dark:text-gray-200 overflow-x-auto whitespace-pre-wrap" x-text="JSON.stringify(modalPayload || {}, null, 2)"></pre>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+                    <x-secondary-button type="button"
+                            @click="modalOpen = false"
+                            class="py-1.5 px-4 text-xs rounded-lg">
+                        {{ __('Close') }}
+                    </x-secondary-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
