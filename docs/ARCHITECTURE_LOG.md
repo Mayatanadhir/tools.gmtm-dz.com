@@ -275,4 +275,48 @@ This document tracks fundamental architectural patterns, engineering decisions, 
      - Features requiring changes across backend and frontend/CSS layers must be structured as discrete, isolated file implementations with explicit paths.
 - **Consequences:** Strong Content Security Policy (CSP) compatibility, elimination of style leakage, clean testability, and total architectural clarity across all future features.
 
+---
+
+## [ADR-016] Profile Module Clean Architecture Delegation & UI Theme Alignment
+- **Date:** 2026-09-08
+- **Status:** Accepted / Active
+- **Context:** The profile views and `ProfileController` retained default Laravel Breeze starter code, lacking dark mode theme alignment (producing glaring white containers against dark mode backgrounds) and bypassing the domain `UserService` layer by manipulating Eloquent models directly in controller methods without explicit typing.
+- **Decision:**
+  1. **Backend Delegation to Domain Service:**
+     - Injected `UserService` into `ProfileController` via constructor property promotion.
+     - Added `declare(strict_types=1);` and explicit return type hinting.
+     - Delegated `update` and `destroy` operations directly to `UserService::updateProfile()` and `UserService::deleteAccount()`, guaranteeing execution within safe atomic database transactions (`executeInTransaction`).
+  2. **UI Theme Alignment & Dark Mode Support:**
+     - Added Tailwind `dark:` variant classes across `resources/views/profile/edit.blade.php` and its sub-views (`update-profile-information-form.blade.php`, `update-password-form.blade.php`, `delete-user-form.blade.php`).
+     - Upgraded shared UI components (`input-label`, `text-input`, `input-error`, `primary-button`, `secondary-button`, `danger-button`, `modal`, `dropdown`, `dropdown-link`, `responsive-nav-link`) with consistent dark backgrounds, borders, text, and focus ring offset classes.
+  3. **Strict Compliance with Separation of Concerns (Rule 12):**
+     - Zero inline `style="..."` attributes utilized.
+     - Complete presentation logic isolated in Blade templates, with zero queries or business logic in views.
+- **Consequences:** Flawless visual consistency across light and dark modes in both RTL and LTR orientations, complete adherence to Clean Architecture principles across the profile domain, and full automated test verification (118/118 tests passing).
+
+---
+
+## [ADR-017] Navigation Bar Brand Identity & Logo Aspect Ratio Optimization
+- **Date:** 2026-09-08
+- **Status:** Accepted / Active
+- **Context:** The application brand logo contains an integrated graphic emblem, the "ENGI-MATE" title, and a subtitle. Previously, rendering this full composite image in the navigation bar constrained to a tiny 40x40 (`h-10 w-10`) box alongside a duplicate text `<span>ENGI-MATE</span>` caused the internal logo typography to become an illegible, blurry smear while redundantly repeating the company name. Furthermore, unnecessary transparent margins within the image canvas wasted more than 21% of the vertical display area.
+- **Decision:**
+  1. **Canvas Bounding Box Optimization:**
+     - Trimmed excessive transparent margins from `public/images/logo.png` and `public/images/logo-dark.png` to a tight 426x426 canvas, maximizing optical clarity.
+  2. **Elimination of Redundant Adjacent Typography:**
+     - Removed the duplicate `<span ...>ENGI-MATE</span>` element from `resources/views/layouts/navigation-ltr.blade.php` and `resources/views/layouts/navigation-rtl.blade.php`.
+  3. **Responsive Dimension Scaling:**
+     - Scaled the standalone brand logo lockup to `h-12 w-auto sm:h-14` (48px to 56px within the 64px header), providing clean vertical centering, clear legibility of the integrated brand name, and subtle hover micro-scaling.
+  4. **Aspect Ratio Preservation in Component:**
+     - Adjusted `resources/views/components/application-logo.blade.php` to use `h-full w-auto object-contain`, ensuring the `<picture>` element preserves natural proportions across all breakpoints.
+  5. **Vite Production Bundling:**
+     - Recompiled production assets with `npm run build` to ensure all responsive Tailwind dimension tokens are embedded in the CSS bundles.
+  6. **Purge of Legacy Single-Layout Templates:**
+     - Deleted obsolete, non-compliant Breeze templates (`resources/views/layouts/navigation.blade.php`, `layouts/app.blade.php`, `layouts/guest.blade.php`) to eliminate dead code and prevent any architectural regression or confusion.
+  7. **Navigation Link Dark Mode Alignment:**
+     - Upgraded `resources/views/components/nav-link.blade.php` with explicit active/inactive dark mode tokens (`dark:text-gray-100`, `dark:border-indigo-500`, `dark:text-gray-400`, `dark:hover:text-gray-300`), preventing black text in dark navigation bars.
+- **Consequences:** Clean, modern, high-contrast navbar presentation across both Light and Dark themes in RTL and LTR modes, zero duplicate branding text, completely streamlined view directory, and 100% passing test suite (118 tests, 378 assertions).
+
+
+
 

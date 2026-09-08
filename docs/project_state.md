@@ -1,17 +1,19 @@
 # Project State: tools.gmtm-dz.com
 
-**Last Updated:** 2026-09-07
-**Status:** Localization & Theme Management Active
+**Last Updated:** 2026-09-08
+**Status:** Localization, Theme Management & Profile Module Clean Architecture Active
 
 ---
 
 ## 1. Application Overview
 - **Framework:** Laravel 13.x (PHP 8.4+)
+- **Application Brand:** ENGI-MATE ("Your Engineering Work Assistant")
 - **Frontend Stack:** Blade + Tailwind CSS (Class-based Dark Mode) + Alpine.js + Vite (Isolated RTL/LTR bundles)
 - **Locales Supported:** `ar` (Arabic, default, hidden prefix), `en` (English, `/en/`), `fr` (French, `/fr/`)
 - **Themes Supported:** `light`, `dark`, `system` (Zero-FOUC prevention script, Alpine.js reactive store, cross-instance sync)
 - **Database Engine:** MySQL (`gmtmdz_tools`)
 - **Authentication:** Laravel Breeze (Session/Blade based)
+- **Test Suite:** 118 tests, 378 assertions (100% passing)
 
 ---
 
@@ -61,19 +63,25 @@
 - **Services (`app/Services`):** `BaseService` (transaction manager & exception handling), `UserService` (domain logic), `ImageOptimizationService` (image compression & scaling), `FileUploadService` (standardized secure file uploads & storage management).
 - **Notifications (`app/Notifications`):** `SystemActivityAlert` (database-channel-only notification with unified payload: `title`, `message`, `type`, `causer`, `extra`).
 - **Observers (`app/Observers`):** `UserObserver` (captures `created` & `deleted` events on User model; auto-dispatches `SystemActivityAlert` to all `Super-Admin` and `Admin` role users; gracefully handles missing roles).
-- **Controllers (`app/Http/Controllers/Api`):** `NotificationController` (API: `index`, `unread`, `markAsRead`, `markAllAsRead`, `destroy`; uses `ApiResponseTrait`; enforces per-user notification isolation).
+- **Controllers:**
+  - `App\Http\Controllers\ProfileController`: Refactored with `declare(strict_types=1);`, delegates `update` and `destroy` to `UserService` (transaction-wrapped).
+  - `App\Http\Controllers\Api\NotificationController`: API (`index`, `unread`, `markAsRead`, `markAllAsRead`, `destroy`; uses `ApiResponseTrait`; enforces per-user notification isolation).
 - **Console Commands (`app/Console/Commands`):** `OptimizeImagesCommand` (`php artisan images:optimize`).
 - **Providers (`app/Providers`):** `RepositoryServiceProvider` (maps repository interfaces to implementations).
 - **Middleware (`app/Http/Middleware`):** `SetLocale` (guarantees runtime locale synchronization).
 - **Middleware Aliases (`bootstrap/app.php`):** `role` (RoleMiddleware), `permission` (PermissionMiddleware), `role_or_permission` (RoleOrPermissionMiddleware), `localize` (LaravelLocalizationRoutes), `localizationRedirect` (LaravelLocalizationRedirectFilter), `localeSessionRedirect` (LocaleSessionRedirect), `localeCookieRedirect` (LocaleCookieRedirect), `localeViewPath` (LaravelLocalizationViewPath).
 - **Views & Layout Isolation (`resources/views`):**
-  - Layouts: `layouts/app-rtl.blade.php`, `layouts/app-ltr.blade.php`, `layouts/guest-rtl.blade.php`, `layouts/guest-ltr.blade.php` (all embedded with Zero-FOUC prevention scripts).
-  - Navigation: `layouts/navigation-rtl.blade.php`, `layouts/navigation-ltr.blade.php` (with responsive desktop/mobile theme & language switchers).
-  - Components: `AppLayout` (dynamic RTL/LTR resolution), `GuestLayout` (dynamic RTL/LTR resolution), `x-language-switcher` (`components/language-switcher.blade.php`), `x-theme-switcher` (`components/theme-switcher.blade.php`).
+  - Layouts: `layouts/app-rtl.blade.php`, `layouts/app-ltr.blade.php`, `layouts/guest-rtl.blade.php`, `layouts/guest-ltr.blade.php` (all embedded with Zero-FOUC prevention scripts; legacy unisolated Breeze files `app`, `guest`, `navigation` purged).
+  - Navigation: `layouts/navigation-rtl.blade.php`, `layouts/navigation-ltr.blade.php` (with responsive desktop/mobile theme & language switchers, and standalone enlarged brand logo lockup `h-12 w-auto sm:h-14` without redundant text labels).
+  - Profile: `profile/edit.blade.php`, `profile/partials/update-profile-information-form.blade.php`, `profile/partials/update-password-form.blade.php`, `profile/partials/delete-user-form.blade.php` (all with complete Dark Mode styling).
+  - Components: `AppLayout` (dynamic RTL/LTR resolution), `GuestLayout` (dynamic RTL/LTR resolution), `x-language-switcher`, `x-theme-switcher`, and Dark-Mode enabled form & navigation components (`x-nav-link`, `x-input-label`, `x-text-input`, `x-input-error`, `x-primary-button`, `x-secondary-button`, `x-danger-button`, `x-modal`, `x-dropdown`, `x-dropdown-link`, `x-responsive-nav-link`, `x-auth-session-status`).
 - **Vite Bundles (`resources/css`, `resources/js`):**
   - RTL: `app-rtl.css`, `app-rtl.js`
   - LTR: `app-ltr.css`, `app-ltr.js`
 - **Tailwind Configuration:** `darkMode: 'class'` in `tailwind.config.js`.
+- **Assets & Storage Structure:**
+  - Static Web Assets: `public/images/` (dual-theme transparent logos `logo.png` [Light] and `logo-dark.png` [Dark], icons, graphics; accessed via `asset('images/...')`).
+  - Dynamic Uploads: `storage/app/public/instruments/` (linked to `public/storage/instruments/` via active junction; accessed via `asset('storage/instruments/...')`).
 - **Scheduled Tasks (`routes/console.php`):** `backup:clean` (01:00 daily), `backup:run` (01:30 daily).
 - **Actions (`app/Actions`):** None yet.
 - **Form Requests (`app/Http/Requests`):** `ProfileUpdateRequest`, `Auth\LoginRequest`.

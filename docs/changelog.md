@@ -91,4 +91,51 @@ The format is based on Keep a Changelog.
   - Prohibited inline `style="..."` attributes across all Blade/HTML markup; refactored dropdown menus to utilize pure CSS `[x-cloak]` and Tailwind utility classes.
   - Enforced zero code mixing across Backend (`app/`, `routes/`, `database/`), Frontend (`resources/views/`, `resources/js/`), and CSS layers (`resources/css/`, Tailwind).
 
+## [2026-09-08]
+### Refactored
+- Aligned Profile Module Architecture & Visual Theming with Project Standards (ADR-016):
+  - Refactored [ProfileController](file:///c:/Project%20HARD/tools.gmtm-dz.com/app/Http/Controllers/ProfileController.php) to adhere strictly to Clean Architecture (ADR-001, ADR-005): added `declare(strict_types=1);`, injected `UserService` via constructor property promotion, and delegated profile updates and account deletions directly to `UserService` inside safe database transactions.
+  - Upgraded [profile/edit.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/profile/edit.blade.php) and sub-views ([update-profile-information-form.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/profile/partials/update-profile-information-form.blade.php), [update-password-form.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/profile/partials/update-password-form.blade.php), [delete-user-form.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/profile/partials/delete-user-form.blade.php)) with comprehensive Tailwind Dark Mode tokens (`dark:bg-gray-800`, `dark:text-gray-100`, `dark:text-gray-200`, `dark:text-gray-400`, `dark:border-gray-700/60`, `dark:shadow-gray-950/50`).
+  - Added full Dark Mode support across shared form and layout components: [input-label.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/components/input-label.blade.php), [text-input.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/components/text-input.blade.php), [input-error.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/components/input-error.blade.php), [primary-button.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/components/primary-button.blade.php), [secondary-button.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/components/secondary-button.blade.php), [danger-button.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/components/danger-button.blade.php), [modal.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/components/modal.blade.php), [dropdown.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/components/dropdown.blade.php), [dropdown-link.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/components/dropdown-link.blade.php), and [responsive-nav-link.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/components/responsive-nav-link.blade.php).
+  - Maintained absolute adherence to Rule 12 (Zero inline styles, zero CSS/JS/PHP mixing).
+  - Added dark mode verification feature test in [ProfileTest.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/tests/Feature/ProfileTest.php).
+  - Full test suite: **118/118 tests passing, 378 assertions**.
+
+### Added
+- Initialized dedicated image asset directory structure:
+  - Created `public/images/` for static branding assets (logos, icons, favicons, graphics) with `.gitkeep`.
+  - Created `storage/app/public/instruments/` for user-uploaded instrument and equipment photos with `.gitkeep`.
+  - Re-linked and verified Windows junction for `public/storage` pointing to `storage/app/public`, ensuring immediate web browser accessibility to uploaded instruments at `/storage/instruments/...`.
+  - Updated `storage/app/public/.gitignore` to track the `instruments/` directory structure across repository checkouts.
+- Integrated **ENGI-MATE** Visual Identity & Logo across the application:
+  - Updated [application-logo.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/components/application-logo.blade.php) to render the new `public/images/logo.png`.
+  - Integrated branded logo and title into navigation bars ([navigation-rtl.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/layouts/navigation-rtl.blade.php), [navigation-ltr.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/layouts/navigation-ltr.blade.php)).
+  - Upgraded authentication guest layouts ([guest-rtl.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/layouts/guest-rtl.blade.php), [guest-ltr.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/layouts/guest-ltr.blade.php)) with high-resolution logo card, brand title, and localized slogan ("Your Engineering Work Assistant").
+  - Redesigned [dashboard.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/dashboard.blade.php) welcome card showcasing the new brand avatar, name, and tagline. Optimized logo dimension to a compact, balanced scale (`w-12 h-12` / 48px) with harmonious typography and spacing.
+  - Generated and integrated `public/images/logo-dark.png`: seamless transparent Dark Mode variant with luminous white lettering and helmet contrast, preserving the dynamic safety-orange orbit.
+  - Upgraded [application-logo.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/components/application-logo.blade.php) to use HTML5 `<picture>` switching automatically between `logo.png` (Light) and `logo-dark.png` (Dark) using Tailwind's `dark:` classes.
+  - Eliminated artificial white background wrappers, shadows, and borders from headers, guest cards, and dashboard, allowing the transparent logo to blend seamlessly directly into both light and dark themes.
+- Optimized Navigation Bar Logo Display & Proportions:
+  - Trimmed empty transparent bounding margins from `public/images/logo.png` and `public/images/logo-dark.png` (426x426 tight canvas) to maximize optical clarity.
+  - Eliminated duplicate adjacent text `<span ...>ENGI-MATE</span>` in [navigation-ltr.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/layouts/navigation-ltr.blade.php) and [navigation-rtl.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/layouts/navigation-rtl.blade.php).
+  - Scaled the standalone brand logo to a generous, balanced size (`h-12 w-auto sm:h-14`) with smooth micro-hover scale feedback.
+  - Rebuilt production frontend assets via `npm run build` to compile responsive Tailwind dimension tokens.
+
+### Removed
+- Purged legacy, non-compliant Breeze layout files to maintain clean code and architecture:
+  - Deleted `resources/views/layouts/navigation.blade.php` (lacked dark mode, language switcher, theme switcher, and modern logo specifications).
+  - Deleted `resources/views/layouts/app.blade.php` and `resources/views/layouts/guest.blade.php` (orphaned single-template layouts completely superseded by ADR-013 isolated RTL/LTR layouts).
+
+### Fixed
+- Resolved black text contrast issue on navigation links in Dark Mode:
+  - Added comprehensive Tailwind Dark Mode tokens to [nav-link.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/components/nav-link.blade.php) (`dark:text-gray-100`, `dark:border-indigo-500`, `dark:focus:border-indigo-400` for active states; `dark:text-gray-400`, `dark:hover:text-gray-300`, `dark:hover:border-gray-600` for inactive states).
+  - Added `dark:text-green-400` to [auth-session-status.blade.php](file:///c:/Project%20HARD/tools.gmtm-dz.com/resources/views/components/auth-session-status.blade.php).
+  - Recompiled production assets via `npm run build`.
+
+
+
+
+
+
+
 

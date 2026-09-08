@@ -34,9 +34,11 @@
                 <x-language-switcher />
             </div>
 
-            <div>
-                <a href="{{ route('dashboard') }}">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500 dark:text-gray-400" />
+            <div class="flex flex-col items-center">
+                <a href="/" class="flex flex-col items-center gap-2 group">
+                    <x-application-logo class="w-24 h-24 transition-transform duration-200 group-hover:scale-105" />
+                    <span class="font-bold text-2xl text-gray-900 dark:text-gray-100 tracking-tight">ENGI-MATE</span>
+                    <span class="text-xs font-medium text-orange-600 dark:text-orange-400 -mt-1">{{ __('Your Engineering Work Assistant') }}</span>
                 </a>
             </div>
 

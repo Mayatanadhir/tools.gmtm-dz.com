@@ -96,4 +96,18 @@ class ProfileTest extends TestCase
 
         $this->assertNotNull($user->fresh());
     }
+
+    public function test_profile_page_renders_dark_mode_classes(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->get('/profile');
+
+        $response->assertOk();
+        $response->assertSee('dark:bg-gray-800');
+        $response->assertSee('dark:text-gray-200');
+        $response->assertSee('dark:text-gray-100');
+    }
 }
