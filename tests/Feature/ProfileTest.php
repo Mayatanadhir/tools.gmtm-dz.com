@@ -3,12 +3,22 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seed(RolesAndPermissionsSeeder::class);
+    }
 
     public function test_profile_page_is_displayed(): void
     {
@@ -109,5 +119,75 @@ class ProfileTest extends TestCase
         $response->assertSee('dark:bg-gray-800');
         $response->assertSee('dark:text-gray-200');
         $response->assertSee('dark:text-gray-100');
+    }
+
+    public function test_user_can_upload_profile_photo_via_profile_form(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->patch('/profile', [
+                'name' => $user->name,
+                'email' => $user->email,
+                'photo' => UploadedFile::fake()->image('avatar.jpg', 100, 100),
+            ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/profile');
+
+        $user->refresh();
+        $this->assertNotNull($user->profile_photo_path);
+        Storage::disk('public')->assertExists($user->profile_photo_path);
+    }
+
+    public function test_user_can_remove_profile_photo_via_profile_form(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create();
+
+        // First upload a photo
+        $this->actingAs($user)->patch('/profile', [
+            'name' => $user->name,
+            'email' => $user->email,
+            'photo' => UploadedFile::fake()->image('avatar.jpg', 100, 100),
+        ]);
+
+        $user->refresh();
+        $existingPath = $user->profile_photo_path;
+        $this->assertNotNull($existingPath);
+
+        // Now remove it
+        $response = $this->actingAs($user)->patch('/profile', [
+            'name' => $user->name,
+            'email' => $user->email,
+            'remove_photo' => '1',
+        ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/profile');
+
+        $user->refresh();
+        $this->assertNull($user->profile_photo_path);
+        Storage::disk('public')->assertMissing($existingPath);
+    }
+
+    public function test_super_admin_cannot_delete_own_account_via_profile(): void
+    {
+        $user = User::factory()->superAdmin()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->delete('/profile', [
+                'password' => 'password',
+            ]);
+
+        $response->assertRedirect('/profile');
+        $this->assertNotNull($user->fresh());
     }
 }

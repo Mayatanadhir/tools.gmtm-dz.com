@@ -10,18 +10,18 @@
                 </p>
             </div>
             <div class="flex items-center gap-2">
-                <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/20 text-xs font-semibold">
+                <x-badge variant="info" size="md">
                     {{ $jobs->total() }} {{ __('Pending') }}
-                </span>
-                <span class="inline-flex items-center px-3 py-1 rounded-full {{ $failedJobs->total() > 0 ? 'bg-rose-500/10 text-rose-600 border-rose-500/20' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300' }} border text-xs font-semibold">
+                </x-badge>
+                <x-badge :variant="$failedJobs->total() > 0 ? 'danger' : 'neutral'" size="md">
                     {{ $failedJobs->total() }} {{ __('Failed') }}
-                </span>
+                </x-badge>
             </div>
         </div>
     </x-slot>
 
     <div class="py-8" x-data="{ currentTab: '{{ in_array($tab, ['jobs', 'failed', 'batches']) ? $tab : 'jobs' }}', errorModalOpen: false, errorTitle: '', errorTrace: '' }">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col lg:flex-row gap-6 items-start">
                 <!-- Sidebar Navigation -->
                 <aside class="w-full lg:w-64 shrink-0">
@@ -70,9 +70,9 @@
                             <x-table.tr>
                                 <x-table.td class="font-mono font-bold text-gray-900 dark:text-white">#{{ $j->id }}</x-table.td>
                                 <x-table.td>
-                                    <span class="px-2 py-0.5 rounded font-mono bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                                    <x-badge variant="info">
                                         {{ $j->queue }}
-                                    </span>
+                                    </x-badge>
                                 </x-table.td>
                                 <x-table.td class="font-bold">{{ $j->attempts }}</x-table.td>
                                 <x-table.td class="font-mono text-xs">

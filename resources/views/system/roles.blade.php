@@ -10,42 +10,47 @@
                 </p>
             </div>
             <div class="flex items-center gap-2">
-                <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 text-xs font-semibold">
+                <x-badge variant="info" size="md">
                     {{ $roles->count() }} {{ __('Roles') }}
-                </span>
-                <span class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-semibold">
+                </x-badge>
+                <x-badge variant="success" size="md">
                     {{ $permissions->total() }} {{ __('Permissions') }}
-                </span>
+                </x-badge>
             </div>
         </div>
     </x-slot>
 
     <div class="py-8" x-data="{
-        showRoleModal: {{ ($errors->any() && old('form_type') === 'role') ? 'true' : 'false' }},
-        showPermissionModal: {{ ($errors->any() && old('form_type') === 'permission') ? 'true' : 'false' }},
-        showEditRoleModal: {{ ($errors->any() && old('form_type') === 'edit_role') ? 'true' : 'false' }},
-        showEditPermissionModal: {{ ($errors->any() && old('form_type') === 'edit_permission') ? 'true' : 'false' }},
-        showDeleteRoleModal: false,
+        showRoleModal:            {{ ($errors->any() && old('form_type') === 'role') ? 'true' : 'false' }},
+        showPermissionModal:      {{ ($errors->any() && old('form_type') === 'permission') ? 'true' : 'false' }},
+        showEditRoleModal:        {{ ($errors->any() && old('form_type') === 'edit_role') ? 'true' : 'false' }},
+        showEditPermissionModal:  {{ ($errors->any() && old('form_type') === 'edit_permission') ? 'true' : 'false' }},
+        showDeleteRoleModal:       false,
         showDeletePermissionModal: false,
+        showPermissionsCatalog:   {{ ($errors->any() && in_array(old('form_type'), ['permission', 'edit_permission'])) ? 'true' : 'false' }},
 
-        editRoleId: {{ old('form_type') === 'edit_role' ? (int) old('edit_role_id', 0) : 'null' }},
-        editRoleName: '{{ old('form_type') === 'edit_role' ? addslashes((string) old('name', '')) : '' }}',
-        editRolePermissions: {{ old('form_type') === 'edit_role' ? json_encode(old('permissions', [])) : '[]' }},
-        editRoleActionUrl: '{{ old('form_type') === 'edit_role' && old('edit_role_id') ? route('system-tables.roles.update', (int) old('edit_role_id')) : '' }}',
+        createRolePermissions:    {{ (old('form_type') === 'role' && is_array(old('permissions'))) ? json_encode(old('permissions')) : '[]' }},
 
-        editPermissionId: {{ old('form_type') === 'edit_permission' ? (int) old('edit_permission_id', 0) : 'null' }},
-        editPermissionName: '{{ old('form_type') === 'edit_permission' ? addslashes((string) old('name', '')) : '' }}',
-        editPermissionActionUrl: '{{ old('form_type') === 'edit_permission' && old('edit_permission_id') ? route('system-tables.permissions.update', (int) old('edit_permission_id')) : '' }}',
+        editRoleId:               {{ old('form_type') === 'edit_role' ? (int) old('edit_role_id', 0) : 'null' }},
+        editRoleName:             '{{ old('form_type') === 'edit_role' ? addslashes((string) old('name', '')) : '' }}',
+        editRolePermissions:      {{ old('form_type') === 'edit_role' && is_array(old('permissions')) ? json_encode(old('permissions')) : '[]' }},
+        editRoleActionUrl:        '{{ old('form_type') === 'edit_role' && old('edit_role_id') ? route('system-tables.roles.update', (int) old('edit_role_id')) : '' }}',
 
-        deleteRoleName: '',
-        deleteRoleActionUrl: '',
-        deletePermissionName: '',
-        deletePermissionActionUrl: '',
+        editPermissionId:         {{ old('form_type') === 'edit_permission' ? (int) old('edit_permission_id', 0) : 'null' }},
+        editPermissionName:       '{{ old('form_type') === 'edit_permission' ? addslashes((string) old('name', '')) : '' }}',
+        editPermissionActionUrl:  '{{ old('form_type') === 'edit_permission' && old('edit_permission_id') ? route('system-tables.permissions.update', (int) old('edit_permission_id')) : '' }}',
+
+        deleteRoleName:             '',
+        deleteRoleActionUrl:        '',
+        deletePermissionName:       '',
+        deletePermissionActionUrl:  '',
+
+        allPermissionNames:       {{ json_encode($permissionMatrix['all_names']) }},
 
         openEditRoleModal(id, name, permissions, actionUrl) {
             this.editRoleId = id;
             this.editRoleName = name;
-            this.editRolePermissions = permissions;
+            this.editRolePermissions = Array.isArray(permissions) ? [...permissions] : [];
             this.editRoleActionUrl = actionUrl;
             this.showEditRoleModal = true;
         },
@@ -69,23 +74,49 @@
             this.showDeletePermissionModal = true;
         },
 
-        isPermissionSelected(permName) {
-            return Array.isArray(this.editRolePermissions) && this.editRolePermissions.includes(permName);
+        toggleCreateEntityAll(actions) {
+            const allSelected = actions.every(p => this.createRolePermissions.includes(p));
+            if (allSelected) {
+                this.createRolePermissions = this.createRolePermissions.filter(p => !actions.includes(p));
+            } else {
+                actions.forEach(p => {
+                    if (!this.createRolePermissions.includes(p)) {
+                        this.createRolePermissions.push(p);
+                    }
+                });
+            }
         },
 
-        togglePermission(permName) {
-            if (!Array.isArray(this.editRolePermissions)) {
-                this.editRolePermissions = [];
-            }
-            const idx = this.editRolePermissions.indexOf(permName);
-            if (idx > -1) {
-                this.editRolePermissions.splice(idx, 1);
+        toggleEditEntityAll(actions) {
+            const allSelected = actions.every(p => this.editRolePermissions.includes(p));
+            if (allSelected) {
+                this.editRolePermissions = this.editRolePermissions.filter(p => !actions.includes(p));
             } else {
-                this.editRolePermissions.push(permName);
+                actions.forEach(p => {
+                    if (!this.editRolePermissions.includes(p)) {
+                        this.editRolePermissions.push(p);
+                    }
+                });
             }
+        },
+
+        selectAllCreate() {
+            this.createRolePermissions = [...this.allPermissionNames];
+        },
+
+        deselectAllCreate() {
+            this.createRolePermissions = [];
+        },
+
+        selectAllEdit() {
+            this.editRolePermissions = [...this.allPermissionNames];
+        },
+
+        deselectAllEdit() {
+            this.editRolePermissions = [];
         }
     }">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col lg:flex-row gap-6 items-start">
                 <!-- Sidebar Navigation -->
                 <aside class="w-full lg:w-64 shrink-0">
@@ -96,592 +127,620 @@
                 <main class="flex-1 w-full min-w-0 space-y-8">
 
                     @if (session('status'))
-                        <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-sm flex items-center justify-between shadow-sm">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <span>{{ session('status') }}</span>
-                            </div>
-                        </div>
+                        <x-alert variant="success">
+                            {{ session('status') }}
+                        </x-alert>
                     @endif
 
-            <!-- Roles Cards Grid -->
-            <div>
-                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                        <span>{{ __('Configured Roles') }} (<code>roles</code>, <code>role_has_permissions</code>, <code>model_has_roles</code>)</span>
-                    </h3>
-                    <x-primary-button type="button" @click="showRoleModal = true" class="py-1.5 px-3 text-xs rounded-lg flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        <span>{{ __('New Role') }}</span>
-                    </x-primary-button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    @forelse($roles as $role)
-                        <div class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700/60 flex flex-col justify-between">
-                            <div>
-                                <div class="flex items-center justify-between mb-3">
-                                    <h4 class="text-lg font-bold text-gray-900 dark:text-white">{{ $role->name }}</h4>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                                        {{ $role->guard_name }}
-                                    </span>
+                    <!-- ============================================================ -->
+                    <!-- Permissions Catalog Section (Collapsible & On-Demand)        -->
+                    <!-- ============================================================ -->
+                    <div class="rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/60 p-5 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center shrink-0 me-3.5">
+                                    <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
                                 </div>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                                    {{ $role->users_count }} {{ __('Users assigned') }}
-                                </p>
-
-                                <div class="space-y-1.5">
-                                    <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">
-                                        {{ __('Granted Permissions') }} ({{ $role->permissions->count() }}):
+                                <div>
+                                    <div class="flex items-center gap-2.5 flex-wrap">
+                                        <h3 class="text-base font-bold text-gray-900 dark:text-white">
+                                             {{ __('Permissions Catalog') }}
+                                        </h3>
+                                        <x-badge variant="success" class="ms-1.5">
+                                            {{ __('Automated Engine') }}
+                                        </x-badge>
+                                    </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                        {{ __('Managed automatically by the Schema Introspection Engine. Hidden by default for clean administration.') }}
                                     </p>
-                                    <div class="flex flex-wrap gap-1.5">
-                                        @forelse($role->permissions as $perm)
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-700/50">
-                                                {{ $perm->name }}
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2.5 shrink-0">
+                                <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                    {{ $permissions->total() }} {{ __('Total permissions') }}
+                                </span>
+                                <x-secondary-button
+                                    type="button"
+                                    @click="showPermissionsCatalog = !showPermissionsCatalog"
+                                    class="py-1.5 px-3 text-xs rounded-lg flex items-center gap-1.5"
+                                >
+                                    <svg class="w-4 h-4 transition-transform duration-200 me-1" :class="{ 'rotate-180': showPermissionsCatalog }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                    <span x-text="showPermissionsCatalog ? '{{ __('Hide Permissions Catalog') }}' : '{{ __('Manage Permissions Catalog') }}'"></span>
+                                </x-secondary-button>
+                                <div x-show="showPermissionsCatalog" x-cloak>
+                                    <x-primary-button type="button" @click="showPermissionModal = true" class="py-1.5 px-3 text-xs rounded-lg flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                        <span>{{ __('New Permission') }}</span>
+                                    </x-primary-button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Collapsible Table Content -->
+                        <div x-show="showPermissionsCatalog" x-cloak class="pt-3 border-t border-gray-100 dark:border-gray-700/60">
+                            <x-table>
+                                <x-slot:header>
+                                    <x-table.th>ID</x-table.th>
+                                    <x-table.th>{{ __('Name') }}</x-table.th>
+                                    <x-table.th>{{ __('Guard') }}</x-table.th>
+                                    <x-table.th>{{ __('Roles using it') }}</x-table.th>
+                                    <x-table.th>{{ __('Date') }}</x-table.th>
+                                    <x-table.th class="text-end">{{ __('Actions') }}</x-table.th>
+                                </x-slot:header>
+
+                                @forelse($permissions as $permission)
+                                    <x-table.tr>
+                                        <x-table.td class="font-mono font-bold text-gray-900 dark:text-white">#{{ $permission->id }}</x-table.td>
+                                        <x-table.td class="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                                            {{ $permission->name }}
+                                        </x-table.td>
+                                        <x-table.td>
+                                            <span class="px-2 py-0.5 rounded text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                                                {{ $permission->guard_name }}
                                             </span>
-                                        @empty
-                                            <span class="text-xs text-gray-400 italic">{{ __('No permissions directly attached.') }}</span>
-                                        @endforelse
-                                    </div>
-                                </div>
-                            </div>
+                                        </x-table.td>
+                                        <x-table.td class="font-bold text-gray-800 dark:text-gray-200">
+                                            {{ $permission->roles_count }}
+                                        </x-table.td>
+                                        <x-table.td class="whitespace-nowrap">
+                                            {{ $permission->created_at?->format('Y-m-d H:i') }}
+                                        </x-table.td>
+                                        <x-table.td class="whitespace-nowrap text-end">
+                                            <x-table.actions class="justify-end">
+                                                <x-table.action-edit
+                                                    :title="__('Edit Permission')"
+                                                    @click="openEditPermissionModal({{ $permission->id }}, '{{ addslashes($permission->name) }}', '{{ route('system-tables.permissions.update', $permission) }}')"
+                                                />
+                                                <x-table.action-delete
+                                                    :title="__('Delete Permission')"
+                                                    @click="openDeletePermissionModal('{{ addslashes($permission->name) }}', '{{ route('system-tables.permissions.destroy', $permission) }}')"
+                                                />
+                                            </x-table.actions>
+                                        </x-table.td>
+                                    </x-table.tr>
+                                @empty
+                                    <x-table.empty colspan="6" />
+                                @endforelse
 
-                            <div class="mt-6 pt-3 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between">
-                                <span class="text-xs font-mono text-gray-400">ID: #{{ $role->id }} &bull; {{ $role->created_at?->format('Y-m-d') }}</span>
-                                <x-table.actions>
-                                    <x-table.action-edit :title="__('Edit Role')" @click="openEditRoleModal({{ $role->id }}, '{{ addslashes($role->name) }}', {{ json_encode($role->permissions->pluck('name')->values()->all()) }}, '{{ route('system-tables.roles.update', $role) }}')" />
-                                    <x-table.action-delete :title="__('Delete Role')" @click="openDeleteRoleModal('{{ addslashes($role->name) }}', '{{ route('system-tables.roles.destroy', $role) }}')"/>
-                                </x-table.actions>
-                            </div>
+                                @if($permissions->hasPages())
+                                    <x-slot:pagination>
+                                        {{ $permissions->links() }}
+                                    </x-slot:pagination>
+                                @endif
+                            </x-table>
                         </div>
-                    @empty
-                        <div class="col-span-3 p-8 text-center bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700/60 text-gray-500">
-                            {{ __('No records found.') }}
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-
-            <!-- Permissions Catalog Section -->
-            <x-table>
-                <x-slot:toolbar>
-                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                        <span>{{ __('Permissions Catalog') }} (<code>permissions</code>, <code>model_has_permissions</code>)</span>
-                    </h3>
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                            {{ $permissions->total() }} {{ __('Total permissions') }}
-                        </span>
-                        <x-primary-button type="button" @click="showPermissionModal = true" class="py-1.5 px-3 text-xs rounded-lg flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            <span>{{ __('New Permission') }}</span>
-                        </x-primary-button>
                     </div>
-                </x-slot:toolbar>
 
-                <x-slot:header>
-                    <x-table.th>ID</x-table.th>
-                    <x-table.th>{{ __('Name') }}</x-table.th>
-                    <x-table.th>{{ __('Guard') }}</x-table.th>
-                    <x-table.th>{{ __('Roles using it') }}</x-table.th>
-                    <x-table.th>{{ __('Date') }}</x-table.th>
-                    <x-table.th class="text-end">{{ __('Actions') }}</x-table.th>
-                </x-slot:header>
+                    <!-- ============================================================ -->
+                    <!-- Configured Roles Section — Unified Table Component          -->
+                    <!-- ============================================================ -->
+                    <div class="space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-indigo-500 shrink-0 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                                    <span>{{ __('Configured Roles') }}</span>
+                                </h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                    {{ __('Role definitions, functional scopes, and granted table privileges') }}
+                                    <span class="text-gray-400 dark:text-gray-500">&bull;</span>
+                                    <span class="font-mono text-[11px] text-gray-400">({{ __('RBAC Tables') }}: <code>roles</code>, <code>role_has_permissions</code>, <code>model_has_roles</code>)</span>
+                                </p>
+                            </div>
+                            <x-primary-button type="button" @click="showRoleModal = true" class="py-1.5 px-3 text-xs rounded-lg flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                <span>{{ __('New Role') }}</span>
+                            </x-primary-button>
+                        </div>
 
-                @forelse($permissions as $permission)
-                    <x-table.tr>
-                        <x-table.td class="font-mono font-bold text-gray-900 dark:text-white">#{{ $permission->id }}</x-table.td>
-                        <x-table.td class="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
-                            {{ $permission->name }}
-                        </x-table.td>
-                        <x-table.td>
-                            <span class="px-2 py-0.5 rounded text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-                                {{ $permission->guard_name }}
-                            </span>
-                        </x-table.td>
-                        <x-table.td class="font-bold text-gray-800 dark:text-gray-200">
-                            {{ $permission->roles_count }}
-                        </x-table.td>
-                        <x-table.td class="whitespace-nowrap">
-                            {{ $permission->created_at?->format('Y-m-d H:i') }}
-                        </x-table.td>
-                        <x-table.td class="whitespace-nowrap text-end">
-                            <x-table.actions class="justify-end">
-                                <x-table.action-edit :title="__('Edit Permission')" @click="openEditPermissionModal({{ $permission->id }}, '{{ addslashes($permission->name) }}', '{{ route('system-tables.permissions.update', $permission) }}')" />
-                                <x-table.action-delete :title="__('Delete Permission')" @click="openDeletePermissionModal('{{ addslashes($permission->name) }}', '{{ route('system-tables.permissions.destroy', $permission) }}')"/>
-                            </x-table.actions>
-                        </x-table.td>
-                    </x-table.tr>
-                @empty
-                    <x-table.empty colspan="6" />
-                @endforelse
+                        <x-table>
+                            <x-slot:header>
+                                <x-table.th class="w-16">ID</x-table.th>
+                                <x-table.th>{{ __('Role & Function') }}</x-table.th>
+                                <x-table.th>{{ __('Functional Scope') }}</x-table.th>
+                                <x-table.th class="text-center">{{ __('Assigned Users') }}</x-table.th>
+                                <x-table.th>{{ __('Privileges Scope') }}</x-table.th>
+                                <x-table.th>{{ __('Role Status') }}</x-table.th>
+                                <x-table.th class="text-end">{{ __('Actions') }}</x-table.th>
+                            </x-slot:header>
 
-                @if($permissions->hasPages())
-                    <x-slot:pagination>
-                        {{ $permissions->links() }}
-                    </x-slot:pagination>
-                @endif
-            </x-table>
+                            @forelse($roles as $role)
+                                @php
+                                    $isSuper = in_array($role->name, $superRoles ?? ['Super-Admin'], true);
+                                    $isDefault = $role->name === ($defaultRole ?? 'User');
+                                @endphp
+                                <x-table.tr>
+                                    {{-- ID --}}
+                                    <x-table.td class="font-mono font-bold text-gray-900 dark:text-white whitespace-nowrap">
+                                        #{{ $role->id }}
+                                    </x-table.td>
 
-            <!-- Create Role Modal (Alpine.js) -->
-            <div x-cloak x-show="showRoleModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="role-modal-title" role="dialog" aria-modal="true">
-                <!-- Backdrop -->
-                <div x-show="showRoleModal"
-                     x-transition:enter="ease-out duration-300"
-                     x-transition:enter-start="opacity-0"
-                     x-transition:enter-end="opacity-100"
-                     x-transition:leave="ease-in duration-200"
-                     x-transition:leave-start="opacity-100"
-                     x-transition:leave-end="opacity-0"
-                     class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
-                     @click="showRoleModal = false"></div>
-
-                <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                    <div x-show="showRoleModal"
-                         x-transition:enter="ease-out duration-300"
-                         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                         x-transition:leave="ease-in duration-200"
-                         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                         class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-start shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-xl border border-gray-100 dark:border-gray-700">
-
-                        <form method="POST" action="{{ route('system-tables.roles.store') }}">
-                            @csrf
-                            <input type="hidden" name="form_type" value="role">
-
-                            <div class="px-6 pt-6 pb-4">
-                                <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-700">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="w-9 h-9 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                                    {{-- Role & Function --}}
+                                    <x-table.td>
+                                        <div class="flex flex-col gap-1">
+                                            <span class="text-sm font-bold text-gray-900 dark:text-white">
+                                                {{ $discoveryService->getRoleFunctionalTitle($role->name) }}
+                                            </span>
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="font-mono text-xs text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700/60 px-1.5 py-0.5 rounded">
+                                                    {{ $role->name }}
+                                                </span>
+                                                <span class="text-[11px] text-gray-400 font-mono">
+                                                    ({{ $role->guard_name }})
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h3 class="text-base font-bold text-gray-900 dark:text-white" id="role-modal-title">
-                                                {{ __('Create New System Role') }}
-                                            </h3>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">
-                                                {{ __('Define a new access role and configure its granted permissions.') }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <button type="button" @click="showRoleModal = false" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
-                                        <span class="sr-only">{{ __('Close') }}</span>
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                    </button>
-                                </div>
+                                    </x-table.td>
 
-                                <div class="mt-4 space-y-4">
-                                    <!-- Role Name -->
-                                    <div>
-                                        <x-input-label for="new_role_name" :value="__('Role Name')" />
-                                        <x-text-input id="new_role_name" name="name" type="text" class="mt-1 block w-full text-sm" :value="old('form_type') === 'role' ? old('name') : ''" required autofocus placeholder="{{ __('e.g. Editor, Supervisor') }}" />
-                                        <x-input-error :messages="old('form_type') === 'role' ? $errors->get('name') : []" class="mt-1 text-xs" />
-                                    </div>
-
-                                    <!-- Permissions -->
-                                    <div>
-                                        <x-input-label :value="__('Assign Permissions (Optional)')" />
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                                            {{ __('Select the permission privileges to attach to this role.') }}
+                                    {{-- Functional Scope --}}
+                                    <x-table.td class="max-w-xs">
+                                        <p class="text-xs text-gray-600 dark:text-gray-300" title="{{ $discoveryService->getRoleFunctionalScope($role->name) }}">
+                                            {{ $discoveryService->getRoleFunctionalScope($role->name) }}
                                         </p>
-                                        <div class="max-h-52 overflow-y-auto rounded-xl border border-gray-200 dark:border-gray-700 p-3 bg-gray-50/50 dark:bg-gray-900/30 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                            @forelse($allPermissions as $perm)
-                                                <label class="flex items-center gap-2 p-2 rounded-lg hover:bg-white dark:hover:bg-gray-800 transition-colors cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
-                                                    <input type="checkbox" name="permissions[]" value="{{ $perm->name }}" {{ (old('form_type') === 'role' && is_array(old('permissions')) && in_array($perm->name, old('permissions'))) ? 'checked' : '' }} class="rounded border-gray-300 dark:border-gray-600 text-orange-500 focus:ring-orange-500">
-                                                    <span class="text-xs font-mono font-medium text-gray-700 dark:text-gray-300 truncate">{{ $perm->name }}</span>
-                                                </label>
-                                            @empty
-                                                <div class="col-span-2 text-xs text-gray-400 italic py-2 text-center">
-                                                    {{ __('No permissions available in the system catalog.') }}
-                                                </div>
-                                            @endforelse
-                                        </div>
-                                        <x-input-error :messages="old('form_type') === 'role' ? $errors->get('permissions') : []" class="mt-1 text-xs" />
-                                    </div>
-                                </div>
-                            </div>
+                                    </x-table.td>
 
-                            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-end gap-3 rounded-b-2xl">
-                                <x-secondary-button type="button" @click="showRoleModal = false">
-                                    {{ __('Cancel') }}
-                                </x-secondary-button>
+                                    {{-- Assigned Users --}}
+                                    <x-table.td class="text-center whitespace-nowrap">
+                                        <span class="inline-flex items-center gap-1 font-bold text-gray-800 dark:text-gray-200">
+                                            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                            <span>{{ $role->users_count }}</span>
+                                        </span>
+                                    </x-table.td>
 
-                                <x-primary-button type="submit">
-                                    <svg class="w-4 h-4 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                    {{ __('Create Role') }}
-                                </x-primary-button>
-                            </div>
-                        </form>
+                                    {{-- Privileges Scope --}}
+                                    <x-table.td>
+                                        @if($isSuper)
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                {{ __('All System Privileges') }} ({{ $role->permissions->count() }})
+                                            </span>
+                                        @else
+                                            <div class="flex items-center gap-1.5 flex-wrap">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-700/60">
+                                                    {{ $role->permissions->count() }} {{ __('Permissions') }}
+                                                </span>
+                                                @foreach($role->permissions->take(3) as $perm)
+                                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-mono bg-gray-100 dark:bg-gray-700/60 text-gray-600 dark:text-gray-300">
+                                                        {{ $perm->name }}
+                                                    </span>
+                                                @endforeach
+                                                @if($role->permissions->count() > 3)
+                                                    <span class="text-[11px] text-gray-400 font-medium">+{{ $role->permissions->count() - 3 }}</span>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </x-table.td>
+
+                                    {{-- Role Status --}}
+                                    <x-table.td class="whitespace-nowrap">
+                                        @if($isSuper)
+                                            <x-badge variant="warning">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                                {{ __('Protected System Role') }}
+                                            </x-badge>
+                                        @elseif($isDefault)
+                                            <x-badge variant="info">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                                {{ __('Default Role') }}
+                                            </x-badge>
+                                        @else
+                                            <x-badge variant="neutral">
+                                                {{ __('Custom Role') }}
+                                            </x-badge>
+                                        @endif
+                                    </x-table.td>
+
+                                    {{-- Actions --}}
+                                    <x-table.td class="whitespace-nowrap text-end">
+                                        <x-table.actions class="justify-end">
+                                            @if($isSuper)
+                                                <span class="text-xs text-gray-400 italic">
+                                                    {{ __('Immutable') }}
+                                                </span>
+                                            @elseif($isDefault)
+                                                <x-table.action-edit
+                                                    :title="__('Edit Role')"
+                                                    @click="openEditRoleModal({{ $role->id }}, '{{ addslashes($role->name) }}', {{ json_encode($role->permissions->pluck('name')->values()->all()) }}, '{{ route('system-tables.roles.update', $role) }}')"
+                                                />
+                                            @else
+                                                <x-table.action-edit
+                                                    :title="__('Edit Role')"
+                                                    @click="openEditRoleModal({{ $role->id }}, '{{ addslashes($role->name) }}', {{ json_encode($role->permissions->pluck('name')->values()->all()) }}, '{{ route('system-tables.roles.update', $role) }}')"
+                                                />
+                                                <x-table.action-delete
+                                                    :title="__('Delete Role')"
+                                                    @click="openDeleteRoleModal('{{ addslashes($role->name) }}', '{{ route('system-tables.roles.destroy', $role) }}')"
+                                                />
+                                            @endif
+                                        </x-table.actions>
+                                    </x-table.td>
+                                </x-table.tr>
+                            @empty
+                                <x-table.empty colspan="7" />
+                            @endforelse
+                        </x-table>
                     </div>
-                </div>
-            </div>
 
-            <!-- Create Permission Modal (Alpine.js) -->
-            <div x-cloak x-show="showPermissionModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="perm-modal-title" role="dialog" aria-modal="true">
-                <!-- Backdrop -->
-                <div x-show="showPermissionModal"
-                     x-transition:enter="ease-out duration-300"
-                     x-transition:enter-start="opacity-0"
-                     x-transition:enter-end="opacity-100"
-                     x-transition:leave="ease-in duration-200"
-                     x-transition:leave-start="opacity-100"
-                     x-transition:leave-end="opacity-0"
-                     class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
-                     @click="showPermissionModal = false"></div>
+                    <!-- ============================================================ -->
+                    <!-- Create Role Modal — x-crud-modal.form                        -->
+                    <!-- ============================================================ -->
+                    <x-crud-modal.form
+                        show="showRoleModal"
+                        :action-url="route('system-tables.roles.store')"
+                        method="POST"
+                        :title="__('Create New System Role')"
+                        :description="__('Define a new access role and configure its granted permissions.')"
+                        icon-color="indigo"
+                        :submit-text="__('Create Role')"
+                        max-width="3xl"
+                    >
+                        <x-slot:hidden>
+                            <input type="hidden" name="form_type" value="role">
+                        </x-slot:hidden>
 
-                <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                    <div x-show="showPermissionModal"
-                         x-transition:enter="ease-out duration-300"
-                         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                         x-transition:leave="ease-in duration-200"
-                         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                         class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-start shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-100 dark:border-gray-700">
+                        <!-- Role Name -->
+                        <div>
+                            <x-input-label for="new_role_name" :value="__('Role Name')" />
+                            <x-text-input
+                                id="new_role_name"
+                                name="name"
+                                type="text"
+                                class="mt-1 block w-full text-sm"
+                                :value="old('form_type') === 'role' ? old('name') : ''"
+                                required
+                                autofocus
+                                placeholder="{{ __('e.g. Editor, Supervisor') }}"
+                            />
+                            <x-input-error :messages="old('form_type') === 'role' ? $errors->get('name') : []" class="mt-1 text-xs" />
+                        </div>
 
-                        <form method="POST" action="{{ route('system-tables.permissions.store') }}">
-                            @csrf
-                            <input type="hidden" name="form_type" value="permission">
-
-                            <div class="px-6 pt-6 pb-4">
-                                <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-700">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                                        </div>
-                                        <div>
-                                            <h3 class="text-base font-bold text-gray-900 dark:text-white" id="perm-modal-title">
-                                                {{ __('Create New Permission') }}
-                                            </h3>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">
-                                                {{ __('Register a new permission into the system access catalog.') }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <button type="button" @click="showPermissionModal = false" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
-                                        <span class="sr-only">{{ __('Close') }}</span>
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <!-- Dynamic Permission Matrix by Entity -->
+                        <div class="space-y-3">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                <div>
+                                    <x-input-label :value="__('Permission Matrix by Entity')" />
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        {{ __('Assign fine-grained CRUD privileges grouped automatically by database table.') }}
+                                    </p>
+                                </div>
+                                <div class="flex items-center gap-2 text-xs">
+                                    <button type="button"
+                                            @click="selectAllCreate()"
+                                            class="font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 hover:underline">
+                                        {{ __('Select All') }}
+                                    </button>
+                                    <span class="text-gray-300 dark:text-gray-600">&bull;</span>
+                                    <button type="button"
+                                            @click="deselectAllCreate()"
+                                            class="font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 hover:underline">
+                                        {{ __('Deselect All') }}
                                     </button>
                                 </div>
+                            </div>
 
-                                <div class="mt-4 space-y-4">
-                                    <!-- Permission Name -->
-                                    <div>
-                                        <x-input-label for="new_permission_name" :value="__('Permission Name')" />
-                                        <x-text-input id="new_permission_name" name="name" type="text" class="mt-1 block w-full text-sm" :value="old('form_type') === 'permission' ? old('name') : ''" required autofocus placeholder="{{ __('e.g. view-reports, manage-billing') }}" />
-                                        <x-input-error :messages="old('form_type') === 'permission' ? $errors->get('name') : []" class="mt-1 text-xs" />
+                            <!-- Matrix Table Container -->
+                            <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm max-h-64 overflow-y-auto">
+                                <table class="w-full text-xs text-start border-collapse">
+                                    <thead class="sticky top-0 bg-gray-50 dark:bg-gray-900/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 z-10">
+                                        <tr>
+                                            <th class="py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-200 text-start">{{ __('Table / Entity') }}</th>
+                                            <th class="py-2.5 px-2 font-semibold text-center text-emerald-600 dark:text-emerald-400 w-16">{{ __('View') }}</th>
+                                            <th class="py-2.5 px-2 font-semibold text-center text-orange-600 dark:text-orange-400 w-16">{{ __('Create') }}</th>
+                                            <th class="py-2.5 px-2 font-semibold text-center text-amber-600 dark:text-amber-400 w-16">{{ __('Edit') }}</th>
+                                            <th class="py-2.5 px-2 font-semibold text-center text-rose-600 dark:text-rose-400 w-16">{{ __('Delete') }}</th>
+                                            <th class="py-2.5 px-3 font-semibold text-end text-gray-500 w-28">{{ __('Toggle Row') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700/60">
+                                        @forelse($permissionMatrix['entities'] as $entity => $actions)
+                                            <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-700/30 transition-colors">
+                                                <td class="py-2.5 px-3 font-medium text-gray-900 dark:text-white">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="w-2 h-2 rounded-full bg-orange-500 shrink-0"></span>
+                                                        <span class="font-mono capitalize font-bold text-xs">{{ $entity }}</span>
+                                                    </div>
+                                                </td>
+                                                @foreach(['view', 'create', 'edit', 'delete'] as $act)
+                                                    <td class="py-2.5 px-2 text-center align-middle">
+                                                        @if(isset($actions[$act]))
+                                                            <input type="checkbox"
+                                                                   name="permissions[]"
+                                                                   value="{{ $actions[$act] }}"
+                                                                   x-model="createRolePermissions"
+                                                                   class="rounded border-gray-300 dark:border-gray-600 text-orange-500 focus:ring-orange-500 cursor-pointer w-4 h-4"
+                                                                   title="{{ $actions[$act] }}">
+                                                        @else
+                                                            <span class="text-gray-300 dark:text-gray-600 text-xs">&mdash;</span>
+                                                        @endif
+                                                    </td>
+                                                @endforeach
+                                                <td class="py-2.5 px-3 text-end align-middle">
+                                                    <button type="button"
+                                                            @click="toggleCreateEntityAll({{ json_encode(array_values($actions)) }})"
+                                                            class="text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 px-2.5 py-1 rounded border border-indigo-200/60 dark:border-indigo-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors whitespace-nowrap">
+                                                        {{ __('Toggle All') }}
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="6" class="py-4 text-center text-gray-400 italic">
+                                                    {{ __('No standard entities found.') }}
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            @if(!empty($permissionMatrix['custom']))
+                                <!-- Additional System Permissions -->
+                                <div class="pt-2">
+                                    <x-input-label :value="__('Additional System Permissions')" />
+                                    <div class="mt-1.5 flex flex-wrap gap-2">
+                                        @foreach($permissionMatrix['custom'] as $customPerm)
+                                            <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/30 text-xs cursor-pointer hover:bg-white dark:hover:bg-gray-800 transition-colors">
+                                                <input type="checkbox"
+                                                       name="permissions[]"
+                                                       value="{{ $customPerm }}"
+                                                       x-model="createRolePermissions"
+                                                       class="rounded border-gray-300 dark:border-gray-600 text-orange-500 focus:ring-orange-500 w-4 h-4">
+                                                <span class="font-mono text-gray-700 dark:text-gray-300">{{ $customPerm }}</span>
+                                            </label>
+                                        @endforeach
                                     </div>
                                 </div>
-                            </div>
+                            @endif
 
-                            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-end gap-3 rounded-b-2xl">
-                                <x-secondary-button type="button" @click="showPermissionModal = false">
-                                    {{ __('Cancel') }}
-                                </x-secondary-button>
+                            <x-input-error :messages="old('form_type') === 'role' ? $errors->get('permissions') : []" class="mt-1 text-xs" />
+                        </div>
+                    </x-crud-modal.form>
 
-                                <x-primary-button type="submit">
-                                    <svg class="w-4 h-4 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                    {{ __('Create Permission') }}
-                                </x-primary-button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+                    <!-- ============================================================ -->
+                    <!-- Create Permission Modal — x-crud-modal.form                  -->
+                    <!-- ============================================================ -->
+                    <x-crud-modal.form
+                        show="showPermissionModal"
+                        :action-url="route('system-tables.permissions.store')"
+                        method="POST"
+                        :title="__('Create New Permission')"
+                        :description="__('Register a new permission into the system access catalog.')"
+                        icon-color="emerald"
+                        :submit-text="__('Create Permission')"
+                    >
+                        <x-slot:hidden>
+                            <input type="hidden" name="form_type" value="permission">
+                        </x-slot:hidden>
 
-            <!-- Edit Role Modal (Alpine.js) -->
-            <div x-cloak x-show="showEditRoleModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="edit-role-modal-title" role="dialog" aria-modal="true">
-                <!-- Backdrop -->
-                <div x-show="showEditRoleModal"
-                     x-transition:enter="ease-out duration-300"
-                     x-transition:enter-start="opacity-0"
-                     x-transition:enter-end="opacity-100"
-                     x-transition:leave="ease-in duration-200"
-                     x-transition:leave-start="opacity-100"
-                     x-transition:leave-end="opacity-0"
-                     class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
-                     @click="showEditRoleModal = false"></div>
+                        <!-- Permission Name -->
+                        <div>
+                            <x-input-label for="new_permission_name" :value="__('Permission Name')" />
+                            <x-text-input
+                                id="new_permission_name"
+                                name="name"
+                                type="text"
+                                class="mt-1 block w-full text-sm"
+                                :value="old('form_type') === 'permission' ? old('name') : ''"
+                                required
+                                autofocus
+                                placeholder="{{ __('e.g. view-reports, manage-billing') }}"
+                            />
+                            <x-input-error :messages="old('form_type') === 'permission' ? $errors->get('name') : []" class="mt-1 text-xs" />
+                        </div>
+                    </x-crud-modal.form>
 
-                <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                    <div x-show="showEditRoleModal"
-                         x-transition:enter="ease-out duration-300"
-                         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                         x-transition:leave="ease-in duration-200"
-                         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                         class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-start shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-xl border border-gray-100 dark:border-gray-700">
-
-                        <form method="POST" :action="editRoleActionUrl">
-                            @csrf
-                            @method('PUT')
+                    <!-- ============================================================ -->
+                    <!-- Edit Role Modal — x-crud-modal.form                          -->
+                    <!-- ============================================================ -->
+                    <x-crud-modal.form
+                        show="showEditRoleModal"
+                        alpine-action="editRoleActionUrl"
+                        method="PUT"
+                        :title="__('Edit System Role')"
+                        :description="__('Update role name and reconfigure its granted permissions.')"
+                        icon-color="amber"
+                        :submit-text="__('Save Changes')"
+                        max-width="3xl"
+                    >
+                        <x-slot:hidden>
                             <input type="hidden" name="form_type" value="edit_role">
                             <input type="hidden" name="edit_role_id" :value="editRoleId">
+                        </x-slot:hidden>
 
-                            <div class="px-6 pt-6 pb-4">
-                                <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-700">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="w-9 h-9 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                        </div>
-                                        <div>
-                                            <h3 class="text-base font-bold text-gray-900 dark:text-white" id="edit-role-modal-title">
-                                                {{ __('Edit System Role') }}
-                                            </h3>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">
-                                                {{ __('Update role name and reconfigure its granted permissions.') }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <button type="button" @click="showEditRoleModal = false" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
-                                        <span class="sr-only">{{ __('Close') }}</span>
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <!-- Role Name -->
+                        <div>
+                            <x-input-label for="edit_role_name" :value="__('Role Name')" />
+                            <x-text-input
+                                id="edit_role_name"
+                                name="name"
+                                type="text"
+                                class="mt-1 block w-full text-sm"
+                                x-model="editRoleName"
+                                x-bind:readonly="editRoleName === '{{ $defaultRole ?? 'User' }}'"
+                                x-bind:class="editRoleName === '{{ $defaultRole ?? 'User' }}' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-80' : ''"
+                                required
+                                autofocus
+                            />
+                            <p x-show="editRoleName === '{{ $defaultRole ?? 'User' }}'" class="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                                {{ __('The default role name is protected and cannot be changed.') }}
+                            </p>
+                            <x-input-error :messages="old('form_type') === 'edit_role' ? $errors->get('name') : []" class="mt-1 text-xs" />
+                        </div>
+
+                        <!-- Dynamic Permission Matrix by Entity -->
+                        <div class="space-y-3">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                <div>
+                                    <x-input-label :value="__('Permission Matrix by Entity')" />
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        {{ __('Assign fine-grained CRUD privileges grouped automatically by database table.') }}
+                                    </p>
+                                </div>
+                                <div class="flex items-center gap-2 text-xs">
+                                    <button type="button"
+                                            @click="selectAllEdit()"
+                                            class="font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 hover:underline">
+                                        {{ __('Select All') }}
+                                    </button>
+                                    <span class="text-gray-300 dark:text-gray-600">&bull;</span>
+                                    <button type="button"
+                                            @click="deselectAllEdit()"
+                                            class="font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 hover:underline">
+                                        {{ __('Deselect All') }}
                                     </button>
                                 </div>
+                            </div>
 
-                                <div class="mt-4 space-y-4">
-                                    <!-- Role Name -->
-                                    <div>
-                                        <x-input-label for="edit_role_name" :value="__('Role Name')" />
-                                        <x-text-input id="edit_role_name" name="name" type="text" class="mt-1 block w-full text-sm" x-model="editRoleName" required autofocus />
-                                        <x-input-error :messages="old('form_type') === 'edit_role' ? $errors->get('name') : []" class="mt-1 text-xs" />
-                                    </div>
+                            <!-- Matrix Table Container -->
+                            <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm max-h-64 overflow-y-auto">
+                                <table class="w-full text-xs text-start border-collapse">
+                                    <thead class="sticky top-0 bg-gray-50 dark:bg-gray-900/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 z-10">
+                                        <tr>
+                                            <th class="py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-200 text-start">{{ __('Table / Entity') }}</th>
+                                            <th class="py-2.5 px-2 font-semibold text-center text-emerald-600 dark:text-emerald-400 w-16">{{ __('View') }}</th>
+                                            <th class="py-2.5 px-2 font-semibold text-center text-orange-600 dark:text-orange-400 w-16">{{ __('Create') }}</th>
+                                            <th class="py-2.5 px-2 font-semibold text-center text-amber-600 dark:text-amber-400 w-16">{{ __('Edit') }}</th>
+                                            <th class="py-2.5 px-2 font-semibold text-center text-rose-600 dark:text-rose-400 w-16">{{ __('Delete') }}</th>
+                                            <th class="py-2.5 px-3 font-semibold text-end text-gray-500 w-28">{{ __('Toggle Row') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700/60">
+                                        @forelse($permissionMatrix['entities'] as $entity => $actions)
+                                            <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-700/30 transition-colors">
+                                                <td class="py-2.5 px-3 font-medium text-gray-900 dark:text-white">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+                                                        <span class="font-mono capitalize font-bold text-xs">{{ $entity }}</span>
+                                                    </div>
+                                                </td>
+                                                @foreach(['view', 'create', 'edit', 'delete'] as $act)
+                                                    <td class="py-2.5 px-2 text-center align-middle">
+                                                        @if(isset($actions[$act]))
+                                                            <input type="checkbox"
+                                                                   name="permissions[]"
+                                                                   value="{{ $actions[$act] }}"
+                                                                   x-model="editRolePermissions"
+                                                                   class="rounded border-gray-300 dark:border-gray-600 text-orange-500 focus:ring-orange-500 cursor-pointer w-4 h-4"
+                                                                   title="{{ $actions[$act] }}">
+                                                        @else
+                                                            <span class="text-gray-300 dark:text-gray-600 text-xs">&mdash;</span>
+                                                        @endif
+                                                    </td>
+                                                @endforeach
+                                                <td class="py-2.5 px-3 text-end align-middle">
+                                                    <button type="button"
+                                                            @click="toggleEditEntityAll({{ json_encode(array_values($actions)) }})"
+                                                            class="text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 px-2.5 py-1 rounded border border-indigo-200/60 dark:border-indigo-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors whitespace-nowrap">
+                                                        {{ __('Toggle All') }}
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="6" class="py-4 text-center text-gray-400 italic">
+                                                    {{ __('No standard entities found.') }}
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
 
-                                    <!-- Permissions -->
-                                    <div>
-                                        <x-input-label :value="__('Assign Permissions (Optional)')" />
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                                            {{ __('Select the permission privileges to attach to this role.') }}
-                                        </p>
-                                        <div class="max-h-52 overflow-y-auto rounded-xl border border-gray-200 dark:border-gray-700 p-3 bg-gray-50/50 dark:bg-gray-900/30 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                            @forelse($allPermissions as $perm)
-                                                <label class="flex items-center gap-2 p-2 rounded-lg hover:bg-white dark:hover:bg-gray-800 transition-colors cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
-                                                    <input type="checkbox" name="permissions[]" value="{{ $perm->name }}" :checked="isPermissionSelected('{{ $perm->name }}')" @change="togglePermission('{{ $perm->name }}')" class="rounded border-gray-300 dark:border-gray-600 text-orange-500 focus:ring-orange-500">
-                                                    <span class="text-xs font-mono font-medium text-gray-700 dark:text-gray-300 truncate">{{ $perm->name }}</span>
-                                                </label>
-                                            @empty
-                                                <div class="col-span-2 text-xs text-gray-400 italic py-2 text-center">
-                                                    {{ __('No permissions available in the system catalog.') }}
-                                                </div>
-                                            @endforelse
-                                        </div>
-                                        <x-input-error :messages="old('form_type') === 'edit_role' ? $errors->get('permissions') : []" class="mt-1 text-xs" />
+                            @if(!empty($permissionMatrix['custom']))
+                                <!-- Additional System Permissions -->
+                                <div class="pt-2">
+                                    <x-input-label :value="__('Additional System Permissions')" />
+                                    <div class="mt-1.5 flex flex-wrap gap-2">
+                                        @foreach($permissionMatrix['custom'] as $customPerm)
+                                            <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/30 text-xs cursor-pointer hover:bg-white dark:hover:bg-gray-800 transition-colors">
+                                                <input type="checkbox"
+                                                       name="permissions[]"
+                                                       value="{{ $customPerm }}"
+                                                       x-model="editRolePermissions"
+                                                       class="rounded border-gray-300 dark:border-gray-600 text-orange-500 focus:ring-orange-500 w-4 h-4">
+                                                <span class="font-mono text-gray-700 dark:text-gray-300">{{ $customPerm }}</span>
+                                            </label>
+                                        @endforeach
                                     </div>
                                 </div>
-                            </div>
+                            @endif
 
-                            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-end gap-3 rounded-b-2xl">
-                                <x-secondary-button type="button" @click="showEditRoleModal = false">
-                                    {{ __('Cancel') }}
-                                </x-secondary-button>
+                            <x-input-error :messages="old('form_type') === 'edit_role' ? $errors->get('permissions') : []" class="mt-1 text-xs" />
+                        </div>
+                    </x-crud-modal.form>
 
-                                <x-primary-button type="submit">
-                                    <svg class="w-4 h-4 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    {{ __('Save Changes') }}
-                                </x-primary-button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Edit Permission Modal (Alpine.js) -->
-            <div x-cloak x-show="showEditPermissionModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="edit-perm-modal-title" role="dialog" aria-modal="true">
-                <!-- Backdrop -->
-                <div x-show="showEditPermissionModal"
-                     x-transition:enter="ease-out duration-300"
-                     x-transition:enter-start="opacity-0"
-                     x-transition:enter-end="opacity-100"
-                     x-transition:leave="ease-in duration-200"
-                     x-transition:leave-start="opacity-100"
-                     x-transition:leave-end="opacity-0"
-                     class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
-                     @click="showEditPermissionModal = false"></div>
-
-                <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                    <div x-show="showEditPermissionModal"
-                         x-transition:enter="ease-out duration-300"
-                         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                         x-transition:leave="ease-in duration-200"
-                         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                         class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-start shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-100 dark:border-gray-700">
-
-                        <form method="POST" :action="editPermissionActionUrl">
-                            @csrf
-                            @method('PUT')
+                    <!-- ============================================================ -->
+                    <!-- Edit Permission Modal — x-crud-modal.form                    -->
+                    <!-- ============================================================ -->
+                    <x-crud-modal.form
+                        show="showEditPermissionModal"
+                        alpine-action="editPermissionActionUrl"
+                        method="PUT"
+                        :title="__('Edit System Permission')"
+                        :description="__('Update permission name in the system access catalog.')"
+                        icon-color="amber"
+                        :submit-text="__('Save Changes')"
+                    >
+                        <x-slot:hidden>
                             <input type="hidden" name="form_type" value="edit_permission">
                             <input type="hidden" name="edit_permission_id" :value="editPermissionId">
+                        </x-slot:hidden>
 
-                            <div class="px-6 pt-6 pb-4">
-                                <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-700">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="w-9 h-9 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                        </div>
-                                        <div>
-                                            <h3 class="text-base font-bold text-gray-900 dark:text-white" id="edit-perm-modal-title">
-                                                {{ __('Edit System Permission') }}
-                                            </h3>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">
-                                                {{ __('Update permission name in the system access catalog.') }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <button type="button" @click="showEditPermissionModal = false" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
-                                        <span class="sr-only">{{ __('Close') }}</span>
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                    </button>
-                                </div>
+                        <!-- Permission Name -->
+                        <div>
+                            <x-input-label for="edit_perm_name" :value="__('Permission Name')" />
+                            <x-text-input id="edit_perm_name" name="name" type="text" class="mt-1 block w-full text-sm" x-model="editPermissionName" required autofocus />
+                            <x-input-error :messages="old('form_type') === 'edit_permission' ? $errors->get('name') : []" class="mt-1 text-xs" />
+                        </div>
+                    </x-crud-modal.form>
 
-                                <div class="mt-4 space-y-4">
-                                    <!-- Permission Name -->
-                                    <div>
-                                        <x-input-label for="edit_perm_name" :value="__('Permission Name')" />
-                                        <x-text-input id="edit_perm_name" name="name" type="text" class="mt-1 block w-full text-sm" x-model="editPermissionName" required autofocus />
-                                        <x-input-error :messages="old('form_type') === 'edit_permission' ? $errors->get('name') : []" class="mt-1 text-xs" />
-                                    </div>
-                                </div>
-                            </div>
+                    <!-- ============================================================ -->
+                    <!-- Delete Role Modal — x-crud-modal.delete                      -->
+                    <!-- ============================================================ -->
+                    <x-crud-modal.delete
+                        show="showDeleteRoleModal"
+                        action-url="deleteRoleActionUrl"
+                        :title="__('Delete Role')"
+                        :message="__('Are you sure you want to permanently delete the role')"
+                        item-name="deleteRoleName"
+                        :submit-text="__('Delete Role')"
+                    />
 
-                            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-end gap-3 rounded-b-2xl">
-                                <x-secondary-button type="button" @click="showEditPermissionModal = false">
-                                    {{ __('Cancel') }}
-                                </x-secondary-button>
+                    <!-- ============================================================ -->
+                    <!-- Delete Permission Modal — x-crud-modal.delete                -->
+                    <!-- ============================================================ -->
+                    <x-crud-modal.delete
+                        show="showDeletePermissionModal"
+                        action-url="deletePermissionActionUrl"
+                        :title="__('Delete Permission')"
+                        :message="__('Are you sure you want to permanently delete the permission')"
+                        item-name="deletePermissionName"
+                        :submit-text="__('Delete Permission')"
+                    />
 
-                                <x-primary-button type="submit">
-                                    <svg class="w-4 h-4 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    {{ __('Save Changes') }}
-                                </x-primary-button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-                <!-- Delete Role Confirmation Modal (Alpine.js) -->
-            <div x-cloak x-show="showDeleteRoleModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="delete-role-modal-title" role="dialog" aria-modal="true">
-                <!-- Backdrop -->
-                <div x-show="showDeleteRoleModal"
-                     x-transition:enter="ease-out duration-300"
-                     x-transition:enter-start="opacity-0"
-                     x-transition:enter-end="opacity-100"
-                     x-transition:leave="ease-in duration-200"
-                     x-transition:leave-start="opacity-100"
-                     x-transition:leave-end="opacity-0"
-                     class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
-                     @click="showDeleteRoleModal = false"></div>
-
-                <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                    <div x-show="showDeleteRoleModal"
-                         x-transition:enter="ease-out duration-300"
-                         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                         x-transition:leave="ease-in duration-200"
-                         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                         class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-start shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-gray-100 dark:border-gray-700">
-
-                        <form method="POST" :action="deleteRoleActionUrl">
-                            @csrf
-                            @method('DELETE')
-
-                            <div class="px-6 pt-6 pb-4">
-                                <div class="flex items-start gap-4">
-                                    <div class="w-10 h-10 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-base font-bold text-gray-900 dark:text-white" id="delete-role-modal-title">
-                                            {{ __('Delete Role') }}
-                                        </h3>
-                                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                            {{ __('Are you sure you want to permanently delete the role') }}
-                                            <strong class="text-gray-800 dark:text-gray-200" x-text="deleteRoleName"></strong>?
-                                            {{ __('This action cannot be undone. All users assigned to this role will lose its permissions.') }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-end gap-3 rounded-b-2xl">
-                                <x-secondary-button type="button" @click="showDeleteRoleModal = false">
-                                    {{ __('Cancel') }}
-                                </x-secondary-button>
-
-                                <x-danger-button type="submit">
-                                    <svg class="w-4 h-4 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    {{ __('Delete Role') }}
-                                </x-danger-button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Delete Permission Confirmation Modal (Alpine.js) -->
-            <div x-cloak x-show="showDeletePermissionModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="delete-perm-modal-title" role="dialog" aria-modal="true">
-                <!-- Backdrop -->
-                <div x-show="showDeletePermissionModal"
-                     x-transition:enter="ease-out duration-300"
-                     x-transition:enter-start="opacity-0"
-                     x-transition:enter-end="opacity-100"
-                     x-transition:leave="ease-in duration-200"
-                     x-transition:leave-start="opacity-100"
-                     x-transition:leave-end="opacity-0"
-                     class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
-                     @click="showDeletePermissionModal = false"></div>
-
-                <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                    <div x-show="showDeletePermissionModal"
-                         x-transition:enter="ease-out duration-300"
-                         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                         x-transition:leave="ease-in duration-200"
-                         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                         class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-start shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-gray-100 dark:border-gray-700">
-
-                        <form method="POST" :action="deletePermissionActionUrl">
-                            @csrf
-                            @method('DELETE')
-
-                            <div class="px-6 pt-6 pb-4">
-                                <div class="flex items-start gap-4">
-                                    <div class="w-10 h-10 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-base font-bold text-gray-900 dark:text-white" id="delete-perm-modal-title">
-                                            {{ __('Delete Permission') }}
-                                        </h3>
-                                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                            {{ __('Are you sure you want to permanently delete the permission') }}
-                                            <strong class="font-mono text-gray-800 dark:text-gray-200" x-text="deletePermissionName"></strong>?
-                                            {{ __('This action cannot be undone. All roles using this permission will lose it immediately.') }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-end gap-3 rounded-b-2xl">
-                                <x-secondary-button type="button" @click="showDeletePermissionModal = false">
-                                    {{ __('Cancel') }}
-                                </x-secondary-button>
-
-                                <x-danger-button type="submit">
-                                    <svg class="w-4 h-4 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    {{ __('Delete Permission') }}
-                                </x-danger-button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            </main>
+                </main>
             </div>
         </div>
     </div>

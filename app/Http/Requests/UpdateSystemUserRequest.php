@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Enums\AccountStatus;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -41,7 +42,11 @@ class UpdateSystemUserRequest extends FormRequest
                 Rule::unique(User::class)->ignore($userId),
             ],
             'password' => ['nullable', 'string', 'confirmed', Password::defaults()],
-            'role' => ['nullable', 'string', 'exists:roles,name'],
+            'role' => ['sometimes', 'required', 'string', 'exists:roles,name'],
+            'status' => ['nullable', 'string', Rule::enum(AccountStatus::class)],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:5120'],
+            'remove_photo' => ['nullable', 'boolean'],
+            'profile_photo_path' => ['nullable', 'string', 'max:2048'],
         ];
     }
 }

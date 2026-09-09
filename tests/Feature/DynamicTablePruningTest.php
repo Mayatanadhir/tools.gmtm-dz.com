@@ -84,7 +84,7 @@ class DynamicTablePruningTest extends TestCase
     public function test_attempting_to_onboard_sovereign_table_is_strictly_rejected(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         $response = $this->actingAs($user)->post(route('system-tables.pruning.tables.add'), [
             'table' => 'users',
@@ -103,7 +103,7 @@ class DynamicTablePruningTest extends TestCase
     public function test_authenticated_user_can_onboard_custom_table_and_view_in_dashboard(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         $response = $this->actingAs($user)->post(route('system-tables.pruning.tables.add'), [
             'table' => 'test_metric_logs',
@@ -176,7 +176,7 @@ class DynamicTablePruningTest extends TestCase
     public function test_custom_table_can_be_removed_and_builtin_tables_cannot_be_removed(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         // 1. Add custom table
         $this->service->addCustomTable([

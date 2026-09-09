@@ -10,18 +10,18 @@
                 </p>
             </div>
             <div class="flex items-center gap-2">
-                <span class="inline-flex items-center px-3 py-1 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/20 text-xs font-semibold">
+                <x-badge variant="primary" size="md">
                     {{ $cacheEntries->total() }} {{ __('Cached Items') }}
-                </span>
-                <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 text-xs font-semibold">
+                </x-badge>
+                <x-badge variant="info" size="md">
                     {{ $cacheLocks->total() }} {{ __('Active Locks') }}
-                </span>
+                </x-badge>
             </div>
         </div>
     </x-slot>
 
     <div class="py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col lg:flex-row gap-6 items-start">
                 <!-- Sidebar Navigation -->
                 <aside class="w-full lg:w-64 shrink-0">
@@ -62,13 +62,13 @@
                         </x-table.td>
                         <x-table.td>
                             @if($isExpired)
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-rose-500/10 text-rose-600 border border-rose-500/20">
+                                <x-badge variant="danger" :dot="true">
                                     {{ __('Expired') }}
-                                </span>
+                                </x-badge>
                             @else
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                                <x-badge variant="success" :dot="true">
                                     {{ __('Active') }}
-                                </span>
+                                </x-badge>
                             @endif
                         </x-table.td>
                         <x-table.td class="whitespace-nowrap text-end">

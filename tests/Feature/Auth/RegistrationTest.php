@@ -2,7 +2,11 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
@@ -27,5 +31,36 @@ class RegistrationTest extends TestCase
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
+    }
+
+    public function test_email_verification_notification_is_sent_upon_registration(): void
+    {
+        Notification::fake();
+
+        $this->post('/register', [
+            'name' => 'Verify User',
+            'email' => 'verify@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $user = User::where('email', 'verify@example.com')->firstOrFail();
+
+        Notification::assertSentTo($user, VerifyEmail::class);
+    }
+
+    public function test_newly_registered_user_is_automatically_assigned_default_role(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+
+        $this->post('/register', [
+            'name' => 'Default Role User',
+            'email' => 'defaultrole@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $user = User::where('email', 'defaultrole@example.com')->firstOrFail();
+        $this->assertTrue($user->hasRole('User'));
     }
 }

@@ -9,15 +9,14 @@
                     {{ __('Monitor and inspect all application database tables and system state') }}
                 </p>
             </div>
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/20 text-xs font-semibold">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>13 {{ __('System Tables') }}</span>
-            </div>
+            <x-badge variant="primary" size="md" :dot="true" :dot-ping="true">
+                13 {{ __('System Tables') }}
+            </x-badge>
         </div>
     </x-slot>
 
     <div class="py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col lg:flex-row gap-6 items-start">
                 <!-- Sidebar Navigation -->
                 <aside class="w-full lg:w-64 shrink-0">
@@ -36,7 +35,7 @@
                                     <h3 class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($stats['users_count']) }}</h3>
                                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ $stats['sessions_count'] }} {{ __('Active Sessions') }}</p>
                                 </div>
-                                <div class="rounded-xl bg-blue-500/10 dark:bg-blue-500/20 p-3 text-blue-600 dark:text-blue-400">
+                                <div class="rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 p-3 text-indigo-600 dark:text-indigo-400">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                                 </div>
                             </div>
@@ -167,19 +166,19 @@
                                         <div class="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                                             <div class="flex items-start gap-3">
                                                 @php
-                                                    $badgeClass = match($activity->event) {
-                                                        'created' => 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
-                                                        'updated' => 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
-                                                        'deleted' => 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
-                                                        default => 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+                                                    $eventVariant = match($activity->event) {
+                                                        'created' => 'success',
+                                                        'updated' => 'warning',
+                                                        'deleted' => 'danger',
+                                                        default => 'info',
                                                     };
                                                 @endphp
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase border {{ $badgeClass }}">
+                                                <x-badge :variant="$eventVariant" class="uppercase">
                                                     {{ $activity->event ?? 'event' }}
-                                                </span>
+                                                </x-badge>
                                                 <div>
                                                     <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {{ $activity->description }}
+                                                        {{ $activity->translated_description ?? $activity->description }}
                                                     </p>
                                                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                                         <span class="font-mono">{{ class_basename($activity->subject_type ?? '') }} #{{ $activity->subject_id }}</span>

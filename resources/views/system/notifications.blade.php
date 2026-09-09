@@ -9,14 +9,14 @@
                     {{ __('Internal database notifications, recipient targeting, and delivery payloads') }}
                 </p>
             </div>
-            <span class="inline-flex items-center px-3 py-1 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/20 text-xs font-semibold">
+            <x-badge variant="primary" size="md">
                 {{ $notifications->total() }} {{ __('Total Notifications') }}
-            </span>
+            </x-badge>
         </div>
     </x-slot>
 
     <div class="py-8" x-data="{ modalOpen: false, modalTitle: '', modalPayload: null }">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col lg:flex-row gap-6 items-start">
                 <!-- Sidebar Navigation -->
                 <aside class="w-full lg:w-64 shrink-0">
@@ -65,25 +65,64 @@
                     @php
                         $data = json_decode($notif->data ?? '{}', true);
                     @endphp
+                    @php
+                        $typeBasename = class_basename($notif->type);
+                        $translatedType = match($typeBasename) {
+                            'SystemActivityAlert' => __('System Activity Alert'),
+                            'ResetPassword', 'ResetPasswordNotification' => __('Password Reset Notification'),
+                            'VerifyEmail' => __('Email Verification Notification'),
+                            default => __($typeBasename),
+                        };
+                        $actionType = $data['type'] ?? null;
+                        $notificationTitle = $data['title'] ?? null;
+                    @endphp
                     <x-table.tr>
                         <x-table.td class="font-mono text-gray-400 dark:text-gray-500">
                             {{ substr($notif->id, 0, 8) }}...
                         </x-table.td>
-                        <x-table.td class="font-semibold text-gray-900 dark:text-white">
-                            {{ class_basename($notif->type) }}
+                        <x-table.td>
+                            <div class="flex flex-col gap-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-semibold text-gray-900 dark:text-white">
+                                        {{ $translatedType }}
+                                    </span>
+                                    @if($actionType)
+                                        @php
+                                            $actionVariant = match($actionType) {
+                                                'created', 'success' => 'success',
+                                                'updated', 'warning' => 'warning',
+                                                'deleted', 'danger' => 'danger',
+                                                default => 'info'
+                                            };
+                                        @endphp
+                                        <x-badge :variant="$actionVariant" size="sm" class="uppercase text-[10px]">
+                                            {{ __($actionType) }}
+                                        </x-badge>
+                                    @endif
+                                </div>
+                                @if($notificationTitle)
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-xs" title="{{ __($notificationTitle) }}">
+                                        {{ __($notificationTitle) }}
+                                    </span>
+                                @else
+                                    <span class="font-mono text-[11px] text-gray-400">
+                                        {{ $typeBasename }}
+                                    </span>
+                                @endif
+                            </div>
                         </x-table.td>
                         <x-table.td class="font-mono text-xs">
-                            {{ class_basename($notif->notifiable_type) }} #{{ $notif->notifiable_id }}
+                            {{ __(class_basename($notif->notifiable_type)) }} #{{ $notif->notifiable_id }}
                         </x-table.td>
                         <x-table.td>
                             @if($notif->read_at)
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                                <x-badge variant="neutral">
                                     {{ __('Read') }} ({{ \Carbon\Carbon::parse($notif->read_at)->diffForHumans() }})
-                                </span>
+                                </x-badge>
                             @else
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                <x-badge variant="success" :dot="true">
                                     {{ __('Unread') }}
-                                </span>
+                                </x-badge>
                             @endif
                         </x-table.td>
                         <x-table.td class="whitespace-nowrap">
@@ -92,7 +131,7 @@
                         <x-table.td class="whitespace-nowrap text-end">
                             <x-table.actions class="justify-end">
                                 <x-table.action-view
-                                    @click="modalOpen = true; modalTitle = '{{ class_basename($notif->type) }}'; modalPayload = {{ json_encode($data) }}"
+                                    @click="modalOpen = true; modalTitle = '{{ addslashes($translatedType) }}'; modalPayload = {{ json_encode($data) }}"
                                     :title="__('View Payload')">
                                     {{ __('View Payload') }}
                                 </x-table.action-view>

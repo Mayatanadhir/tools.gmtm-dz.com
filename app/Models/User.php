@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\AccountStatus;
 use App\Observers\UserObserver;
 use App\Traits\FilterableTrait;
 use Database\Factories\UserFactory;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -15,14 +16,15 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Models\Concerns\HasActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'status', 'profile_photo_path', 'photo_hash'])]
 #[Hidden(['password', 'remember_token'])]
 #[ObservedBy([UserObserver::class])]
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use FilterableTrait, HasActivity, HasFactory, HasRoles, Notifiable;
@@ -32,7 +34,7 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected array $filterable = ['id', 'name', 'email', 'created_at'];
+    protected array $filterable = ['id', 'name', 'email', 'status', 'created_at'];
 
     /**
      * The attributes that are searched via the keyword 'search' / 'q' filter.
@@ -51,6 +53,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'status' => AccountStatus::class,
         ];
     }
 
@@ -60,10 +63,40 @@ class User extends Authenticatable
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'email'])
+            ->logOnly(['name', 'email', 'status', 'profile_photo_path', 'photo_hash'])
             ->logOnlyDirty()
             ->dontLogEmptyChanges()
             ->setDescriptionForEvent(fn (string $eventName): string => "User has been {$eventName}");
+    }
+
+    /**
+     * Check if user account is currently active.
+     */
+    public function isActive(): bool
+    {
+        return $this->status === AccountStatus::Active;
+    }
+
+    /**
+     * Check if user account is currently suspended.
+     */
+    public function isSuspended(): bool
+    {
+        return $this->status === AccountStatus::Suspended;
+    }
+
+    /**
+     * Get the public URL for the user's profile photo.
+     */
+    public function getProfilePhotoUrlAttribute(): ?string
+    {
+        if (blank($this->profile_photo_path)) {
+            return null;
+        }
+
+        return str_starts_with($this->profile_photo_path, 'http')
+            ? $this->profile_photo_path
+            : Storage::disk('public')->url($this->profile_photo_path);
     }
 
     /**
@@ -74,5 +107,13 @@ class User extends Authenticatable
     public function filterRole(Builder $query, string $role): void
     {
         $query->role($role);
+    }
+
+    /**
+     * Determine if the user possesses a super role that bypasses all permissions.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole('Super-Admin');
     }
 }

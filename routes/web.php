@@ -2,23 +2,40 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SystemTableController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 $routes = function (): void {
     Route::get('/', function () {
+        try {
+            if (! Schema::hasTable('users') || User::count() === 0) {
+                return redirect()->route('system-tables.setup');
+            }
+        } catch (Throwable) {
+            // Graceful fallback if database connection is not yet configured
+        }
+
         return view('welcome');
+    })->name('welcome');
+
+    Route::prefix('system-tables')->name('system-tables.')->group(function () {
+        Route::get('/setup', [SystemTableController::class, 'setup'])->name('setup');
+        Route::post('/setup', [SystemTableController::class, 'storeSetup'])->name('setup.store');
     });
 
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->middleware(['auth', 'verified'])->name('dashboard');
 
-    Route::middleware(['auth', 'verified'])->prefix('system-tables')->name('system-tables.')->group(function () {
+    Route::middleware(['auth', 'verified', 'role:Super-Admin'])->prefix('system-tables')->name('system-tables.')->group(function () {
         Route::get('/', [SystemTableController::class, 'index'])->name('index');
         Route::get('/users', [SystemTableController::class, 'users'])->name('users');
         Route::post('/users', [SystemTableController::class, 'storeUser'])->name('users.store');
         Route::put('/users/{user}', [SystemTableController::class, 'updateUser'])->name('users.update');
+        Route::post('/users/{user}/toggle-status', [SystemTableController::class, 'toggleUserStatus'])->name('users.toggle-status');
+        Route::delete('/users/{user}', [SystemTableController::class, 'destroyUser'])->name('users.destroy');
         Route::get('/roles', [SystemTableController::class, 'roles'])->name('roles');
         Route::post('/roles', [SystemTableController::class, 'storeRole'])->name('roles.store');
         Route::put('/roles/{role}', [SystemTableController::class, 'updateRole'])->name('roles.update');

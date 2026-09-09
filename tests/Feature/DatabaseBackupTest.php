@@ -32,22 +32,18 @@ class DatabaseBackupTest extends TestCase
         $this->seed(RolesAndPermissionsSeeder::class);
         $this->service = app(DatabaseBackupService::class);
 
-        $backupName = (string) config('backup.backup.name', 'Laravel');
-        $this->backupDir = Storage::disk('local')->path($backupName);
+        // Isolate test backup directory to prevent wiping real backups
+        config(['backup.backup.name' => 'TestingBackup']);
+        $this->backupDir = Storage::disk('local')->path('TestingBackup');
 
         File::ensureDirectoryExists($this->backupDir);
     }
 
     protected function tearDown(): void
     {
-        // Clean up test backup files
+        // Clean up only isolated test directory
         if (File::exists($this->backupDir)) {
-            $files = File::files($this->backupDir);
-            foreach ($files as $file) {
-                if (str_starts_with($file->getFilename(), 'test_backup_')) {
-                    File::delete($file->getPathname());
-                }
-            }
+            File::deleteDirectory($this->backupDir);
         }
 
         Schema::dropIfExists('test_restore_table');
@@ -69,7 +65,7 @@ class DatabaseBackupTest extends TestCase
     public function test_authenticated_user_can_access_backups_dashboard_with_empty_state(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         // Clear backup directory for this test
         if (File::exists($this->backupDir)) {
@@ -87,7 +83,7 @@ class DatabaseBackupTest extends TestCase
     public function test_authenticated_user_can_access_backups_dashboard_with_existing_backups_and_badges(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         $fileName1 = 'test_backup_1.zip';
         $fileName2 = 'test_backup_2.zip';
@@ -145,7 +141,7 @@ class DatabaseBackupTest extends TestCase
     public function test_authenticated_user_can_download_backup_archive(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         $fileName = 'test_backup_download.zip';
         $this->createTestZip($fileName, 'SELECT 1;');
@@ -159,7 +155,7 @@ class DatabaseBackupTest extends TestCase
     public function test_authenticated_user_can_delete_backup_archive(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         $fileName = 'test_backup_delete.zip';
         $this->createTestZip($fileName, 'SELECT 1;');
@@ -183,7 +179,7 @@ class DatabaseBackupTest extends TestCase
     public function test_authenticated_user_can_restore_from_backup_snapshot(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         $fileName = 'test_backup_restore.zip';
         $sql = 'CREATE TABLE test_restore_table (id INTEGER PRIMARY KEY, note TEXT); INSERT INTO test_restore_table (id, note) VALUES (1, "Restored Successfully");';
@@ -212,7 +208,7 @@ class DatabaseBackupTest extends TestCase
     public function test_authenticated_user_can_restore_oldest_backup(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         // Clear backup directory first to ensure predictable order
         if (File::exists($this->backupDir)) {
@@ -243,7 +239,7 @@ class DatabaseBackupTest extends TestCase
     public function test_restore_fails_gracefully_when_no_backups_available(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         if (File::exists($this->backupDir)) {
             File::cleanDirectory($this->backupDir);

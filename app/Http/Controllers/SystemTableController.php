@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\AccountStatus;
 use App\Http\Requests\AddPruningTableRequest;
 use App\Http\Requests\CreatePermissionRequest;
 use App\Http\Requests\CreateRoleRequest;
 use App\Http\Requests\CreateSystemUserRequest;
+use App\Http\Requests\InitialSystemSetupRequest;
 use App\Http\Requests\UpdatePermissionRequest;
 use App\Http\Requests\UpdatePruningSettingsRequest;
 use App\Http\Requests\UpdateRoleRequest;
@@ -15,12 +17,16 @@ use App\Http\Requests\UpdateSystemUserRequest;
 use App\Models\User;
 use App\Services\DatabaseBackupService;
 use App\Services\DataPruningService;
+use App\Services\PermissionDiscoveryService;
 use App\Services\SystemTableService;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Permission;
@@ -33,7 +39,8 @@ class SystemTableController extends Controller
         protected SystemTableService $systemTableService,
         protected DataPruningService $dataPruningService,
         protected DatabaseBackupService $databaseBackupService,
-        protected UserService $userService
+        protected UserService $userService,
+        protected PermissionDiscoveryService $permissionDiscoveryService
     ) {}
 
     /**
@@ -53,11 +60,15 @@ class SystemTableController extends Controller
     public function users(Request $request): View
     {
         $search = $request->query('search');
-        $users = $this->systemTableService->getUsers(is_string($search) ? $search : null);
+        $status = $request->query('status');
+        $users = $this->systemTableService->getUsers(
+            is_string($search) ? $search : null,
+            is_string($status) ? $status : null
+        );
         $sessions = $this->systemTableService->getSessions();
         $roles = $this->systemTableService->getRoles();
 
-        return view('system.users', compact('users', 'sessions', 'search', 'roles'));
+        return view('system.users', compact('users', 'sessions', 'search', 'status', 'roles'));
     }
 
     /**
@@ -67,11 +78,23 @@ class SystemTableController extends Controller
     {
         $validated = $request->validated();
 
-        $user = $this->userService->register([
+        $userData = [
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => $validated['password'],
-        ]);
+        ];
+
+        if (! empty($validated['status'])) {
+            $userData['status'] = $validated['status'];
+        }
+
+        if ($request->hasFile('photo')) {
+            $userData['profile_photo_path'] = $request->file('photo')->store('photos', 'public');
+        } elseif (array_key_exists('profile_photo_path', $validated)) {
+            $userData['profile_photo_path'] = $validated['profile_photo_path'];
+        }
+
+        $user = $this->userService->register($userData);
 
         if (! empty($validated['role'])) {
             $user->assignRole($validated['role']);
@@ -83,6 +106,7 @@ class SystemTableController extends Controller
                 'user_id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'status' => $user->status?->value ?? 'active',
                 'role' => $validated['role'] ?? null,
             ])
             ->log("Created new system user '{$user->name}'");
@@ -99,6 +123,24 @@ class SystemTableController extends Controller
     {
         $validated = $request->validated();
 
+        // Anti-lockout guard: Do not allow admin to suspend their own account
+        if (
+            $user->id === auth()->id() &&
+            ! empty($validated['status']) &&
+            $validated['status'] === AccountStatus::Suspended->value
+        ) {
+            return redirect()
+                ->route('system-tables.users')
+                ->withErrors(['status' => __('You cannot suspend your own account.')]);
+        }
+
+        // Rank-lock guard: Do not allow admin to change their own role
+        if ($user->id === auth()->id() && array_key_exists('role', $validated)) {
+            return redirect()
+                ->route('system-tables.users')
+                ->withErrors(['role' => __('You cannot change your own role.')]);
+        }
+
         $updateData = [
             'name' => $validated['name'],
             'email' => $validated['email'],
@@ -108,10 +150,32 @@ class SystemTableController extends Controller
             $updateData['password'] = Hash::make($validated['password']);
         }
 
+        if (! empty($validated['status'])) {
+            $updateData['status'] = $validated['status'];
+        }
+
+        if ($request->hasFile('photo')) {
+            if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
+                Storage::disk('public')->delete($user->profile_photo_path);
+            }
+            $updateData['profile_photo_path'] = $request->file('photo')->store('photos', 'public');
+        } elseif ($request->boolean('remove_photo')) {
+            if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
+                Storage::disk('public')->delete($user->profile_photo_path);
+            }
+            $updateData['profile_photo_path'] = null;
+        } elseif (array_key_exists('profile_photo_path', $validated)) {
+            $updateData['profile_photo_path'] = $validated['profile_photo_path'];
+        }
+
         $user->update($updateData);
 
         if (array_key_exists('role', $validated)) {
-            $user->syncRoles(! empty($validated['role']) ? [$validated['role']] : []);
+            $roleToAssign = ! empty($validated['role'])
+                ? $validated['role']
+                : $this->permissionDiscoveryService->getDefaultRole();
+
+            $user->syncRoles([$roleToAssign]);
         }
 
         activity('system_users')
@@ -120,6 +184,7 @@ class SystemTableController extends Controller
                 'user_id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'status' => $user->status?->value ?? 'active',
                 'role' => $validated['role'] ?? null,
             ])
             ->log("Updated system user '{$user->name}'");
@@ -130,15 +195,82 @@ class SystemTableController extends Controller
     }
 
     /**
+     * Toggle active/suspended status of a user.
+     */
+    public function toggleUserStatus(User $user): RedirectResponse
+    {
+        // Anti-lockout guard: prevent suspending own account
+        if ($user->id === auth()->id()) {
+            return redirect()
+                ->route('system-tables.users')
+                ->withErrors(['error' => __('You cannot suspend your own account.')]);
+        }
+
+        $newStatus = $user->isActive() ? AccountStatus::Suspended : AccountStatus::Active;
+        $user->update(['status' => $newStatus]);
+
+        activity('system_users')
+            ->performedOn($user)
+            ->withProperties([
+                'user_id' => $user->id,
+                'name' => $user->name,
+                'previous_status' => $user->getOriginal('status'),
+                'new_status' => $newStatus->value,
+            ])
+            ->log("Changed user status to '{$newStatus->value}' for '{$user->name}'");
+
+        return redirect()
+            ->route('system-tables.users')
+            ->with('status', __('User :name status changed to :status.', [
+                'name' => $user->name,
+                'status' => $newStatus->label(),
+            ]));
+    }
+
+    /**
+     * Delete a user account from the system explorer.
+     */
+    public function destroyUser(User $user): RedirectResponse
+    {
+        // Anti-lockout guard: Do not allow admin to delete their own account
+        if ($user->id === auth()->id()) {
+            return redirect()
+                ->route('system-tables.users')
+                ->withErrors(['error' => __('You cannot delete your own account.')]);
+        }
+
+        $userName = $user->name;
+
+        activity('system_users')
+            ->performedOn($user)
+            ->withProperties([
+                'user_id' => $user->id,
+                'name' => $userName,
+                'email' => $user->email,
+            ])
+            ->log("Deleted system user '{$userName}'");
+
+        $user->delete();
+
+        return redirect()
+            ->route('system-tables.users')
+            ->with('status', __('User :name deleted successfully.', ['name' => $userName]));
+    }
+
+    /**
      * Display Roles and Permissions matrix.
      */
     public function roles(): View
     {
+        $permissionMatrix = $this->permissionDiscoveryService->getGroupedPermissionMatrix(autoSync: true);
         $roles = $this->systemTableService->getRoles();
         $permissions = $this->systemTableService->getPermissions();
         $allPermissions = Permission::orderBy('name')->get();
+        $superRoles = $this->permissionDiscoveryService->getSuperRoles();
+        $defaultRole = $this->permissionDiscoveryService->getDefaultRole();
+        $discoveryService = $this->permissionDiscoveryService;
 
-        return view('system.roles', compact('roles', 'permissions', 'allPermissions'));
+        return view('system.roles', compact('roles', 'permissions', 'allPermissions', 'permissionMatrix', 'superRoles', 'defaultRole', 'discoveryService'));
     }
 
     /**
@@ -201,7 +333,19 @@ class SystemTableController extends Controller
      */
     public function updateRole(UpdateRoleRequest $request, Role $role): RedirectResponse
     {
+        if ($this->permissionDiscoveryService->isSuperRole($role->name)) {
+            return redirect()
+                ->route('system-tables.roles')
+                ->withErrors(['role' => __('The Super-Admin role is protected by the anti-lockout mechanism and cannot be modified.')]);
+        }
+
         $validated = $request->validated();
+
+        if ($this->permissionDiscoveryService->isDefaultRole($role->name) && $validated['name'] !== $role->name) {
+            return redirect()
+                ->route('system-tables.roles')
+                ->withErrors(['role' => __('The default role cannot be renamed.')]);
+        }
 
         $oldName = $role->name;
         $role->update([
@@ -256,6 +400,18 @@ class SystemTableController extends Controller
      */
     public function destroyRole(Role $role): RedirectResponse
     {
+        if ($this->permissionDiscoveryService->isSuperRole($role->name)) {
+            return redirect()
+                ->route('system-tables.roles')
+                ->withErrors(['role' => __('The Super-Admin role is protected by the anti-lockout mechanism and cannot be deleted.')]);
+        }
+
+        if ($this->permissionDiscoveryService->isDefaultRole($role->name)) {
+            return redirect()
+                ->route('system-tables.roles')
+                ->withErrors(['role' => __('The default role cannot be deleted.')]);
+        }
+
         $roleName = $role->name;
 
         activity('roles_permissions')
@@ -356,7 +512,11 @@ class SystemTableController extends Controller
     {
         $effectiveConfig = $this->dataPruningService->getEffectiveConfig();
         $hasCustomSettings = $this->dataPruningService->hasCustomSettings();
-        $history = $this->dataPruningService->getPruningHistory(10);
+        $history = $this->dataPruningService->getPruningHistory(10)->map(function ($item) {
+            $item->translated_description = $this->systemTableService->translateActivityDescription($item->description);
+
+            return $item;
+        });
         $eligibleTables = $this->dataPruningService->getEligibleTablesForPruning();
 
         $counts = [];
@@ -583,5 +743,55 @@ class SystemTableController extends Controller
                 ->route('system-tables.backups')
                 ->withErrors(['backup' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * Display the initial Super Admin setup screen when the system has no users or unmigrated schema.
+     */
+    public function setup(): View
+    {
+        $needsMigration = ! Schema::hasTable('users');
+
+        if (! $needsMigration && User::count() > 0) {
+            abort(404);
+        }
+
+        return view('system.setup', compact('needsMigration'));
+    }
+
+    /**
+     * Provision the first Super Admin account and initialize system state.
+     */
+    public function storeSetup(InitialSystemSetupRequest $request): RedirectResponse
+    {
+        if (Schema::hasTable('users') && User::count() > 0) {
+            abort(404);
+        }
+
+        $user = $this->systemTableService->createInitialSuperAdmin($request->validated());
+
+        Auth::login($user);
+        $request->session()->save();
+
+        if (env('SESSION_DRIVER') === 'database' && Schema::hasTable('sessions')) {
+            try {
+                DB::table('sessions')->updateOrInsert(
+                    ['id' => $request->session()->getId()],
+                    [
+                        'user_id' => $user->id,
+                        'ip_address' => $request->ip(),
+                        'user_agent' => substr((string) $request->userAgent(), 0, 500),
+                        'payload' => base64_encode(serialize($request->session()->all())),
+                        'last_activity' => time(),
+                    ]
+                );
+            } catch (\Throwable) {
+                // Fallback gracefully
+            }
+        }
+
+        return redirect()
+            ->route('dashboard')
+            ->with('status', __('System initialized successfully! Welcome to ENGI-MATE.'));
     }
 }

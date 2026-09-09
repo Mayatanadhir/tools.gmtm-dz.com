@@ -6,8 +6,8 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-transparent dark:border-gray-700/60 transition-colors duration-200">
+        <div class="w-full px-4 sm:px-6 lg:px-8 space-y-6">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-xl border border-gray-100 dark:border-gray-700/60 transition-colors duration-200">
                 <div class="p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-5">
                     <x-application-logo class="w-12 h-12 shrink-0" />
                     <div class="text-center sm:text-start">

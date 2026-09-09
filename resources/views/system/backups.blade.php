@@ -10,12 +10,12 @@
                 </p>
             </div>
             <div class="flex items-center gap-2">
-                <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 text-xs font-semibold">
+                <x-badge variant="info" size="md">
                     {{ $backupData['total_count'] }} {{ __('backups') }}
-                </span>
-                <span class="inline-flex items-center px-3 py-1 rounded-full bg-gray-500/10 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400 border border-gray-500/20 text-xs font-semibold">
+                </x-badge>
+                <x-badge variant="neutral" size="md">
                     {{ $backupData['total_size_formatted'] }}
-                </span>
+                </x-badge>
             </div>
         </div>
     </x-slot>
@@ -34,7 +34,7 @@
             this.showRestoreModal = true;
         }
     }">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col lg:flex-row gap-6 items-start">
                 <!-- Sidebar Navigation -->
                 <aside class="w-full lg:w-64 shrink-0">
@@ -45,19 +45,15 @@
                 <main class="flex-1 w-full min-w-0 space-y-6">
 
                     @if ($errors->any())
-                        <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-sm flex items-center gap-2 shadow-sm">
-                            <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span>{{ $errors->first() }}</span>
-                        </div>
+                        <x-alert variant="danger">
+                            {{ $errors->first() }}
+                        </x-alert>
                     @endif
 
                     @if (session('status'))
-                        <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-sm flex items-center justify-between shadow-sm">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <span>{{ session('status') }}</span>
-                            </div>
-                        </div>
+                        <x-alert variant="success">
+                            {{ session('status') }}
+                        </x-alert>
                     @endif
 
                     <!-- Top Action & Overview Card -->
@@ -82,11 +78,12 @@
                                     </x-warning-button>
                                 @endif
 
-                                <form method="POST" action="{{ route('system-tables.backups.create') }}">
+                                <form method="POST" action="{{ route('system-tables.backups.create') }}" x-data="{ isCreating: false }" @submit="isCreating = true">
                                     @csrf
-                                    <x-primary-button type="submit">
-                                        <svg class="w-4 h-4 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                        {{ __('Create Backup Now') }}
+                                    <x-primary-button type="submit" ::disabled="isCreating">
+                                        <svg x-show="!isCreating" class="w-4 h-4 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                        <svg x-show="isCreating" x-cloak class="animate-spin w-4 h-4 me-1.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                        <span x-text="isCreating ? '{{ __('Creating Backup...') }}' : '{{ __('Create Backup Now') }}'">{{ __('Create Backup Now') }}</span>
                                     </x-primary-button>
                                 </form>
                             </div>
@@ -153,15 +150,15 @@
 
                                 <x-table.td class="whitespace-nowrap">
                                     @if($backup['is_oldest'])
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                                        <x-badge variant="warning">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                             {{ __('Oldest Snapshot') }}
-                                        </span>
+                                        </x-badge>
                                     @elseif($backup['is_newest'])
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                        <x-badge variant="success">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                             {{ __('Latest Snapshot') }}
-                                        </span>
+                                        </x-badge>
                                     @else
                                         <span class="text-xs text-gray-400 dark:text-gray-500">
                                             {{ __('Standard Backup') }}
@@ -172,29 +169,23 @@
                                 <x-table.td class="text-end whitespace-nowrap">
                                     <x-table.actions>
                                         <!-- 1. Download Backup Button -->
-                                        <a href="{{ route('system-tables.backups.download', $backup['file_name']) }}"
-                                           class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors"
-                                           title="{{ __('Download backup archive') }}">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                                        </a>
+                                        <x-table.action-download
+                                            href="{{ route('system-tables.backups.download', $backup['file_name']) }}"
+                                            :title="__('Download backup archive')"
+                                        />
 
                                         <!-- 2. Restore Backup Button -->
-                                        <button type="button"
-                                                @click="openRestoreModal('{{ $backup['file_name'] }}', '{{ $backup['date']->format('Y-m-d H:i') }}', '{{ $backup['size_formatted'] }}', {{ $backup['is_oldest'] ? 'true' : 'false' }})"
-                                                class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors"
-                                                title="{{ __('Restore database from this snapshot') }}">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                                        </button>
+                                        <x-table.action-restore
+                                            @click="openRestoreModal('{{ $backup['file_name'] }}', '{{ $backup['date']->format('Y-m-d H:i') }}', '{{ $backup['size_formatted'] }}', {{ $backup['is_oldest'] ? 'true' : 'false' }})"
+                                            :title="__('Restore database from this snapshot')"
+                                        />
 
                                         <!-- 3. Delete Backup Button -->
-                                        <form method="POST"
-                                              action="{{ route('system-tables.backups.delete', $backup['file_name']) }}"
-                                              onsubmit="return confirm('{{ __('Are you sure you want to permanently delete backup snapshot :file?', ['file' => $backup['file_name']]) }}')"
-                                              class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <x-table.action-delete type="submit" :title="__('Delete backup snapshot')" />
-                                        </form>
+                                        <x-table.action-delete
+                                            :action-url="route('system-tables.backups.delete', $backup['file_name'])"
+                                            :confirm-message="__('Are you sure you want to permanently delete backup snapshot :file?', ['file' => $backup['file_name']])"
+                                            :title="__('Delete backup snapshot')"
+                                        />
                                     </x-table.actions>
                                 </x-table.td>
                             </x-table.tr>
@@ -283,15 +274,19 @@
                     </div>
 
                     <!-- Form Actions (Rule 14 Unified Buttons) -->
-                    <form method="POST" action="{{ route('system-tables.backups.restore') }}" class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
+                    <form method="POST" action="{{ route('system-tables.backups.restore') }}"
+                          x-data="{ isRestoring: false }"
+                          @submit="isRestoring = true"
+                          class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
                         @csrf
                         <input type="hidden" name="file" :value="restoreFileName">
-                        <x-secondary-button type="button" @click="showRestoreModal = false">
+                        <x-secondary-button type="button" @click="showRestoreModal = false" ::disabled="isRestoring">
                             {{ __('Cancel') }}
                         </x-secondary-button>
-                        <x-danger-button type="submit">
-                            <svg class="w-4 h-4 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                            {{ __('Yes, Restore Database State') }}
+                        <x-danger-button type="submit" ::disabled="isRestoring">
+                            <svg x-show="!isRestoring" class="w-4 h-4 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            <svg x-show="isRestoring" x-cloak class="animate-spin w-4 h-4 me-1.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                            <span x-text="isRestoring ? '{{ __('Restoring Database...') }}' : '{{ __('Yes, Restore Database State') }}'">{{ __('Yes, Restore Database State') }}</span>
                         </x-danger-button>
                     </form>
                 </div>
