@@ -14,11 +14,13 @@ $routes = function (): void {
         return view('dashboard');
     })->middleware(['auth', 'verified'])->name('dashboard');
 
-    Route::middleware(['auth', 'verified'])->prefix('system-tables')->name('system-tables.')->group(function () {
+    Route::middleware(['auth', 'verified', 'role:Super-Admin'])->prefix('system-tables')->name('system-tables.')->group(function () {
         Route::get('/', [SystemTableController::class, 'index'])->name('index');
         Route::get('/users', [SystemTableController::class, 'users'])->name('users');
         Route::post('/users', [SystemTableController::class, 'storeUser'])->name('users.store');
         Route::put('/users/{user}', [SystemTableController::class, 'updateUser'])->name('users.update');
+        Route::post('/users/{user}/toggle-status', [SystemTableController::class, 'toggleUserStatus'])->name('users.toggle-status');
+        Route::delete('/users/{user}', [SystemTableController::class, 'destroyUser'])->name('users.destroy');
         Route::get('/roles', [SystemTableController::class, 'roles'])->name('roles');
         Route::post('/roles', [SystemTableController::class, 'storeRole'])->name('roles.store');
         Route::put('/roles/{role}', [SystemTableController::class, 'updateRole'])->name('roles.update');

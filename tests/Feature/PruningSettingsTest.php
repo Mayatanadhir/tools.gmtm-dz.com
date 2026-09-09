@@ -37,7 +37,7 @@ class PruningSettingsTest extends TestCase
     public function test_authenticated_users_can_view_pruning_settings_dashboard(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         $response = $this->actingAs($user)->get(route('system-tables.pruning'));
 
@@ -54,7 +54,7 @@ class PruningSettingsTest extends TestCase
     public function test_updating_pruning_settings_persists_in_database_and_alters_engine_behavior(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         $payload = [
             'enabled' => '1',
@@ -101,7 +101,7 @@ class PruningSettingsTest extends TestCase
     public function test_dry_run_endpoint_returns_json_simulation_report(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         $response = $this->actingAs($user)
             ->postJson(route('system-tables.pruning.dry-run'));
@@ -120,7 +120,7 @@ class PruningSettingsTest extends TestCase
     public function test_immediate_execution_endpoint_triggers_pruning_and_redirects(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         $response = $this->actingAs($user)->post(route('system-tables.pruning.execute'));
 
@@ -131,7 +131,7 @@ class PruningSettingsTest extends TestCase
     public function test_reset_endpoint_restores_configuration_defaults(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         // Establish custom overrides first
         $this->service->saveCustomSettings([
@@ -155,5 +155,26 @@ class PruningSettingsTest extends TestCase
 
         // Effective config should revert to default config/pruning.php values
         $this->assertSame(1000, $this->service->getEffectiveConfig()['chunk_size']);
+    }
+
+    public function test_pruning_audit_trail_operation_column_displays_translated_descriptions(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->superAdmin()->create();
+
+        activity('data_pruning')
+            ->log('Updated automated data pruning settings');
+
+        // Arabic view
+        app()->setLocale('ar');
+        $responseAr = $this->actingAs($user)->get(route('system-tables.pruning'));
+        $responseAr->assertOk();
+        $responseAr->assertSee('تم تحديث إعدادات التقليم التلقائي للبيانات');
+
+        // French view
+        app()->setLocale('fr');
+        $responseFr = $this->actingAs($user)->get(route('fr.system-tables.pruning'));
+        $responseFr->assertOk();
+        $responseFr->assertSee("Paramètres d'élagage automatique des données mis à jour");
     }
 }

@@ -11,25 +11,23 @@
             </div>
             <div class="flex items-center gap-2">
                 @if($effectiveConfig['enabled'])
-                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-semibold">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 me-1.5 animate-pulse"></span>
+                    <x-badge variant="success" size="md" :dot="true" :dot-ping="true">
                         {{ __('Pruning Active') }}
-                    </span>
+                    </x-badge>
                 @else
-                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-xs font-semibold">
-                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500 me-1.5"></span>
+                    <x-badge variant="danger" size="md" :dot="true">
                         {{ __('Pruning Disabled') }}
-                    </span>
+                    </x-badge>
                 @endif
 
                 @if($hasCustomSettings)
-                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 text-xs font-semibold">
+                    <x-badge variant="info" size="md">
                         {{ __('Custom Settings Active') }}
-                    </span>
+                    </x-badge>
                 @else
-                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-gray-500/10 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400 border border-gray-500/20 text-xs font-semibold">
+                    <x-badge variant="neutral" size="md">
                         {{ __('Config Defaults') }}
-                    </span>
+                    </x-badge>
                 @endif
             </div>
         </div>
@@ -81,7 +79,7 @@
             }
         }
     }">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col lg:flex-row gap-6 items-start">
                 <!-- Sidebar Navigation -->
                 <aside class="w-full lg:w-64 shrink-0">
@@ -92,19 +90,15 @@
                 <main class="flex-1 w-full min-w-0 space-y-6">
 
                     @if ($errors->any())
-                        <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-sm flex items-center gap-2 shadow-sm">
-                            <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span>{{ $errors->first() }}</span>
-                        </div>
+                        <x-alert variant="danger">
+                            {{ $errors->first() }}
+                        </x-alert>
                     @endif
 
                     @if (session('status'))
-                        <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-sm flex items-center justify-between shadow-sm">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <span>{{ session('status') }}</span>
-                            </div>
-                        </div>
+                        <x-alert variant="success">
+                            {{ session('status') }}
+                        </x-alert>
                     @endif
 
                     <!-- Main Settings Form -->
@@ -463,7 +457,7 @@
                                 <x-table.td class="font-medium text-gray-900 dark:text-white">
                                     <div class="flex items-center gap-2">
                                         <span class="w-2 h-2 rounded-full bg-orange-500 shrink-0"></span>
-                                        <span>{{ $item->description }}</span>
+                                        <span>{{ $item->translated_description ?? $item->description }}</span>
                                     </div>
                                 </x-table.td>
                                 <x-table.td class="font-mono text-xs text-gray-600 dark:text-gray-300">

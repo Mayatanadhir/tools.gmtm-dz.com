@@ -23,7 +23,7 @@ class GlobalFilterTest extends TestCase
     public function test_global_filter_renders_in_users_view_with_search_input(): void
     {
         /** @var User $user */
-        $user = User::factory()->create(['name' => 'Alice Test Engineer']);
+        $user = User::factory()->superAdmin()->create(['name' => 'Alice Test Engineer']);
 
         $response = $this->actingAs($user)->get(route('system-tables.users'));
 
@@ -38,7 +38,7 @@ class GlobalFilterTest extends TestCase
     public function test_global_filter_displays_reset_button_when_search_query_is_active(): void
     {
         /** @var User $user */
-        $user = User::factory()->create(['name' => 'Bob Mechanical Engineer']);
+        $user = User::factory()->superAdmin()->create(['name' => 'Bob Mechanical Engineer']);
 
         $response = $this->actingAs($user)->get(route('system-tables.users', ['search' => 'Mechanical']));
 
@@ -52,7 +52,7 @@ class GlobalFilterTest extends TestCase
     public function test_global_filter_select_filters_activity_log_by_event(): void
     {
         /** @var User $user */
-        $user = User::factory()->create(['name' => 'Audit Trigger']);
+        $user = User::factory()->superAdmin()->create(['name' => 'Audit Trigger']);
 
         $response = $this->actingAs($user)->get(route('system-tables.activity-log', ['event' => 'created']));
 
@@ -64,7 +64,7 @@ class GlobalFilterTest extends TestCase
     public function test_global_filter_select_filters_notifications_by_status(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         $response = $this->actingAs($user)->get(route('system-tables.notifications', ['status' => 'unread']));
 
@@ -96,7 +96,7 @@ class GlobalFilterTest extends TestCase
     public function test_pagination_retains_global_filter_query_string(): void
     {
         /** @var User $user */
-        $user = User::factory()->create(['name' => 'Lead Engineer']);
+        $user = User::factory()->superAdmin()->create(['name' => 'Lead Engineer']);
 
         // Create 20 users matching "Engineer" to trigger pagination (15 per page)
         User::factory()->count(20)->create(['name' => 'Staff Engineer']);
@@ -112,7 +112,7 @@ class GlobalFilterTest extends TestCase
     public function test_security_unwhitelisted_query_parameters_do_not_leak_or_break_page(): void
     {
         /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::factory()->superAdmin()->create();
 
         $response = $this->actingAs($user)->get(route('system-tables.users', [
             'search' => 'Engineer',

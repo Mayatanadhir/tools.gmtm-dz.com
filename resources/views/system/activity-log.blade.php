@@ -9,14 +9,14 @@
                     {{ __('Forensic audit trail, model mutations, and actor tracking') }}
                 </p>
             </div>
-            <span class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-semibold">
+            <x-badge variant="info" size="md">
                 {{ $activities->total() }} {{ __('Total Activities') }}
-            </span>
+            </x-badge>
         </div>
     </x-slot>
 
     <div class="py-8" x-data="{ modalOpen: false, modalTitle: '', modalChanges: null }">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col lg:flex-row gap-6 items-start">
                 <!-- Sidebar Navigation -->
                 <aside class="w-full lg:w-64 shrink-0">
@@ -67,23 +67,23 @@
 
                 @forelse($activities as $act)
                     @php
-                        $badgeColor = match($act->event) {
-                            'created' => 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
-                            'updated' => 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
-                            'deleted' => 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
-                            default => 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+                        $eventVariant = match($act->event) {
+                            'created' => 'success',
+                            'updated' => 'warning',
+                            'deleted' => 'danger',
+                            default => 'info',
                         };
                         $changesPayload = json_encode($act->attribute_changes ?? $act->properties ?? []);
                     @endphp
                     <x-table.tr>
                         <x-table.td class="font-mono font-bold text-gray-900 dark:text-white">#{{ $act->id }}</x-table.td>
                         <x-table.td>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase border {{ $badgeColor }}">
+                            <x-badge :variant="$eventVariant" class="uppercase">
                                 {{ $act->event ?? 'event' }}
-                            </span>
+                            </x-badge>
                         </x-table.td>
                         <x-table.td class="font-medium text-gray-900 dark:text-white">
-                            {{ $act->description }}
+                            {{ $act->translated_description ?? $act->description }}
                         </x-table.td>
                         <x-table.td class="font-mono text-xs">
                             @if($act->subject_type)
@@ -108,7 +108,7 @@
                         <x-table.td class="whitespace-nowrap text-end">
                             <x-table.actions class="justify-end">
                                 <x-table.action-view
-                                    @click="modalOpen = true; modalTitle = '{{ addslashes($act->description) }}'; modalChanges = {{ $changesPayload }}"
+                                    @click="modalOpen = true; modalTitle = '{{ addslashes($act->translated_description ?? $act->description) }}'; modalChanges = {{ $changesPayload }}"
                                     :title="__('View Changes')">
                                     {{ __('View Changes') }}
                                 </x-table.action-view>

@@ -87,5 +87,6 @@ return [
         'password' => 'كلمة المرور',
         'password_confirmation' => 'تأكيد كلمة المرور',
         'current_password' => 'كلمة المرور الحالية',
+        'role' => 'الدور',
     ],
 ];

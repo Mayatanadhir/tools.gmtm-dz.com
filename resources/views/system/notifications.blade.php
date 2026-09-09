@@ -9,14 +9,14 @@
                     {{ __('Internal database notifications, recipient targeting, and delivery payloads') }}
                 </p>
             </div>
-            <span class="inline-flex items-center px-3 py-1 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/20 text-xs font-semibold">
+            <x-badge variant="primary" size="md">
                 {{ $notifications->total() }} {{ __('Total Notifications') }}
-            </span>
+            </x-badge>
         </div>
     </x-slot>
 
     <div class="py-8" x-data="{ modalOpen: false, modalTitle: '', modalPayload: null }">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col lg:flex-row gap-6 items-start">
                 <!-- Sidebar Navigation -->
                 <aside class="w-full lg:w-64 shrink-0">
@@ -77,13 +77,13 @@
                         </x-table.td>
                         <x-table.td>
                             @if($notif->read_at)
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                                <x-badge variant="neutral">
                                     {{ __('Read') }} ({{ \Carbon\Carbon::parse($notif->read_at)->diffForHumans() }})
-                                </span>
+                                </x-badge>
                             @else
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                <x-badge variant="success" :dot="true">
                                     {{ __('Unread') }}
-                                </span>
+                                </x-badge>
                             @endif
                         </x-table.td>
                         <x-table.td class="whitespace-nowrap">
