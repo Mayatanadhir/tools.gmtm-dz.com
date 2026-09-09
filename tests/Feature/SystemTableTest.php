@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\User;
+<<<<<<< HEAD
 use App\Notifications\SystemActivityAlert;
+=======
+>>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
 use App\Services\SystemTableService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -134,7 +137,10 @@ class SystemTableTest extends TestCase
     {
         /** @var User $user */
         $user = User::factory()->superAdmin()->create();
+<<<<<<< HEAD
         $user->notify(new SystemActivityAlert('New Login', 'Logged in successfully', 'info'));
+=======
+>>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
 
         $response = $this->actingAs($user)->get(route('system-tables.notifications'));
 

@@ -234,6 +234,7 @@
                     </div>
 
                     <!-- ============================================================ -->
+<<<<<<< HEAD
                     <!-- Configured Roles Section — Unified Table Component          -->
                     <!-- ============================================================ -->
                     <div class="space-y-4">
@@ -249,12 +250,23 @@
                                     <span class="font-mono text-[11px] text-gray-400">({{ __('RBAC Tables') }}: <code>roles</code>, <code>role_has_permissions</code>, <code>model_has_roles</code>)</span>
                                 </p>
                             </div>
+=======
+                    <!-- Roles Cards Grid                                             -->
+                    <!-- ============================================================ -->
+                    <div>
+                        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                            <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <svg class="w-5 h-5 text-indigo-500 shrink-0 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                                <span>{{ __('Configured Roles') }} (<code>roles</code>, <code>role_has_permissions</code>, <code>model_has_roles</code>)</span>
+                            </h3>
+>>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
                             <x-primary-button type="button" @click="showRoleModal = true" class="py-1.5 px-3 text-xs rounded-lg flex items-center gap-1.5">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                                 <span>{{ __('New Role') }}</span>
                             </x-primary-button>
                         </div>
 
+<<<<<<< HEAD
                         <x-table>
                             <x-slot:header>
                                 <x-table.th class="w-16">ID</x-table.th>
@@ -360,6 +372,51 @@
                                                     {{ __('Immutable') }}
                                                 </span>
                                             @elseif($isDefault)
+=======
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                            @forelse($roles as $role)
+                                <div class="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700/60 flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex items-center justify-between mb-3">
+                                            <h4 class="text-lg font-bold text-gray-900 dark:text-white">{{ $role->name }}</h4>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                                {{ $role->guard_name }}
+                                            </span>
+                                        </div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                                            {{ $role->users_count }} {{ __('Users assigned') }}
+                                        </p>
+
+                                        <div class="space-y-1.5">
+                                            <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">
+                                                {{ __('Granted Permissions') }} ({{ $role->permissions->count() }}):
+                                            </p>
+                                            <div class="flex flex-wrap gap-1.5">
+                                                @forelse($role->permissions as $perm)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-700/50">
+                                                        {{ $perm->name }}
+                                                    </span>
+                                                @empty
+                                                    <span class="text-xs text-gray-400 italic">{{ __('No permissions directly attached.') }}</span>
+                                                @endforelse
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-6 pt-3 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between">
+                                        <span class="text-xs font-mono text-gray-400">ID: #{{ $role->id }} &bull; {{ $role->created_at?->format('Y-m-d') }}</span>
+                                        <x-table.actions>
+                                            @if(in_array($role->name, $superRoles ?? ['Super-Admin'], true))
+                                                <x-badge variant="warning">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                                    {{ __('Protected System Role') }}
+                                                </x-badge>
+                                            @elseif($role->name === ($defaultRole ?? 'User'))
+                                                <x-badge variant="info">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                                                    {{ __('Default Role') }}
+                                                </x-badge>
+>>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
                                                 <x-table.action-edit
                                                     :title="__('Edit Role')"
                                                     @click="openEditRoleModal({{ $role->id }}, '{{ addslashes($role->name) }}', {{ json_encode($role->permissions->pluck('name')->values()->all()) }}, '{{ route('system-tables.roles.update', $role) }}')"
@@ -375,12 +432,23 @@
                                                 />
                                             @endif
                                         </x-table.actions>
+<<<<<<< HEAD
                                     </x-table.td>
                                 </x-table.tr>
                             @empty
                                 <x-table.empty colspan="7" />
                             @endforelse
                         </x-table>
+=======
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="col-span-3 p-8 text-center bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700/60 text-gray-500">
+                                    {{ __('No records found.') }}
+                                </div>
+                            @endforelse
+                        </div>
+>>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
                     </div>
 
                     <!-- ============================================================ -->

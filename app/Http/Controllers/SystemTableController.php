@@ -268,9 +268,14 @@ class SystemTableController extends Controller
         $allPermissions = Permission::orderBy('name')->get();
         $superRoles = $this->permissionDiscoveryService->getSuperRoles();
         $defaultRole = $this->permissionDiscoveryService->getDefaultRole();
+<<<<<<< HEAD
         $discoveryService = $this->permissionDiscoveryService;
 
         return view('system.roles', compact('roles', 'permissions', 'allPermissions', 'permissionMatrix', 'superRoles', 'defaultRole', 'discoveryService'));
+=======
+
+        return view('system.roles', compact('roles', 'permissions', 'allPermissions', 'permissionMatrix', 'superRoles', 'defaultRole'));
+>>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
     }
 
     /**

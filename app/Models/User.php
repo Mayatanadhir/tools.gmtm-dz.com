@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+<<<<<<< HEAD
+=======
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+>>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
 use App\Enums\AccountStatus;
 use App\Observers\UserObserver;
 use App\Traits\FilterableTrait;

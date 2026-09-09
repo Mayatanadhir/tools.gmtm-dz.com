@@ -3,7 +3,10 @@
 namespace App\Providers;
 
 use Illuminate\Support\Facades\Gate;
+<<<<<<< HEAD
 use Illuminate\Support\Facades\Schema;
+=======
+>>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -31,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(function ($user, string $ability): ?bool {
             return (method_exists($user, 'hasAnyRole') && $user->hasAnyRole($this->superRoles)) ? true : null;
         });
+<<<<<<< HEAD
 
         $this->ensureSafeDriversWhenUnmigrated();
     }
@@ -52,5 +56,7 @@ class AppServiceProvider extends ServiceProvider
             config(['session.driver' => 'file']);
             config(['cache.default' => 'file']);
         }
+=======
+>>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
     }
 }

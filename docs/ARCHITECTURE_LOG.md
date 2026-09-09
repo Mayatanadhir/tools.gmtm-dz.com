@@ -4,6 +4,7 @@ This document tracks fundamental architectural patterns, engineering decisions, 
 
 ---
 
+<<<<<<< HEAD
 ## [ADR-045] User Model MustVerifyEmail Implementation & Immediate Verification Dispatch
 - **Date:** 2026-09-09
 - **Status:** Accepted / Active
@@ -86,6 +87,8 @@ This document tracks fundamental architectural patterns, engineering decisions, 
 
 ---
 
+=======
+>>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
 ## [ADR-040] Dual-Layer Anti-Self-Action Protection Suite (Self-Deletion, Self-Suspension & Edit Modal Field Locks)
 - **Date:** 2026-09-09
 - **Status:** Accepted / Active

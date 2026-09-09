@@ -5,11 +5,19 @@
 
 <div class="relative" x-data="{ open: false }" @click.outside="open = false" @close.stop="open = false">
 
+<<<<<<< HEAD
     {{-- Trigger: ghost button showing globe icon + locale code --}}
     <button @click="open = ! open"
             type="button"
             class="flex items-center gap-1.5 h-9 px-2.5 rounded-full text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-offset-gray-800 transition-all duration-150">
         <span class="text-base leading-none">🌐</span>
+=======
+    {{-- Trigger: ghost button showing flag + locale code --}}
+    <button @click="open = ! open"
+            type="button"
+            class="flex items-center gap-1.5 h-9 px-2.5 rounded-full text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-offset-gray-800 transition-all duration-150">
+        <span class="text-base leading-none">{{ $localeFlags[$currentLocale] ?? '🌐' }}</span>
+>>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
         <span class="text-xs font-semibold uppercase tracking-wide">{{ strtoupper($currentLocale) }}</span>
         <svg class="h-3 w-3 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': open }" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -35,7 +43,11 @@
                    rel="alternate"
                    hreflang="{{ $localeCode }}"
                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-100 {{ $isActive ? 'bg-orange-50 dark:bg-gray-700/70 text-orange-600 dark:text-orange-400 font-semibold' : 'text-gray-700 dark:text-gray-200 hover:bg-orange-50 dark:hover:bg-gray-700' }}">
+<<<<<<< HEAD
                     <span class="text-base leading-none shrink-0">🌐</span>
+=======
+                    <span class="text-base leading-none shrink-0">{{ $localeFlags[$localeCode] ?? '🌐' }}</span>
+>>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
                     <span class="flex-1">{{ $properties['native'] }}</span>
                     @if($isActive)
                         <svg class="h-3.5 w-3.5 text-orange-500 dark:text-orange-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">

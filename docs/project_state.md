@@ -12,11 +12,16 @@
 - **Locales Supported:** `ar` (Arabic, default, hidden prefix), `en` (English, `/en/`), `fr` (French, `/fr/`)
 - **Themes Supported:** `light`, `dark`, `system` (Zero-FOUC prevention script, Alpine.js reactive store, cross-instance sync)
 - **Database Engine:** MySQL (`gmtmdz_tools`)
+<<<<<<< HEAD
 - **Authentication:** Laravel Breeze (Session/Blade based with active `MustVerifyEmail` contract; registration immediately dispatches verification emails via `${APP_NAME} <${MAIL_FROM_ADDRESS}>`)
 - **Test Suite:** 244 tests, 1045 assertions (100% passing)
 - **Localization Parity:** Trilingual dictionary parity across Arabic, English, and French (499 keys each, 0 missing)
 - **Roles & Permissions Architecture:** Configured Roles section modernized to Unified Table Component (`<x-table>`) with localized functional titles, scopes, and privilege previews.
 - **Notifications Architecture:** Database notifications explorer updated with localized alert types, semantic action badges, payload title translation (`{{ __($notificationTitle) }}`), and preview modals with 100% key parity across AR, EN, and FR.
+=======
+- **Authentication:** Laravel Breeze (Session/Blade based)
+- **Test Suite:** 227 tests, 920 assertions (100% passing)
+>>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
 - **Anti-Self-Action Security Policy:** Administrators are strictly prohibited from self-demotion/role changing, self-suspension, or self-deletion via dual-layer protection (controller guards and UI action masking).
 
 ---
@@ -38,7 +43,11 @@
 
 ## 3. Registered Models & Enums
 - `App\Enums\AccountStatus`: Backed string enum (`Active = 'active'`, `Suspended = 'suspended'`) with UI labels, badge color tokens, and translation helpers.
+<<<<<<< HEAD
 - `App\Models\User`: Authenticatable user model (implements `MustVerifyEmail`; includes `FilterableTrait`, `HasActivity`, `HasFactory`, `HasRoles`, `Notifiable`; casts `'status' => AccountStatus::class`; attributes `profile_photo_path`, `photo_hash`, `profile_photo_url`). Automatically assigned default role `'User'` on creation via `UserObserver::created()`. Immediate verification email dispatched on registration.
+=======
+- `App\Models\User`: Authenticatable user model (includes `FilterableTrait`, `HasActivity`, `HasFactory`, `HasRoles`, `Notifiable`; casts `'status' => AccountStatus::class`; attributes `profile_photo_path`, `photo_hash`, `profile_photo_url`). Automatically assigned default role `'User'` on creation via `UserObserver::created()`.
+>>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
 - `App\Models\SystemSetting`: System configuration overrides model with cached access and JSON value casting.
 - `App\Services\PermissionDiscoveryService`: Introspection and RBAC service defining super roles (`Super-Admin`) and default baseline role (`User`), with immutability guarantees.
 
@@ -101,7 +110,11 @@
   - `App\Http\Controllers\ProfileController`: Refactored with `declare(strict_types=1);`, delegates `update` and `destroy` to `UserService` (transaction-wrapped).
   - `App\Http\Controllers\SystemTableController`: Thin controller orchestrating requests for the System Tables Explorer suite.
   - `App\Http\Controllers\Api\NotificationController`: API (`index`, `unread`, `markAsRead`, `markAllAsRead`, `destroy`; uses `ApiResponseTrait`; enforces per-user notification isolation).
+<<<<<<< HEAD
 - **Console Commands (`app/Console/Commands`):** `SetupProjectCommand` (`php artisan project:setup [--fresh] [--force]`), `OptimizeImagesCommand` (`php artisan images:optimize`), `SyncTablePermissionsCommand` (`php artisan permissions:sync-tables [--dry-run]`), `DataPruneCommand` (`php artisan data:prune`).
+=======
+- **Console Commands (`app/Console/Commands`):** `OptimizeImagesCommand` (`php artisan images:optimize`), `SyncTablePermissionsCommand` (`php artisan permissions:sync-tables [--dry-run]`).
+>>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
 - **Providers (`app/Providers`):** `RepositoryServiceProvider` (maps repository interfaces to implementations).
 - **Middleware (`app/Http/Middleware`):** `SetLocale` (guarantees runtime locale synchronization).
 - **Middleware Aliases (`bootstrap/app.php`):** `role` (RoleMiddleware), `permission` (PermissionMiddleware), `role_or_permission` (RoleOrPermissionMiddleware), `localize` (LaravelLocalizationRoutes), `localizationRedirect` (LaravelLocalizationRedirectFilter), `localeSessionRedirect` (LocaleSessionRedirect), `localeCookieRedirect` (LocaleCookieRedirect), `localeViewPath` (LaravelLocalizationViewPath).
@@ -281,6 +294,7 @@
     6. Neutral / Structure: Cool Gray (`gray`) for cards, borders, secondary actions, and subtitles.
   - Standardized Components: `<x-badge>` (polymorphic badge with dot/ping options) and `<x-alert>` (dismissible flash message banner with semantic icons).
   - Standardized Border Radiuses: `rounded-xl` for cards and tables, `rounded-2xl` for modals and popovers, `rounded-lg` for interactive controls and inputs, `rounded-full` for badges and pills.
+<<<<<<< HEAD
 - **Rule 31 (Standardized Client Handoff & Project Setup Architecture):**
   - Command: `php artisan project:setup` (`app/Console/Commands/SetupProjectCommand.php`).
   - Automated Migration Pipeline: Runs `migrate` (or `migrate:fresh` when `--fresh` is specified) with production overrides (`--force`).
@@ -299,6 +313,8 @@
 
 
 
+=======
+>>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
 
 
 
