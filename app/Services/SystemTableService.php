@@ -324,7 +324,6 @@ class SystemTableService
 
         return $trimmed;
     }
-<<<<<<< HEAD
 
     /**
      * Provision the first Super-Admin account and initialize system RBAC baseline.
@@ -371,6 +370,4 @@ class SystemTableService
             return $user;
         });
     }
-=======
->>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
 }

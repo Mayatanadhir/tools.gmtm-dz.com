@@ -96,7 +96,6 @@ class PermissionDiscoveryService
     }
 
     /**
-<<<<<<< HEAD
      * Get the translated functional title for a given role name.
      */
     public function getRoleFunctionalTitle(string $roleName): string
@@ -123,8 +122,6 @@ class PermissionDiscoveryService
     }
 
     /**
-=======
->>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
      * Discover business tables from the active database schema, excluding blacklisted system tables.
      *
      * @return array<int, string>

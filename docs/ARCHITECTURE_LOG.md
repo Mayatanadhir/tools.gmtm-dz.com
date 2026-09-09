@@ -4,7 +4,18 @@ This document tracks fundamental architectural patterns, engineering decisions, 
 
 ---
 
-<<<<<<< HEAD
+## [ADR-046] Merge Conflict Cleanse and Codebase Stability Restoration
+- **Date:** 2026-09-09
+- **Status:** Accepted / Implemented
+- **Context:** Following a git pull/merge between remote and local branches, merge conflict markers (`<<<<<<< HEAD`, `=======`, `>>>>>>>`) were committed across 16 files, breaking the PHP bootstrap (`AppServiceProvider.php`) and causing a `500 Internal Server Error` on all requests.
+- **Decision:**
+  1. Restored the verified codebase baseline from the latest active feature commit (`06fdda1`), retaining all newest features (email verification, unified table components for configured roles, notifications explorer localization, auto-setup commands).
+  2. Verified 100% dictionary integrity across `lang/ar.json`, `lang/en.json`, and `lang/fr.json` (499 keys each, 0 missing).
+  3. Validated full test suite execution (244 tests, 1045 assertions passed) and confirmed HTTP 200 responses.
+- **Consequences:** Restored application availability, eliminating 500 parse errors and maintaining structural integrity across all architectural layers.
+
+---
+
 ## [ADR-045] User Model MustVerifyEmail Implementation & Immediate Verification Dispatch
 - **Date:** 2026-09-09
 - **Status:** Accepted / Active
@@ -87,8 +98,6 @@ This document tracks fundamental architectural patterns, engineering decisions, 
 
 ---
 
-=======
->>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
 ## [ADR-040] Dual-Layer Anti-Self-Action Protection Suite (Self-Deletion, Self-Suspension & Edit Modal Field Locks)
 - **Date:** 2026-09-09
 - **Status:** Accepted / Active

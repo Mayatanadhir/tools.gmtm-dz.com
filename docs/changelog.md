@@ -4,7 +4,15 @@ All notable changes, features, refactorings, and fixes will be documented in thi
 
 The format is based on Keep a Changelog.
 
-<<<<<<< HEAD
+## [2026-09-09] — Merge Conflict Resolution & 500 Internal Server Error Fix
+### Fixed
+- **Committed Merge Conflict Markers Purged**:
+  - Resolved syntax errors (`ParseError: syntax error, unexpected token "<<" at app/Providers/AppServiceProvider.php:6`) caused by conflict markers inadvertently committed during a branch merge.
+  - Cleaned all 16 impacted files across PHP services, models, providers, Blade templates, test suites, and localization dictionaries (`lang/ar.json`, `lang/en.json`, `lang/fr.json`).
+  - Verified application responds with `200 OK` on root URL and all 244 feature/unit tests pass with 1045 assertions.
+
+---
+
 ## [2026-09-09] — Immediate Email Verification on Registration & Sender Customization
 ### Added & Refactored
 - **`MustVerifyEmail` Contract Implementation (`app/Models/User.php`)**:
@@ -104,8 +112,6 @@ The format is based on Keep a Changelog.
 
 ---
 
-=======
->>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
 ## [2026-09-09] — Comprehensive Anti-Self-Action Protection Suite (Self-Delete, Self-Suspend, Self-Role Locks)
 ### Security & UI Protection
 - **Anti-Self-Deletion Guard (`SystemTableController::destroyUser`)**: Rejects any DELETE request where the authenticated administrator targets their own account (`$user->id === auth()->id()`). Redirects with localized session error `"You cannot delete your own account."`.

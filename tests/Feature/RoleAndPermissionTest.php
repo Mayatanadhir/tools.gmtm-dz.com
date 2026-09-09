@@ -138,7 +138,6 @@ class RoleAndPermissionTest extends TestCase
         $this->assertTrue($superAdmin->isSuperAdmin());
         $this->assertFalse($regularUser->isSuperAdmin());
     }
-<<<<<<< HEAD
 
     public function test_roles_page_renders_unified_table_with_translated_functional_columns(): void
     {
@@ -157,6 +156,4 @@ class RoleAndPermissionTest extends TestCase
         $response->assertSeeText(__('Role Status'));
         $response->assertSeeText(__('Super Administrator (Full Sovereign Access)'));
     }
-=======
->>>>>>> 1355bd68bffa8592fe252627c65c6998eba406ce
 }
