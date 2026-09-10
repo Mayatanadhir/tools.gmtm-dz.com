@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -20,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        require_once app_path('Helpers/helpers.php');
     }
 
     /**
@@ -30,6 +31,10 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::before(function ($user, string $ability): ?bool {
             return (method_exists($user, 'hasAnyRole') && $user->hasAnyRole($this->superRoles)) ? true : null;
+        });
+
+        Blade::if('registrationOpen', function (): bool {
+            return is_registration_open();
         });
 
         $this->ensureSafeDriversWhenUnmigrated();

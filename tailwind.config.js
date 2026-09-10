@@ -19,4 +19,9 @@ export default {
     },
 
     plugins: [forms],
+
+    safelist: [
+        'translate-x-0',
+        'translate-x-7',
+    ],
 };

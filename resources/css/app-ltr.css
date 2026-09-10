@@ -6,3 +6,11 @@
 [x-cloak] {
     display: none !important;
 }
+
+/* Switch Knob Positions for LTR */
+.switch-knob-left {
+    transform: translateX(0);
+}
+.switch-knob-right {
+    transform: translateX(1.75rem);
+}

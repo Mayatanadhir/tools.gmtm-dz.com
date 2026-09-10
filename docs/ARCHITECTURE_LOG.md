@@ -4,6 +4,55 @@ This document tracks fundamental architectural patterns, engineering decisions, 
 
 ---
 
+## [ADR-048] Automatic Migration & Dual-Layer Database Provisioning Architecture
+- **Date:** 2026-09-10
+- **Status:** Accepted / Implemented
+- **Context:** When running the application against a fresh or uninitialized database (such as switching `DB_DATABASE=gmtmdz_tools2` or non-existent database names), fatal `QueryException` or `1049 Unknown database` errors would crash requests before any admin could intervene. The application required an automatic migration and provisioning engine capable of silently creating missing databases, building all database tables, and seeding roles without manual terminal intervention, coupled with an onboarding gate that directs any incoming guest traffic to provision the initial Super Admin account only while the `users` table is completely empty, and a graceful fallback error screen if the database server is unreachable.
+- **Decision:**
+  1. **Dual-Layer Database Provisioning & Auto-Migration (`EnsureDatabaseIsMigrated`):**
+     - **Layer 1 (Smart Database Auto-Creation):** Catches missing database exceptions (`1049 Unknown database` in MySQL or PostgreSQL/SQLite equivalents). Connects directly to the server host via raw PDO without a database specifier and provisions the database automatically (`CREATE DATABASE IF NOT EXISTS \`db_name\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`), reconnects on the fly, and proceeds with migration and seeding.
+     - **Layer 2 (Graceful Error Fallback View):** If the database cannot be reached or automatically created (e.g., MySQL server offline, invalid credentials, or lack of privileges), catches the exception and renders `resources/views/errors/database.blade.php` with HTTP status `503 Service Unavailable`, featuring Light/Dark mode, diagnostics table, troubleshooting steps, and retry CTA.
+     - **Schema Migration & Seeding:** Inspects pending migrations via Laravel's `Migrator` repository and checks for missing critical tables (`migrations`, `users`, `system_settings`). If unmigrated, automatically invokes `Artisan::call('migrate', ['--force' => true])`, seeds roles via `db:seed`, and generates CRUD permissions.
+     - Caches schema readiness per database (`system_schema_migrated_{dbName}`) with a 3600-second TTL and static request memoization to guarantee zero performance overhead on subsequent requests.
+     - Bypasses during unit tests (`app()->runningUnitTests()`) to preserve `RefreshDatabase` isolation and speed.
+  2. **Zero-State Super Admin Setup Gate (`EnsureSuperAdminExists`):**
+     - Evaluates whether the system has registered users via `User::exists()`.
+     - **Empty Database Interception:** If zero users exist, smoothly redirects all web traffic (`/`, `/login`, `/register`, `/dashboard`, etc.) directly to the first-run setup wizard (`route('system-tables.setup')`). Exempts static assets, health checks (`/up`), API endpoints, and CSRF token requests.
+     - **Anti-Hijacking Route Sealing:** Once at least one user is registered, any direct navigation to `/system-tables/setup` immediately aborts with `404 Not Found` (GET) or `403 Forbidden` (POST), preventing any unauthorized re-initialization.
+  3. **Middleware Pipeline & Global Exception Integration (`bootstrap/app.php`):**
+     - Appended `EnsureDatabaseIsMigrated::class` and `EnsureSuperAdminExists::class` to the `web` middleware group.
+     - Added global `PDOException` exception handler in `bootstrap/app.php` to catch any database connection failures and render the localized database error screen.
+  4. **Strict Compliance with Rules 12, 13, 14, 15, and 17:**
+     - Pre-approved under Rule 13 (High-Security Quarantine) with explicit developer verification.
+     - UI layout in `resources/views/system/setup.blade.php` and `resources/views/errors/database.blade.php` uses standardized `<x-primary-button>`, `<x-badge>`, `<x-text-input>`, and zero inline styles.
+     - 100% trilingual dictionary synchronization verified across Arabic, English, and French (559 keys each, 0 missing).
+  5. **Verification & Test Coverage:**
+     - Automated test suite `tests/Feature/AutoMigrationAndSetupMiddlewareTest.php` and `tests/Feature/InitialSystemSetupTest.php` passing 100% (261 tests total).
+     - Validated full lifecycle in browser using fresh database `gmtmdz_tools2`.
+- **Consequences:** Provides hands-free, zero-configuration deployment and migration when connecting to any new database, while strictly safeguarding the administrative onboarding flow against hijacking or repeated execution.
+
+---
+
+## [ADR-047] Dynamic System Settings Engine & Registration Shield Architecture
+- **Date:** 2026-09-10
+- **Status:** Accepted / Implemented
+- **Context:** The application required an extensible runtime configuration mechanism rather than hardcoding business flags (such as enabling/disabling public account registration). The solution needed to eliminate redundant database reads on high-frequency public traffic, guard route entry points against unwanted access, eliminate dead links in guest views, and provide a real-time reactive toggle for Super Administrators.
+- **Decision:**
+  1. **Dual-Layer Database & Cache Strategy:** Built upon `App\Models\SystemSetting` with persistent cache storage (`86400` TTL) and immediate write-through cache refresh (`Cache::put()`) upon mutation. Added typed accessors (`getBool`, `getInt`, `getString`, `has`) and global helper functions (`system_setting()`, `is_registration_open()`).
+  2. **Route Shield Middleware (`EnsureRegistrationIsOpen`):** Created a dedicated HTTP middleware checking `is_registration_open()` strictly from cache. Unauthenticated visitors attempting to access `/register` (`GET` or `POST`) while disabled are redirected to `/login` with an informative error alert, or receive a `403 Forbidden` JSON payload for API/AJAX requests.
+  3. **Super-Admin Reactive Control Interface (`resources/views/system/settings.blade.php`):** Created a dedicated System Settings dashboard under `/system-tables/settings` restricted to the `Super-Admin` role. Implemented an interactive Alpine.js toggle switch dispatching asynchronous JSON requests (`POST /system-tables/settings/toggle-registration`), complete with smooth state animations, non-blocking toast notifications, and an inspection table (`<x-table>`) detailing active key-value parameters.
+     - **Bilingual Direction & Semantic Color Palette:**
+       - **Arabic (RTL):** Open state = Emerald Green (`bg-emerald-500`) with knob on the **RIGHT** (`switch-knob-right`); Closed state = Red (`bg-rose-500`) with knob on the **LEFT** (`switch-knob-left`).
+       - **English (LTR):** Open state = Emerald Green (`bg-emerald-500`) with knob on the **LEFT** (`switch-knob-left`); Closed state = Red (`bg-rose-500`) with knob on the **RIGHT** (`switch-knob-right`).
+     - **Rule 12 Isolation:** Pure CSS toggle classes maintained separately in `resources/css/app-rtl.css` and `resources/css/app-ltr.css`, compiled via Vite with zero inline styles.
+  4. **Dynamic UI Cleanup:** Surrounded registration buttons on `welcome.blade.php` and `login.blade.php` with `is_registration_open()`, ensuring call-to-action buttons vanish dynamically when registration is paused.
+  5. **Users & Sessions Explorer Modernization (`users.blade.php`):** Integrated a real-time registration status badge in the header toolbar linking to System Settings, and clarified manual account locking with Lock (`قفل الحساب`) / Unlock (`إلغاء قفل الحساب`) icons and tooltips.
+  6. **Trilingual Localization Parity (Rule 17):** Synchronized 39 new dictionary entries across `lang/ar.json`, `lang/en.json`, and `lang/fr.json` (538 keys each, 0 missing).
+  7. **Feature Test Suite:** Implemented `tests/Feature/SystemSettingsTest.php` with 10 automated test cases (47 assertions) verifying cache behavior, route guarding, AJAX toggling, and UI reactivity.
+- **Consequences:** Provides a high-performance, zero-latency configuration engine for site registration with immediate extensibility for future system-wide runtime switches (e.g. maintenance mode, notification limits).
+
+---
+
 ## [ADR-046] Merge Conflict Cleanse and Codebase Stability Restoration
 - **Date:** 2026-09-09
 - **Status:** Accepted / Implemented

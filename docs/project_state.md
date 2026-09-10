@@ -1,7 +1,7 @@
 # Project State: tools.gmtm-dz.com
 
-**Last Updated:** 2026-09-09
-**Status:** Unified CRUD Suite Architecture Implemented — System Explorer Full CRUD Active
+**Last Updated:** 2026-09-10
+**Status:** Automatic Migration Engine & Zero-State Super Admin Gate Active
 
 ---
 
@@ -11,13 +11,17 @@
 - **Frontend Stack:** Blade + Tailwind CSS (Class-based Dark Mode) + Alpine.js + Vite (Isolated RTL/LTR bundles)
 - **Locales Supported:** `ar` (Arabic, default, hidden prefix), `en` (English, `/en/`), `fr` (French, `/fr/`)
 - **Themes Supported:** `light`, `dark`, `system` (Zero-FOUC prevention script, Alpine.js reactive store, cross-instance sync)
-- **Database Engine:** MySQL (`gmtmdz_tools`)
-- **Authentication:** Laravel Breeze (Session/Blade based with active `MustVerifyEmail` contract; registration immediately dispatches verification emails via `${APP_NAME} <${MAIL_FROM_ADDRESS}>`)
-- **Test Suite:** 244 tests, 1045 assertions (100% passing)
-- **Localization Parity:** Trilingual dictionary parity across Arabic, English, and French (499 keys each, 0 missing)
+- **Database Engine:** MySQL (`gmtmdz_tools2` active, supports zero-touch auto-migration from fresh state)
+- **Authentication:** Laravel Breeze (Session/Blade based with active `MustVerifyEmail` contract; registration immediately dispatches verification emails via `${APP_NAME} <${MAIL_FROM_ADDRESS}>`; registration routes guarded by dynamic cache-backed `EnsureRegistrationIsOpen` middleware)
+- **Automatic Migration & Auto-Creation Engine:** `EnsureDatabaseIsMigrated` middleware inspects pending schema and database existence. Automatically provisions missing MySQL/SQLite/PostgreSQL databases via raw PDO, runs `migrate --force`, `db:seed`, and permission discovery without user prompt.
+- **Database Error Fallback View:** `resources/views/errors/database.blade.php` rendered with HTTP 503 if database connection or auto-creation fails, preventing 500 crashes and offering connection diagnostics and troubleshooting steps.
+- **Zero-State Super Admin Setup Gate:** `EnsureSuperAdminExists` middleware intercepts all web traffic on zero-user databases, redirecting to `/system-tables/setup` to provision Super Admin, then permanently locks the route (404/403).
+- **Test Suite:** 261 tests, 1109 assertions (100% passing)
+- **Localization Parity:** Trilingual dictionary parity across Arabic, English, and French (559 keys each, 0 missing)
 - **Roles & Permissions Architecture:** Configured Roles section modernized to Unified Table Component (`<x-table>`) with localized functional titles, scopes, and privilege previews.
 - **Notifications Architecture:** Database notifications explorer updated with localized alert types, semantic action badges, payload title translation (`{{ __($notificationTitle) }}`), and preview modals with 100% key parity across AR, EN, and FR.
-- **Anti-Self-Action Security Policy:** Administrators are strictly prohibited from self-demotion/role changing, self-suspension, or self-deletion via dual-layer protection (controller guards and UI action masking).
+- **System Settings Engine:** Enterprise key-value runtime configuration engine with zero-latency persistent caching (`86400` TTL), atomic cache updates, and Super-Admin interactive dashboard.
+- **Anti-Self-Action Security Policy:** Administrators are strictly prohibited from self-demotion/role changing, self-suspension, self-locking, or self-deletion via dual-layer protection (controller guards and UI action masking).
 
 ---
 
@@ -78,7 +82,10 @@
     - `DELETE /system-tables/backups/{file}` -> Delete Backup Snapshot (`SystemTableController@deleteBackup`).
     - `POST /system-tables/backups/restore` -> Restore Point-in-time Snapshot (`SystemTableController@restoreBackup`).
     - `POST /system-tables/backups/restore-oldest` -> Restore Oldest Available Snapshot (`SystemTableController@restoreOldestBackup`).
-    - Auth routes (`login`, `register`, `forgot-password`, `reset-password`, etc.).
+    - `GET /system-tables/settings` -> Dynamic System Settings Dashboard (`SystemTableController@settings`). **[NEW 2026-09-10]**
+    - `POST /system-tables/settings/toggle-registration` -> Real-time Registration Switch Toggle (`SystemTableController@toggleRegistration`). **[NEW 2026-09-10]**
+    - `POST /system-tables/settings/update` -> Dynamic Setting Parameter Update (`SystemTableController@updateSetting`). **[NEW 2026-09-10]**
+    - Auth routes (`login`, `register` [shielded by `EnsureRegistrationIsOpen`], `forgot-password`, `reset-password`, etc.).
   - English (`/en/...`) and French (`/fr/...`):
     - Prefixed mirror routes (`en.dashboard`, `fr.dashboard`, `en.system-tables.index`, `fr.system-tables.index`, etc.).
 - **API Notification Routes** (`routes/api.php`) — Auth-protected:
@@ -91,6 +98,7 @@
 ---
 
 ## 5. Architectural Components
+- **Helpers (`app/Helpers`):** `helpers.php` (`system_setting($key, $default)` for cached configuration retrieval, `is_registration_open()` for instant boolean gate inspection).
 - **Traits (`app/Traits`):** `ApiResponseTrait` (unified API responses with success/error envelopes), `FilterableTrait` (declarative dynamic request query filtering and search scope).
 - **Interfaces (`app/Interfaces`):** `BaseRepositoryInterface` (includes `filter` & `paginateWithFilter`), `UserRepositoryInterface`.
 - **Repositories (`app/Repositories`):** `BaseRepository` (abstract base with dynamic filtering), `UserRepository`.
@@ -99,18 +107,19 @@
 - **Observers (`app/Observers`):** `UserObserver` (captures `created` & `deleted` events on User model; auto-dispatches `SystemActivityAlert` to all `Super-Admin` and `Admin` role users; gracefully handles missing roles).
 - **Controllers:**
   - `App\Http\Controllers\ProfileController`: Refactored with `declare(strict_types=1);`, delegates `update` and `destroy` to `UserService` (transaction-wrapped).
-  - `App\Http\Controllers\SystemTableController`: Thin controller orchestrating requests for the System Tables Explorer suite.
+  - `App\Http\Controllers\SystemTableController`: Thin controller orchestrating requests for the System Tables Explorer suite (includes `settings`, `toggleRegistration`, `updateSetting`).
   - `App\Http\Controllers\Api\NotificationController`: API (`index`, `unread`, `markAsRead`, `markAllAsRead`, `destroy`; uses `ApiResponseTrait`; enforces per-user notification isolation).
 - **Console Commands (`app/Console/Commands`):** `SetupProjectCommand` (`php artisan project:setup [--fresh] [--force]`), `OptimizeImagesCommand` (`php artisan images:optimize`), `SyncTablePermissionsCommand` (`php artisan permissions:sync-tables [--dry-run]`), `DataPruneCommand` (`php artisan data:prune`).
-- **Providers (`app/Providers`):** `RepositoryServiceProvider` (maps repository interfaces to implementations).
-- **Middleware (`app/Http/Middleware`):** `SetLocale` (guarantees runtime locale synchronization).
-- **Middleware Aliases (`bootstrap/app.php`):** `role` (RoleMiddleware), `permission` (PermissionMiddleware), `role_or_permission` (RoleOrPermissionMiddleware), `localize` (LaravelLocalizationRoutes), `localizationRedirect` (LaravelLocalizationRedirectFilter), `localeSessionRedirect` (LocaleSessionRedirect), `localeCookieRedirect` (LocaleCookieRedirect), `localeViewPath` (LaravelLocalizationViewPath).
+- **Providers (`app/Providers`):** `RepositoryServiceProvider` (maps repository interfaces to implementations), `AppServiceProvider` (registers Blade `@registrationOpen` directive, super role bypass, and helper autoloading).
+- **Middleware (`app/Http/Middleware`):** `SetLocale` (guarantees runtime locale synchronization), `EnsureRegistrationIsOpen` (guards `/register` routes).
+- **Middleware Aliases (`bootstrap/app.php`):** `role` (RoleMiddleware), `permission` (PermissionMiddleware), `role_or_permission` (RoleOrPermissionMiddleware), `localize` (LaravelLocalizationRoutes), `localizationRedirect` (LaravelLocalizationRedirectFilter), `localeSessionRedirect` (LocaleSessionRedirect), `localeCookieRedirect` (LocaleCookieRedirect), `localeViewPath` (LaravelLocalizationViewPath), `setLocale` (SetLocale), `registration.open` (EnsureRegistrationIsOpen).
 - **Views & Layout Isolation (`resources/views`):**
   - Layouts: `layouts/app-rtl.blade.php`, `layouts/app-ltr.blade.php`, `layouts/guest-rtl.blade.php`, `layouts/guest-ltr.blade.php` (all embedded with Zero-FOUC prevention scripts; legacy unisolated Breeze files `app`, `guest`, `navigation` purged).
   - Navigation: `layouts/navigation-rtl.blade.php`, `layouts/navigation-ltr.blade.php` (with responsive desktop/mobile theme & language switchers, and standalone enlarged brand logo lockup `h-12 w-auto sm:h-14` without redundant text labels).
   - Profile: `profile/edit.blade.php`, `profile/partials/update-profile-information-form.blade.php`, `profile/partials/update-password-form.blade.php`, `profile/partials/delete-user-form.blade.php` (all with complete Dark Mode styling).
-  - Components: `AppLayout` (dynamic RTL/LTR resolution), `GuestLayout` (dynamic RTL/LTR resolution), `x-system-tabs` (vertical sidebar), `x-language-switcher`, `x-theme-switcher`, and Dark-Mode enabled standardized button & form components (`x-primary-button`, `x-secondary-button`, `x-danger-button`, `x-success-button`, `x-warning-button`, `x-info-button`, `x-nav-link`, `x-input-label`, `x-text-input`, `x-input-error`, `x-modal`, `x-dropdown`, `x-dropdown-link`, `x-responsive-nav-link`, `x-auth-session-status`).
-  - **Unified CRUD Modal Components [NEW 2026-09-09]:** `x-crud-modal.delete` (unified delete confirmation modal; accepts Alpine variable names for `show`/`action-url`/`item-name`), `x-crud-modal.form` (unified create/edit form modal; supports POST/PUT, `alpine-action` for dynamic action URLs, `$hidden` named slot, configurable icon colors: orange/amber/indigo/emerald/rose).
+  - System Explorer: `system/settings.blade.php` (Dynamic System Settings dashboard with Alpine.js real-time toggles), `system/users.blade.php` (Users & Sessions with registration status indicator and manual account locking).
+  - Components: `AppLayout` (dynamic RTL/LTR resolution), `GuestLayout` (dynamic RTL/LTR resolution), `x-system-tabs` (vertical sidebar with System Settings item), `x-language-switcher`, `x-theme-switcher`, and Dark-Mode enabled standardized button & form components (`x-primary-button`, `x-secondary-button`, `x-danger-button`, `x-success-button`, `x-warning-button`, `x-info-button`, `x-nav-link`, `x-input-label`, `x-text-input`, `x-input-error`, `x-modal`, `x-dropdown`, `x-dropdown-link`, `x-responsive-nav-link`, `x-auth-session-status`).
+  - **Unified CRUD Modal Components:** `x-crud-modal.delete`, `x-crud-modal.form`.
 - **Vite Bundles (`resources/css`, `resources/js`):**
   - RTL: `app-rtl.css`, `app-rtl.js`
   - LTR: `app-ltr.css`, `app-ltr.js`

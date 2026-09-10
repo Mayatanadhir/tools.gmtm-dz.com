@@ -4,6 +4,67 @@ All notable changes, features, refactorings, and fixes will be documented in thi
 
 The format is based on Keep a Changelog.
 
+## [2026-09-10] — Automatic Migration Engine & Zero-State First-Run Super Admin Setup Gate
+### Added & Refactored
+- **Automatic Migration Engine (`App\Http\Middleware\EnsureDatabaseIsMigrated`)**:
+  - Automatically verifies database schema status upon incoming web requests.
+  - If database tables are missing or pending (e.g., fresh database `gmtmdz_tools2`), the engine automatically executes all pending migrations via `Artisan::call('migrate', ['--force' => true])` without manual intervention or prompt.
+  - Automatically runs `Artisan::call('db:seed', ['--force' => true])` if roles are unseeded, and triggers `PermissionDiscoveryService::generateCrudPermissionsForTables()` to dynamically provision table permissions.
+  - Employs per-database persistent caching (`system_schema_migrated_{dbName}`) with 3600-second TTL and static request-level memoization to ensure zero runtime performance penalty on subsequent requests.
+  - Bypasses during PHPUnit unit tests to ensure compatibility with `RefreshDatabase`.
+- **Dual-Layer Database Auto-Creation & Fallback Protection Engine (`EnsureDatabaseIsMigrated`, `resources/views/errors/database.blade.php`)**:
+  - **Layer 1 (Automatic Database Creation):** When an uninitialized database name is configured in `.env` (throwing MySQL error `1049 Unknown database` or PgSQL/SQLite equivalents), the engine automatically connects via PDO to the database host without a database specifier and executes `CREATE DATABASE IF NOT EXISTS \`db_name\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`.
+  - Upon creation, the connection is purged and reconnected on the fly (`DB::purge`, `DB::reconnect`), proceeding seamlessly with running all migrations and seeds before routing the guest to the Super Admin setup page.
+  - **Layer 2 (Graceful Error Fallback View):** If the database cannot be reached or automatically created (e.g., MySQL server offline, invalid credentials, or user lacks `CREATE DATABASE` privilege), the engine catches the exception and renders a high-aesthetic, localized error view (`errors/database.blade.php`) with HTTP status `503 Service Unavailable`.
+  - The error screen features Light/Dark mode support, connection diagnostics table (driver, host, port, database name), step-by-step troubleshooting suggestions, a unified retry button (`<x-primary-button>`), and zero inline styles (Rule 12 compliant).
+  - Registered global `PDOException` error renderer in `bootstrap/app.php` to prevent unhandled database crashes across all web requests.
+- **Trilingual Localization Parity (Rule 17)**:
+  - Added 13 new translation keys for the database error screen across `lang/ar.json`, `lang/en.json`, and `lang/fr.json` (559 keys each, exactly 0 missing).
+- **First-Run Super Admin Setup Gate (`App\Http\Middleware\EnsureSuperAdminExists`)**:
+  - Protects and regulates access to the first-run Super Admin setup flow (`/system-tables/setup`).
+  - **Zero-State Interception:** When the `users` table is completely empty (`User::count() === 0`), intercepts all inbound web traffic (e.g. `/`, `/login`, `/register`, `/dashboard`) and smoothly redirects visitors to `route('system-tables.setup')`.
+  - **Anti-Hijacking Lockdown:** As soon as at least one user exists in the database, the setup routes (`GET /system-tables/setup` and `POST /system-tables/setup`) are permanently sealed, aborting with `404 Not Found` on GET and `403 Forbidden` on mutation attempts.
+  - Exempts health checks (`/up`), API endpoints (`api/*`), debug utilities, and CSRF token endpoints from redirection.
+- **Middleware Pipeline Registration (`bootstrap/app.php`)**:
+  - Registered `EnsureDatabaseIsMigrated::class` and `EnsureSuperAdminExists::class` at the forefront of the `web` middleware pipeline.
+- **End-to-End Automated Test Suite Verification (`tests/Feature/AutoMigrationAndSetupMiddlewareTest.php`)**:
+  - Added comprehensive automated feature tests covering root redirection, setup screen allowance on empty state, permanent 404/403 lockdown once users exist, database auto-creation detection, and fallback error view rendering (261 passing tests total).
+
+## [2026-09-10] — Dynamic System Settings Engine & Registration Shield Architecture
+### Added & Refactored
+- **Dynamic System Settings Engine Core (`App\Models\SystemSetting`, `app/Helpers/helpers.php`)**:
+  - Enhanced `SystemSetting` model with persistent caching (`86400` TTL) and immediate cache refresh upon state mutations (`Cache::put`).
+  - Added typed getters: `getBool()`, `getInt()`, `getString()`, `has()`.
+  - Introduced global helpers `system_setting($key, $default)` and `is_registration_open()`.
+  - Added defensive exception handling (`try / catch`) across `SystemSetting::get()`, `has()`, and `forget()` to gracefully fall back to default values when connected to fresh or unmigrated databases without throwing fatal `QueryException` errors.
+  - Registered Blade conditional directive `@registrationOpen` ... `@endRegistrationOpen`.
+- **Middleware Shield (`App\Http\Middleware\EnsureRegistrationIsOpen`)**:
+  - Implemented middleware that inspects `is_registration_open()` with zero database overhead via memory cache.
+  - Intercepts requests to `/register` (`GET` and `POST`) when registration is closed, redirecting guests to `/login` with an elegant localized error alert, or returning `403 Forbidden` for JSON requests.
+  - Registered alias `'registration.open'` in `bootstrap/app.php` and shielded registration route group in `routes/auth.php`.
+- **Super-Admin System Settings Dashboard (`resources/views/system/settings.blade.php`, `SystemTableController`)**:
+  - Created dedicated System Settings dashboard under `/system-tables/settings` restricted to `Super-Admin`.
+  - Interactive Alpine.js toggle switch for `allow_registration` with real-time AJAX dispatch (`POST /system-tables/settings/toggle-registration`), smooth animation, and floating toast notifications.
+  - Built custom bilingual toggle mechanics:
+    - **Arabic (RTL):** Open state is Emerald Green (`bg-emerald-500`) with knob positioned on the **RIGHT** (`switch-knob-right`); Closed state is Red (`bg-rose-500`) with knob on the **LEFT** (`switch-knob-left`).
+    - **English (LTR):** Open state is Emerald Green (`bg-emerald-500`) with knob positioned on the **LEFT** (`switch-knob-left`); Closed state is Red (`bg-rose-500`) with knob on the **RIGHT** (`switch-knob-right`).
+  - Isolated dedicated toggle classes in `resources/css/app-rtl.css` and `resources/css/app-ltr.css` compiled via Vite to maintain strict Rule 12 zero-inline-styles compliance.
+  - Unified table preview (`<x-table>`) inspecting all active system parameters in `system_settings`.
+  - Added "System Settings" navigation item with gear icon in `<x-system-tabs>`.
+  - Hardened Alpine.js component against unescaped apostrophes in localized strings (e.g. French `l'état`, `d'inscription`, `s'est`) by utilizing Laravel's `@js()` directive, preventing `Uncaught SyntaxError` and `toggleRegistration is not defined` runtime exceptions.
+- **Dynamic UI Cleanup & Users Explorer Integration (`welcome.blade.php`, `login.blade.php`, `users.blade.php`)**:
+  - Protected public registration links in `welcome.blade.php` and `login.blade.php` with `is_registration_open()` to eliminate dead links when disabled.
+  - Added Registration Status indicator badge in `system-tables/users` header linking directly to system settings.
+  - Modernized manual account lock actions in `users.blade.php` with Lock (`قفل الحساب`) and Unlock (`إلغاء قفل الحساب`) icons and tooltips, plus `Suspended / Locked` badge styling.
+  - Eliminated duplicate error message on `login.blade.php` when visitors are redirected from disabled registration by switching to `@if / @elseif` logic with the unified `<x-alert variant="danger" :dismissible="true">` component.
+- **Trilingual Dictionary Synchronization (`lang/ar.json`, `lang/en.json`, `lang/fr.json`)**:
+  - Synchronized 47 total new translation keys across Arabic, English, and French dictionaries with 100% key parity (546 keys each, 0 missing).
+  - Localized system setting keys, descriptions, and groups in the Active Configuration Registry table (`"Setting Key"`, `"allow_registration"`, `"data_pruning_settings"`, `"Data pruning custom lifecycle parameters"`, `"Allow new user registrations on the site"`, `"Group"`, `"Last Updated"`, `"pruning"`, `"auth"`).
+- **Automated Feature Verification (`tests/Feature/SystemSettingsTest.php`)**:
+  - Added 10 automated test cases with 47 assertions covering default open state, cache invalidation, Super-Admin UI access, standard user denial, AJAX toggle, middleware interception, and dynamic UI link visibility.
+
+---
+
 ## [2026-09-09] — Merge Conflict Resolution & 500 Internal Server Error Fix
 ### Fixed
 - **Committed Merge Conflict Markers Purged**:

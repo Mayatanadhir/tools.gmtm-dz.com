@@ -60,6 +60,9 @@ $routes = function (): void {
         Route::post('/backups/restore', [SystemTableController::class, 'restoreBackup'])->name('backups.restore');
         Route::post('/backups/restore-oldest', [SystemTableController::class, 'restoreOldestBackup'])->name('backups.restore-oldest');
         Route::delete('/backups/{file}', [SystemTableController::class, 'deleteBackup'])->name('backups.delete');
+        Route::get('/settings', [SystemTableController::class, 'settings'])->name('settings');
+        Route::post('/settings/toggle-registration', [SystemTableController::class, 'toggleRegistration'])->name('settings.toggle-registration');
+        Route::post('/settings/update', [SystemTableController::class, 'updateSetting'])->name('settings.update');
     });
 
     Route::middleware('auth')->group(function () {

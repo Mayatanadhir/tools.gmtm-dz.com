@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\EnsureDatabaseIsMigrated;
+use App\Http\Middleware\EnsureRegistrationIsOpen;
+use App\Http\Middleware\EnsureSuperAdminExists;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -23,6 +26,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
+            EnsureDatabaseIsMigrated::class,
+            EnsureSuperAdminExists::class,
             SetLocale::class,
         ]);
 
@@ -36,10 +41,24 @@ return Application::configure(basePath: dirname(__DIR__))
             'localeCookieRedirect' => LocaleCookieRedirect::class,
             'localeViewPath' => LaravelLocalizationViewPath::class,
             'setLocale' => SetLocale::class,
+            'registration.open' => EnsureRegistrationIsOpen::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->render(function (PDOException $e, Request $request) {
+            if (! app()->runningUnitTests() && ! $request->is('api/*') && ! $request->expectsJson()) {
+                $defaultConn = (string) config('database.default');
+
+                return response()->view('errors.database', [
+                    'connection' => $defaultConn,
+                    'database' => (string) config("database.connections.{$defaultConn}.database"),
+                    'host' => (string) config("database.connections.{$defaultConn}.host", '127.0.0.1'),
+                    'port' => (string) config("database.connections.{$defaultConn}.port", '3306'),
+                ], 503);
+            }
+        });
     })->create();

@@ -2,6 +2,20 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
+    @if (session('error'))
+        <div class="mb-4">
+            <x-alert variant="danger" :dismissible="true">
+                {{ session('error') }}
+            </x-alert>
+        </div>
+    @elseif ($errors->has('registration_closed'))
+        <div class="mb-4">
+            <x-alert variant="danger" :dismissible="true">
+                {{ $errors->first('registration_closed') }}
+            </x-alert>
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
@@ -28,13 +42,13 @@
         <div class="block mt-4">
             <label for="remember_me" class="inline-flex items-center">
                 <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
             </label>
         </div>
 
         <div class="flex items-center justify-end mt-4">
             @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
+                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
                     {{ __('Forgot your password?') }}
                 </a>
             @endif
@@ -43,5 +57,14 @@
                 {{ __('Log in') }}
             </x-primary-button>
         </div>
+
+        @if (Route::has('register') && is_registration_open())
+            <div class="mt-6 text-center text-sm text-gray-600 dark:text-gray-400 border-t border-gray-100 dark:border-gray-700/60 pt-4">
+                <span>{{ __("Don't have an account?") }}</span>
+                <a href="{{ route('register') }}" class="underline font-semibold text-orange-600 dark:text-orange-400 hover:text-orange-500 ms-1">
+                    {{ __('Create an account') }}
+                </a>
+            </div>
+        @endif
     </form>
 </x-guest-layout>

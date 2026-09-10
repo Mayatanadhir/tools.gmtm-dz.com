@@ -9,9 +9,27 @@
                     {{ __('Inspect registered accounts, role assignments, and active user sessions') }}
                 </p>
             </div>
-            <x-badge variant="info" size="md">
-                {{ $users->total() }} {{ __('Total Users') }}
-            </x-badge>
+            <div class="flex flex-wrap items-center gap-2">
+                <x-badge variant="info" size="md">
+                    {{ $users->total() }} {{ __('Total Users') }}
+                </x-badge>
+
+                @if($registrationOpen ?? is_registration_open())
+                    <a href="{{ route('system-tables.settings') }}"
+                       title="{{ __('Click to configure System Settings') }}"
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>{{ __('Registration: Open') }}</span>
+                    </a>
+                @else
+                    <a href="{{ route('system-tables.settings') }}"
+                       title="{{ __('Click to configure System Settings') }}"
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60 hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                        <span>{{ __('Registration: Closed') }}</span>
+                    </a>
+                @endif
+            </div>
         </div>
     </x-slot>
 
@@ -164,7 +182,7 @@
                                         </x-badge>
                                     @else
                                         <x-badge variant="danger" :dot="true">
-                                            {{ __('Suspended') }}
+                                            {{ __('Suspended / Locked') }}
                                         </x-badge>
                                     @endif
 
@@ -196,11 +214,11 @@
                                                 <x-table.action
                                                     type="delete"
                                                     button-type="submit"
-                                                    :title="__('Suspend User')"
-                                                    onclick="return confirm('{{ __('Are you sure you want to suspend this user account?') }}')"
+                                                    :title="__('Lock Account')"
+                                                    onclick="return confirm('{{ __('Are you sure you want to lock this user account?') }}')"
                                                 >
                                                     <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                                     </svg>
                                                 </x-table.action>
                                             </form>
@@ -210,12 +228,11 @@
                                                 <x-table.action
                                                     type="success"
                                                     button-type="submit"
-                                                    :title="__('Activate User')"
-                                                    onclick="return confirm('{{ __('Are you sure you want to activate this user account?') }}')"
+                                                    :title="__('Unlock Account')"
+                                                    onclick="return confirm('{{ __('Are you sure you want to unlock this user account?') }}')"
                                                 >
                                                     <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
                                                     </svg>
                                                 </x-table.action>
                                             </form>
@@ -542,9 +559,9 @@
                                         <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        <span x-text="editUserStatus === 'active' ? '{{ __('Active') }}' : '{{ __('Suspended') }}'"></span>
+                                        <span x-text="editUserStatus === 'active' ? '{{ __('Active') }}' : '{{ __('Suspended / Locked') }}'"></span>
                                     </div>
-                                    <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">{{ __('You cannot suspend your own account.') }}</p>
+                                    <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">{{ __('You cannot suspend or lock your own account.') }}</p>
                                 </div>
                             </template>
 
@@ -552,7 +569,7 @@
                             <template x-if="!editUserIsSelf">
                                 <select id="edit_user_status_select" name="status" x-model="editUserStatus" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-orange-500 focus:ring-orange-500 text-sm">
                                     <option value="active">{{ __('Active') }}</option>
-                                    <option value="suspended">{{ __('Suspended') }}</option>
+                                    <option value="suspended">{{ __('Suspended / Locked') }}</option>
                                 </select>
                             </template>
 

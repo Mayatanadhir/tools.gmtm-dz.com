@@ -14,6 +14,7 @@ use App\Http\Requests\UpdatePermissionRequest;
 use App\Http\Requests\UpdatePruningSettingsRequest;
 use App\Http\Requests\UpdateRoleRequest;
 use App\Http\Requests\UpdateSystemUserRequest;
+use App\Models\SystemSetting;
 use App\Models\User;
 use App\Services\DatabaseBackupService;
 use App\Services\DataPruningService;
@@ -67,8 +68,9 @@ class SystemTableController extends Controller
         );
         $sessions = $this->systemTableService->getSessions();
         $roles = $this->systemTableService->getRoles();
+        $registrationOpen = is_registration_open();
 
-        return view('system.users', compact('users', 'sessions', 'search', 'status', 'roles'));
+        return view('system.users', compact('users', 'sessions', 'search', 'status', 'roles', 'registrationOpen'));
     }
 
     /**
@@ -793,5 +795,105 @@ class SystemTableController extends Controller
         return redirect()
             ->route('dashboard')
             ->with('status', __('System initialized successfully! Welcome to ENGI-MATE.'));
+    }
+
+    /**
+     * Display Dynamic System Settings dashboard.
+     */
+    public function settings(): View
+    {
+        $registrationOpen = is_registration_open();
+        $settings = SystemSetting::orderBy('group')->orderBy('key')->get();
+
+        return view('system.settings', compact('registrationOpen', 'settings'));
+    }
+
+    /**
+     * Toggle the system registration status.
+     */
+    public function toggleRegistration(Request $request): JsonResponse|RedirectResponse
+    {
+        $current = is_registration_open();
+        $newValue = $request->has('enabled')
+            ? filter_var($request->input('enabled'), FILTER_VALIDATE_BOOLEAN)
+            : ! $current;
+
+        SystemSetting::set(
+            'allow_registration',
+            $newValue,
+            'auth',
+            'Allow new user registrations on the site'
+        );
+
+        $stateLabel = $newValue ? 'enabled' : 'disabled';
+        $logMessage = "Changed registration status to {$stateLabel}";
+
+        activity('system_settings')
+            ->causedBy(auth()->user())
+            ->withProperties([
+                'setting' => 'allow_registration',
+                'previous_value' => $current,
+                'new_value' => $newValue,
+            ])
+            ->log($logMessage);
+
+        $message = $newValue
+            ? __('New user registration has been enabled successfully.')
+            : __('New user registration has been disabled successfully.');
+
+        if ($request->expectsJson() || $request->isJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'enabled' => $newValue,
+                'message' => $message,
+            ]);
+        }
+
+        return redirect()->back()->with('status', $message);
+    }
+
+    /**
+     * Dynamic update for arbitrary system settings.
+     */
+    public function updateSetting(Request $request): JsonResponse|RedirectResponse
+    {
+        $validated = $request->validate([
+            'key' => 'required|string|max:191',
+            'value' => 'required',
+            'group' => 'nullable|string|max:100',
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        $key = $validated['key'];
+        $value = $validated['value'];
+        $group = $validated['group'] ?? 'general';
+        $description = $validated['description'] ?? null;
+
+        $previous = SystemSetting::get($key);
+
+        SystemSetting::set($key, $value, $group, $description);
+
+        activity('system_settings')
+            ->causedBy(auth()->user())
+            ->withProperties([
+                'setting' => $key,
+                'previous_value' => $previous,
+                'new_value' => $value,
+                'group' => $group,
+            ])
+            ->log("Updated system setting '{$key}'");
+
+        $message = __('Setting :key updated successfully.', ['key' => $key]);
+
+        if ($request->expectsJson() || $request->isJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'key' => $key,
+                'value' => $value,
+                'message' => $message,
+            ]);
+        }
+
+        return redirect()->back()->with('status', $message);
     }
 }

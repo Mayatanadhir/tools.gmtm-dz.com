@@ -1,58 +1,125 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="public/build/assets/logo.svg" width="120" height="120" alt="Core Kernel Logo" onerror="this.src='https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg'">
 </p>
 
-## About Laravel
+<h1 align="center">ENGI-MATE Core Kernel — Point Zero Master Template</h1>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<p align="center">
+  <strong>Production-Ready Enterprise SaaS & Application Foundation for Laravel 13 & PHP 8.4+</strong>
+</p>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<p align="center">
+  <img src="https://img.shields.io/badge/PHP-8.4%2B-blue?style=flat-square" alt="PHP Version">
+  <img src="https://img.shields.io/badge/Laravel-13.x-red?style=flat-square" alt="Laravel Version">
+  <img src="https://img.shields.io/badge/Tests-261%20Passed%20(100%25)-emerald?style=flat-square" alt="Tests">
+  <img src="https://img.shields.io/badge/Localization-AR%20%7C%20EN%20%7C%20FR%20(559%20Keys)-orange?style=flat-square" alt="Localization">
+  <img src="https://img.shields.io/badge/Code%20Style-Laravel%20Pint-purple?style=flat-square" alt="Pint Style">
+  <img src="https://img.shields.io/badge/Template%20Tag-v1.0.0--core--kernel-indigo?style=flat-square" alt="Core Tag">
+</p>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🌟 Overview (نظرة عامة)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**ENGI-MATE Core Kernel (Point Zero)** هو القالب المعماري الأساسي والنواة الأم المجهزة للانطلاق في تطوير أي مشروع أو نظام برمجي ضخم (Enterprise Application / Multi-Tenant SaaS / ERP / CRM / eCommerce).
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+بدلاً من قضاء أسابيع في بناء أنظمة المصادقة، الصلاحيات، دعم اللغات، الوضع الليلي، والاتصال بقواعد البيانات لكل مشروع جديد، توفر هذه النواة بنية تحتية برمجية ذاتية الشفاء والتهيئة (`Zero-Touch & Self-Healing`) تتيح لك إطلاق أي تطبيق جديد خلال **5 دقائق فقط**.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+---
 
-## Agentic Development
+## 🚀 Key Architectural Pillars (الميزات المعمارية الجاهزة)
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 1. Zero-Touch Database Auto-Creation & Auto-Migration (التهجير والإنشاء الذاتي لقاعدة البيانات)
+- **إنشاء تلقائي صامت للقواعد الجديدة:** بمجرد تحديد اسم قاعدة بيانات جديدة في `.env`، يقوم وسيط `EnsureDatabaseIsMigrated` بالاتصال بالخادم وإنشاء القاعدة تلقائياً (`CREATE DATABASE IF NOT EXISTS`) دون الحاجة لأي أوامر يدوية.
+- **محرك التهجير التلقائي:** يفحص الجداول المفقودة ويشغل ملفات التهجير وتغذية الأدوار والصلاحيات تلقائياً وبشكل صامت.
+- **شاشة خطأ احتياطية فاخرة (`503 Fallback View`):** في حال تعذر الاتصال بالسيرفر أو كانت الصلاحيات مقيدة، يتم عرض صفحة تشخيصية راقية توضح حالة الاتصال وإرشادات الحل بدلاً من انهيار التطبيق.
 
+### 2. Zero-State Super Admin Onboarding Gate (بوابة الإعداد الأولي التلقائي)
+- **اعتراض حالة الصفر:** عند تشغيل النظام على قاعدة جديدة وفارغة (`User::count() === 0`)، يتم اعتراض جميع الطلبات وتحويل الزائر إلى معالج إعداد حساب السوبر أدمن الأول (`/system-tables/setup`).
+- **الإغلاق المحكم التلقائي (Anti-Hijacking Lockdown):** بمجرد إنشاء السوبر أدمن، يتم إغلاق مسار الإعداد نهائياً وإرجاع `404 Not Found` لأي محاولة وصول لاحقة لحماية النظام من التلاعب.
+
+### 3. Enterprise RBAC & Security Quarantine (إدارة الصلاحيات وسجل التدقيق)
+- مبني على **Spatie Laravel-Permission** مع حماية خاصة للدور الأساسي `Super-Admin` والدور التلقائي للمستخدمين `User`.
+- **التوليد الذاتي للصلاحيات (`PermissionDiscoveryService`):** يقوم بفحص جميع جداول التطبيق وتوليد صلاحيات CRUD تلقائياً لكل جدول وتعيينها للسوبر أدمن.
+- **سياسة حماية النفس (Anti-Self-Action Policy):** منع المسؤولين برمجياً من تخفيض رتبهم، قفل حساباتهم، أو حذف أنفسهم.
+- **قسم الجداول الأمنية السري المعزول (`system-tables.*`):** عزل تام لأدوات التحقيق الجنائي، الجلسات النشطة، النسخ الاحتياطية، وسجل النشاطات.
+
+### 4. Native Trilingual Localization (المحرك ثلاثي اللغة AR / EN / FR)
+- دعم كامل ومتزامن لثلاث لغات: **العربية (افتراضية RTL)، الإنجليزية (LTR)، والفرنسية (LTR)**.
+- تطابق 1-إلى-1 لكافة المفاتيح بنسبة 100% عبر `lang/ar.json`, `lang/en.json`, `lang/fr.json` (أكثر من 559 مفتاحاً دون أي مفتاح مفقود).
+- حزم أصول منفصلة كلياً لـ RTL و LTR مجمعة عبر Vite لمنع أي تضارب أو وميض بصري (Zero-FOUC).
+
+### 5. Unified Design System (نظام التصميم الموحد الخالي من الستايلات المدمجة)
+- التزام صارم بالقاعدة 12: **منع الستايلات المدمجة (`style="..."`) نهائياً**.
+- مصفوفة الأزرار الموحدة الدلالية (`<x-primary-button>`, `<x-secondary-button>`, `<x-danger-button>`, `<x-success-button>`, `<x-warning-button>`, `<x-info-button>`).
+- معمارية الجداول الموحدة (`<x-table>`, `<x-table.th>`, `<x-table.tr>`, `<x-table.td>`, `<x-table.actions>`, `<x-table.empty>`).
+- دعم متكامل للوضع الليلي والنهاري (Dark & Light Mode) وحفظ التفضيل عبر التخزين المحلي.
+
+### 6. Dynamic System Settings & Cached Shields (محرك الإعدادات الديناميكي)
+- إدارة معلمات التشغيل من قاعدة البيانات مع نظام تخزين مؤقت فائق السرعة (`Cache TTL: 86400s`).
+- درع إيقاف وتفعيل التسجيل الفوري مع زر تبديل ثنائي اللغة تفاعلي بـ Alpine.js.
+
+### 7. Living Documentation Protocol (بروتوكول الذاكرة الحية والتوثيق المستمر)
+- وثائق هندسية حية ومحدثة باستمرار داخل مجلد `docs/`:
+  - `docs/changelog.md`: الأرشيف التاريخي الزمني لجميع التغييرات.
+  - `docs/project_state.md`: لقطة شاملة للحالة الراهنة للجداول، المسارات، والاختبارات.
+  - `docs/ARCHITECTURE_LOG.md`: سجل القرارات المعمارية وتبريراتها الهندسية (ADRs).
+
+---
+
+## ⚡ How to Spin Up a New Project (كيف تنطلق لإنشاء مشروع جديد في دقائق)
+
+### الخطوة 1: استنساخ النواة الأساسية
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone <repository-url> my-new-app
+cd my-new-app
+composer install
+npm install
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### الخطوة 2: تهيئة ملف البيئة (`.env`)
+قم بنسخ ملف `.env.example` وتحديد اسم مشروعك وقاعدة البيانات الجديدة:
+```env
+APP_NAME="My New System"
+DB_DATABASE=my_new_system_db
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## Contributing
+### الخطوة 3: تخصيص الهوية البصرية (اختياري)
+- استبدل الشعار في `resources/views/components/application-logo.blade.php`.
+- عدّل الألوان الأساسية في `tailwind.config.js` إذا رغبت في هوية لونية مختلفة.
+- قم ببناء الأصول:
+```bash
+npm run build
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### الخطوة 4: افتح المتصفح وانطلق!
+قم بزيارة رابط المشروع محلياً (مثلاً عبر Laravel Herd):
+```
+http://my-new-app.test
+```
+- **سيتولى النظام فوراً وبشكل تلقائي:**
+  1. إنشاء قاعدة البيانات `my_new_system_db` في MySQL.
+  2. تشغيل كافة ملفات التهجير وتغذية الأدوار والصلاحيات.
+  3. تحويلك مباشرة لصفحة إعداد أول حساب سوبر أدمن (`/system-tables/setup`).
+  4. بمجرد إدخال البيانات، يتم تفعيل حسابك وتوجيهك إلى لوحة التحكم (`/dashboard`)، ويتم قفل صفحة الإعداد نهائياً!
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🧪 Testing & Code Standards (الاختبارات والمعايير)
 
-## Security Vulnerabilities
+تشمل النواة حزمة اختبارات تغطي 100% من الوظائف الأساسية والأمنية:
+```bash
+# تشغيل حزمة الاختبارات الكاملة (261 اختباراً)
+php artisan test
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# فحص وتنسيق الكود وفق معايير Laravel Pint
+vendor/bin/pint --format agent
+```
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 📄 License
+
+هذا القالب المعماري متاح ومخصص للاستخدام الداخلي ومشاريع المؤسسة وفق ترخيص [MIT License](LICENSE).
