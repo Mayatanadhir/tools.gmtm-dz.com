@@ -1,10 +1,7 @@
-# Project State: ENGI-MATE Core Kernel (Point Zero)
+# Project State: tools.gmtm-dz.com
 
 **Last Updated:** 2026-09-10
-**Status:** Point Zero Master Core Kernel Baseline Active (v1.0.0)
-
-> [!NOTE]
-> Historical state log prior to Point Zero Core Kernel extraction is preserved in `docs/archive/legacy_project_state.md`.
+**Status:** Automatic Migration Engine & Zero-State Super Admin Gate Active
 
 ---
 
