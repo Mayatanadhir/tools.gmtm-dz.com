@@ -145,7 +145,11 @@ class SystemTableService
             $query->where(function ($q) use ($term) {
                 $q->where('description', 'like', $term)
                     ->orWhere('log_name', 'like', $term)
-                    ->orWhere('subject_type', 'like', $term);
+                    ->orWhere('subject_type', 'like', $term)
+                    ->orWhereHasMorph('causer', [User::class], function ($userQuery) use ($term) {
+                        $userQuery->where('name', 'like', $term)
+                            ->orWhere('email', 'like', $term);
+                    });
             });
         }
 
@@ -275,6 +279,12 @@ class SystemTableService
         if (preg_match("/^Deleted system user '([^']+)'$/", $trimmed, $m)) {
             return __("Deleted system user ':name'", ['name' => $m[1]]);
         }
+        if (preg_match("/^Changed user status to '([^']+)' for '([^']+)'$/", $trimmed, $m)) {
+            return __("Changed user status to ':status' for ':name'", [
+                'status' => __(ucfirst($m[1])),
+                'name' => $m[2],
+            ]);
+        }
 
         // 3. Role mutations
         if (preg_match("/^Created new system role '([^']+)'$/", $trimmed, $m)) {
@@ -320,6 +330,14 @@ class SystemTableService
         }
         if (preg_match("/^Restored database state from snapshot '([^']+)'$/", $trimmed, $m)) {
             return __("Restored database state from snapshot ':file'", ['file' => $m[1]]);
+        }
+
+        // 7. System settings mutations
+        if (preg_match("/^Updated system setting '([^']+)'$/", $trimmed, $m)) {
+            return __("Updated system setting ':key'", ['key' => $m[1]]);
+        }
+        if (preg_match('/^Changed registration status to (enabled|disabled)$/', $trimmed, $m)) {
+            return __("Changed registration status to {$m[1]}");
         }
 
         return $trimmed;

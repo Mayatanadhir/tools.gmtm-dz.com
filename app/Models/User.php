@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
@@ -115,5 +116,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isSuperAdmin(): bool
     {
         return $this->hasRole('Super-Admin');
+    }
+
+    /**
+     * Get the associated employee record.
+     *
+     * @return HasOne<Employee, $this>
+     */
+    public function employee(): HasOne
+    {
+        return $this->hasOne(Employee::class);
     }
 }

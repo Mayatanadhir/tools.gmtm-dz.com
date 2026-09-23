@@ -18,6 +18,7 @@ use App\Models\SystemSetting;
 use App\Models\User;
 use App\Services\DatabaseBackupService;
 use App\Services\DataPruningService;
+use App\Services\MediaOptimizationService;
 use App\Services\PermissionDiscoveryService;
 use App\Services\SystemTableService;
 use App\Services\UserService;
@@ -91,7 +92,7 @@ class SystemTableController extends Controller
         }
 
         if ($request->hasFile('photo')) {
-            $userData['profile_photo_path'] = $request->file('photo')->store('photos', 'public');
+            $userData['profile_photo_path'] = app(MediaOptimizationService::class)->optimizeAvatar($request->file('photo'), 'photos', 'public');
         } elseif (array_key_exists('profile_photo_path', $validated)) {
             $userData['profile_photo_path'] = $validated['profile_photo_path'];
         }
@@ -157,13 +158,13 @@ class SystemTableController extends Controller
         }
 
         if ($request->hasFile('photo')) {
-            if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
-                Storage::disk('public')->delete($user->profile_photo_path);
+            if ($user->profile_photo_path) {
+                app(MediaOptimizationService::class)->safeDelete($user->profile_photo_path, 'public', $user->id);
             }
-            $updateData['profile_photo_path'] = $request->file('photo')->store('photos', 'public');
+            $updateData['profile_photo_path'] = app(MediaOptimizationService::class)->optimizeAvatar($request->file('photo'), 'photos', 'public');
         } elseif ($request->boolean('remove_photo')) {
-            if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
-                Storage::disk('public')->delete($user->profile_photo_path);
+            if ($user->profile_photo_path) {
+                app(MediaOptimizationService::class)->safeDelete($user->profile_photo_path, 'public', $user->id);
             }
             $updateData['profile_photo_path'] = null;
         } elseif (array_key_exists('profile_photo_path', $validated)) {
@@ -794,7 +795,7 @@ class SystemTableController extends Controller
 
         return redirect()
             ->route('dashboard')
-            ->with('status', __('System initialized successfully! Welcome to ENGI-MATE.'));
+            ->with('status', __('System initialized successfully! Welcome to ENGI-GMTM.'));
     }
 
     /**

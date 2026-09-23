@@ -22,25 +22,25 @@ class SyncTablePermissionsCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Introspect database schema, discover business tables, and generate standard CRUD permissions';
+    protected $description = 'Synchronize standard CRUD permissions from the static permissions catalog into database';
 
     /**
      * Execute the console command.
      */
     public function handle(PermissionDiscoveryService $service): int
     {
-        $this->info('Starting automated database schema introspection...');
+        $this->info('Synchronizing static permissions registry...');
 
         $tables = $service->getDiscoveredTables();
         $isDryRun = (bool) $this->option('dry-run');
 
         if (empty($tables)) {
-            $this->warn('No business tables discovered outside of the system blacklist.');
+            $this->warn('No business modules configured in permissions catalog.');
 
             return self::SUCCESS;
         }
 
-        $this->line('Discovered <fg=cyan>'.count($tables).'</> business tables:');
+        $this->line('Configured <fg=cyan>'.count($tables).'</> business modules:');
         $rows = [];
 
         foreach ($tables as $index => $table) {
@@ -54,7 +54,7 @@ class SyncTablePermissionsCommand extends Command
         $this->table(['#', 'Table / Entity', 'Standard CRUD Permissions'], $rows);
 
         if ($isDryRun) {
-            $this->warn('[DRY-RUN MODE] Schema inspected. No permissions were created in the database.');
+            $this->warn('[DRY-RUN MODE] Static catalog inspected. No permissions were created in the database.');
 
             return self::SUCCESS;
         }

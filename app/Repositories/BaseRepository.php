@@ -94,7 +94,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
      */
     public function paginate(int $perPage = 15, array $columns = ['*']): LengthAwarePaginator
     {
-        return $this->model->newQuery()->paginate($perPage, $columns);
+        return $this->model->newQuery()->paginate($perPage, $columns)->withQueryString();
     }
 
     /**
@@ -129,6 +129,6 @@ abstract class BaseRepository implements BaseRepositoryInterface
             $query->filter($filters);
         }
 
-        return $query->paginate($perPage, $columns);
+        return $query->paginate($perPage, $columns)->withQueryString();
     }
 }

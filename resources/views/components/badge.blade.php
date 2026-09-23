@@ -1,4 +1,4 @@
-@props([
+﻿@props([
     'variant' => 'neutral',
     'size' => 'sm',
     'dot' => false,
@@ -16,7 +16,7 @@
     };
 
     $variantClasses = match($normalizedVariant) {
-        'primary' => 'bg-orange-500/10 text-orange-700 dark:text-orange-300 border-orange-500/20',
+        'primary' => 'bg-brand-600/10 text-brand-800 dark:text-brand-300 border-brand-500/20',
         'success' => 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20',
         'danger' => 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/20',
         'warning' => 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20',
@@ -25,7 +25,7 @@
     };
 
     $dotColors = match($normalizedVariant) {
-        'primary' => 'bg-orange-500',
+        'primary' => 'bg-brand-600',
         'success' => 'bg-emerald-500',
         'danger' => 'bg-rose-500',
         'warning' => 'bg-amber-500',

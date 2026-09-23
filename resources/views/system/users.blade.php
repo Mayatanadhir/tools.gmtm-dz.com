@@ -17,14 +17,14 @@
                 @if($registrationOpen ?? is_registration_open())
                     <a href="{{ route('system-tables.settings') }}"
                        title="{{ __('Click to configure System Settings') }}"
-                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors">
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span>{{ __('Registration: Open') }}</span>
                     </a>
                 @else
                     <a href="{{ route('system-tables.settings') }}"
                        title="{{ __('Click to configure System Settings') }}"
-                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60 hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors">
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 hover:bg-rose-500/20 transition-colors">
                         <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                         <span>{{ __('Registration: Closed') }}</span>
                     </a>
@@ -113,7 +113,7 @@
                                     :search-value="$search"
                                     :submit-text="__('Search')"
                                 >
-                                    <select name="status" onchange="this.form.submit()" class="py-1.5 ps-2.5 pe-8 text-xs rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/80 text-gray-900 dark:text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 shadow-sm">
+                                    <select name="status" onchange="this.form.submit()" class="py-1.5 ps-2.5 pe-8 text-xs rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/80 text-gray-900 dark:text-white focus:border-brand-600 focus:ring-1 focus:ring-brand-600 shadow-sm">
                                         <option value="">{{ __('All Statuses') }}</option>
                                         <option value="active" @selected($status === 'active')>{{ __('Active') }}</option>
                                         <option value="suspended" @selected($status === 'suspended')>{{ __('Suspended') }}</option>
@@ -148,7 +148,7 @@
                                              alt="{{ $user->name }}"
                                              class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700 shadow-sm shrink-0">
                                     @else
-                                        <div class="w-8 h-8 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 flex items-center justify-center font-bold text-xs shrink-0">
+                                        <div class="w-8 h-8 rounded-full bg-brand-600/10 dark:bg-brand-600/20 text-brand-700 dark:text-brand-400 flex items-center justify-center font-bold text-xs shrink-0">
                                             {{ strtoupper(substr($user->name, 0, 1)) }}
                                         </div>
                                     @endif
@@ -335,7 +335,7 @@
                     enctype="multipart/form-data"
                     :title="__('Create New System User')"
                     :description="__('Add a new user account with credentials and role assignment.')"
-                    icon-color="orange"
+                    icon-color="green"
                     :submit-text="__('Create User')"
                 >
                     <!-- Name -->
@@ -369,7 +369,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <x-input-label for="new_user_role" :value="__('Role Assignment')" />
-                            <select id="new_user_role" name="role" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-orange-500 focus:ring-orange-500 text-sm">
+                            <select id="new_user_role" name="role" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-brand-600 focus:ring-brand-600 text-sm">
                                 <option value="" disabled>-- {{ __('Select Role') }} --</option>
                                 @foreach($roles as $role)
                                     <option value="{{ $role->name }}" @selected(old('role', 'User') === $role->name)>
@@ -382,7 +382,7 @@
 
                         <div>
                             <x-input-label for="new_user_status" :value="__('Account Status')" />
-                            <select id="new_user_status" name="status" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-orange-500 focus:ring-orange-500 text-sm">
+                            <select id="new_user_status" name="status" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-brand-600 focus:ring-brand-600 text-sm">
                                 <option value="active" @selected(old('status', 'active') === 'active')>{{ __('Active') }}</option>
                                 <option value="suspended" @selected(old('status') === 'suspended')>{{ __('Suspended') }}</option>
                             </select>
@@ -527,7 +527,7 @@
                             <template x-if="editUserIsSelf">
                                 <div>
                                     <div class="mt-1 flex items-center gap-2 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 text-sm text-gray-500 dark:text-gray-400 cursor-not-allowed select-none">
-                                        <svg class="w-4 h-4 text-orange-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 text-brand-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m0 0v2m0-2h2m-2 0H10m2-6a3 3 0 100-6 3 3 0 000 6z" />
                                         </svg>
                                         <span x-text="editUserRole"></span>
@@ -538,7 +538,7 @@
 
                             {{-- Normal editable select for other users --}}
                             <template x-if="!editUserIsSelf">
-                                <select id="edit_user_role_select" name="role" x-model="editUserRole" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-orange-500 focus:ring-orange-500 text-sm">
+                                <select id="edit_user_role_select" name="role" x-model="editUserRole" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-brand-600 focus:ring-brand-600 text-sm">
                                     <option value="" disabled>-- {{ __('Select Role') }} --</option>
                                     @foreach($roles as $role)
                                         <option value="{{ $role->name }}">{{ $role->name }}</option>
@@ -567,7 +567,7 @@
 
                             {{-- Normal editable select for other users --}}
                             <template x-if="!editUserIsSelf">
-                                <select id="edit_user_status_select" name="status" x-model="editUserStatus" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-orange-500 focus:ring-orange-500 text-sm">
+                                <select id="edit_user_status_select" name="status" x-model="editUserStatus" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-brand-600 focus:ring-brand-600 text-sm">
                                     <option value="active">{{ __('Active') }}</option>
                                     <option value="suspended">{{ __('Suspended / Locked') }}</option>
                                 </select>

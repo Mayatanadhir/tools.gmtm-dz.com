@@ -38,7 +38,7 @@
                     <x-global-filter
                         :action="route('system-tables.activity-log')"
                         :search="true"
-                        :search-placeholder="__('Search description, subject...')"
+                        :search-placeholder="__('Search description, subject, user...')"
                         :search-value="$search"
                         :submit-text="__('Filter')">
                         <x-global-filter.select
@@ -46,9 +46,9 @@
                             :placeholder="__('All Events')"
                             :value="$event"
                             :options="[
-                                'created' => 'Created',
-                                'updated' => 'Updated',
-                                'deleted' => 'Deleted'
+                                'created' => __('Created'),
+                                'updated' => __('Updated'),
+                                'deleted' => __('Deleted'),
                             ]"
                         />
                     </x-global-filter>
@@ -56,7 +56,7 @@
 
                 <!-- Table Content -->
                 <x-slot:header>
-                    <x-table.th>ID</x-table.th>
+                    <x-table.th>{{ __('ID') }}</x-table.th>
                     <x-table.th>{{ __('Event') }}</x-table.th>
                     <x-table.th>{{ __('Description') }}</x-table.th>
                     <x-table.th>{{ __('Subject') }}</x-table.th>
@@ -79,7 +79,7 @@
                         <x-table.td class="font-mono font-bold text-gray-900 dark:text-white">#{{ $act->id }}</x-table.td>
                         <x-table.td>
                             <x-badge :variant="$eventVariant" class="uppercase">
-                                {{ $act->event ?? 'event' }}
+                                {{ __($act->event ?? 'event') }}
                             </x-badge>
                         </x-table.td>
                         <x-table.td class="font-medium text-gray-900 dark:text-white">
@@ -93,13 +93,33 @@
                                 <span class="text-gray-400 italic">{{ __('None') }}</span>
                             @endif
                         </x-table.td>
-                        <x-table.td class="font-medium text-xs">
+                        <x-table.td class="whitespace-nowrap">
                             @if($act->causer)
-                                <span class="text-gray-800 dark:text-gray-200">{{ $act->causer->name ?? $act->causer->email }}</span>
+                                <div class="flex items-center gap-2.5">
+                                    @if(method_exists($act->causer, 'getProfilePhotoUrlAttribute') && $act->causer->profile_photo_url)
+                                        <img src="{{ $act->causer->profile_photo_url }}"
+                                             alt="{{ $act->causer->name }}"
+                                             class="w-7 h-7 rounded-full object-cover border border-gray-200 dark:border-gray-700 shrink-0">
+                                    @else
+                                        <div class="w-7 h-7 rounded-full bg-brand-600/10 dark:bg-brand-600/20 text-brand-700 dark:text-brand-400 flex items-center justify-center font-bold text-xs shrink-0">
+                                            {{ strtoupper(substr($act->causer->name ?? $act->causer->email ?? 'U', 0, 1)) }}
+                                        </div>
+                                    @endif
+                                    <div class="min-w-0">
+                                        <span class="font-semibold text-xs text-gray-900 dark:text-white block truncate">
+                                            {{ $act->causer->name ?? $act->causer->email }}
+                                        </span>
+                                        @if(!empty($act->causer->email) && $act->causer->name && $act->causer->email !== $act->causer->name)
+                                            <span class="font-mono text-[11px] text-gray-500 dark:text-gray-400 block truncate">
+                                                {{ $act->causer->email }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
                             @elseif($act->causer_id)
-                                <span class="font-mono text-gray-500">ID: {{ $act->causer_id }}</span>
+                                <span class="font-mono text-xs text-gray-500">{{ __('ID') }}: {{ $act->causer_id }}</span>
                             @else
-                                <span class="text-gray-400 italic">{{ __('System') }}</span>
+                                <span class="text-xs text-gray-400 dark:text-gray-500 italic">{{ __('System') }}</span>
                             @endif
                         </x-table.td>
                         <x-table.td class="whitespace-nowrap">

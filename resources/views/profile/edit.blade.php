@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Profile') }}
@@ -11,19 +11,19 @@
             {{-- ─── User Identity Hero Card ─── --}}
             <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700/60 shadow-sm overflow-hidden">
                 {{-- Gradient Banner --}}
-                <div class="h-24 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400"></div>
+                <div class="h-24 bg-gradient-to-r from-brand-600 via-brand-500 to-brand-700"></div>
 
                 {{-- Avatar + Details --}}
                 <div class="px-6 pb-6">
                     <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 -mt-12">
                         {{-- Avatar --}}
                         <div class="relative shrink-0">
-                            @if($user->profile_photo_path)
+                            @if($user->profile_photo_url)
                                 <img class="w-24 h-24 rounded-full object-cover ring-4 ring-white dark:ring-gray-800 shadow-lg"
-                                     src="{{ asset('storage/' . $user->profile_photo_path) }}"
+                                     src="{{ $user->profile_photo_url }}"
                                      alt="{{ $user->name }}">
                             @else
-                                <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 text-white font-bold text-3xl flex items-center justify-center ring-4 ring-white dark:ring-gray-800 shadow-lg">
+                                <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-brand-600 to-brand-800 text-white font-bold text-3xl flex items-center justify-center ring-4 ring-white dark:ring-gray-800 shadow-lg">
                                     {{ strtoupper(substr($user->name, 0, 1)) }}
                                 </div>
                             @endif

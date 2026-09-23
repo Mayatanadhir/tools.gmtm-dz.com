@@ -17,11 +17,11 @@ $resolvedTitle = $title ?? match($type) {
 };
 
 $themeClasses = match($type) {
-    'edit', 'restore' => 'bg-amber-50 text-amber-700 border-amber-200/80 hover:bg-amber-500 hover:text-white hover:border-amber-500 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60 dark:hover:bg-amber-500 dark:hover:text-white focus:ring-amber-500',
-    'delete' => 'bg-rose-50 text-rose-700 border-rose-200/80 hover:bg-rose-600 hover:text-white hover:border-rose-600 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/60 dark:hover:bg-rose-600 dark:hover:text-white focus:ring-rose-500',
-    'primary' => 'bg-orange-50 text-orange-700 border-orange-200/80 hover:bg-orange-500 hover:text-white hover:border-orange-500 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-800/60 dark:hover:bg-orange-500 dark:hover:text-white focus:ring-orange-500',
-    'success' => 'bg-emerald-50 text-emerald-700 border-emerald-200/80 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60 dark:hover:bg-emerald-600 dark:hover:text-white focus:ring-emerald-500',
-    default => 'bg-indigo-50 text-indigo-700 border-indigo-200/80 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800/60 dark:hover:bg-indigo-600 dark:hover:text-white focus:ring-indigo-500',
+    'edit', 'restore' => 'bg-amber-500/10 text-amber-700 border-amber-500/20 hover:bg-amber-500 hover:text-white hover:border-amber-500 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30 dark:hover:bg-amber-500 dark:hover:text-white focus:ring-amber-500',
+    'delete' => 'bg-rose-500/10 text-rose-700 border-rose-500/20 hover:bg-rose-600 hover:text-white hover:border-rose-600 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30 dark:hover:bg-rose-600 dark:hover:text-white focus:ring-rose-500',
+    'primary' => 'bg-brand-600/10 text-brand-800 border-brand-500/20 hover:bg-brand-600 hover:text-white hover:border-brand-500 dark:bg-brand-600/20 dark:text-brand-300 dark:border-brand-500/30 dark:hover:bg-brand-600 dark:hover:text-white focus:ring-brand-600',
+    'success' => 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30 dark:hover:bg-emerald-600 dark:hover:text-white focus:ring-emerald-500',
+    default => 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 dark:border-indigo-500/30 dark:hover:bg-indigo-600 dark:hover:text-white focus:ring-brand-600',
 };
 
 $hasSlot = $slot->isNotEmpty();

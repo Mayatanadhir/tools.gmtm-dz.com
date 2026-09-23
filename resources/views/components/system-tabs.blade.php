@@ -1,4 +1,4 @@
-@props(['active' => 'index'])
+﻿@props(['active' => 'index'])
 
 @php
 $tabs = [
@@ -56,14 +56,7 @@ $tabs = [
 @endphp
 
 <div class="rounded-2xl bg-white dark:bg-gray-800 p-3.5 shadow-sm border border-gray-100 dark:border-gray-700/60 sticky top-24">
-    <div class="px-3 py-2 mb-2 border-b border-gray-100 dark:border-gray-700/60">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-            {{ __('Navigation') }}
-        </p>
-        <h3 class="text-sm font-bold text-gray-900 dark:text-white mt-0.5">
-            {{ __('System Tables') }}
-        </h3>
-    </div>
+    
 
     <nav class="space-y-1.5" aria-label="System Tables Sidebar">
         @foreach($tabs as $key => $tab)
@@ -71,8 +64,8 @@ $tabs = [
                 $isActive = ($active === $key);
             @endphp
             <a href="{{ $tab['route'] }}"
-               class="group flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 {{ $isActive ? 'bg-orange-500 text-white shadow-sm shadow-orange-500/25 dark:bg-orange-600 font-semibold' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700/50' }}">
-                <span class="shrink-0 transition-transform duration-200 group-hover:scale-110 {{ $isActive ? 'text-white' : 'text-gray-400 dark:text-gray-500 group-hover:text-orange-500 dark:group-hover:text-orange-400' }}">
+               class="group flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 {{ $isActive ? 'bg-brand-600 text-white shadow-sm shadow-brand-600/20 dark:bg-brand-700 font-semibold' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700/50' }}">
+                <span class="shrink-0 transition-transform duration-200 group-hover:scale-110 {{ $isActive ? 'text-white' : 'text-gray-400 dark:text-gray-500 group-hover:text-brand-600 dark:group-hover:text-brand-400' }}">
                     {!! $tab['icon'] !!}
                 </span>
                 <span class="truncate">{{ $tab['name'] }}</span>
@@ -80,13 +73,5 @@ $tabs = [
         @endforeach
     </nav>
 
-    <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700/60 px-3">
-        <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-            <span>{{ __('Status') }}</span>
-            <span class="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                {{ __('Active') }}
-            </span>
-        </div>
-    </div>
+   
 </div>

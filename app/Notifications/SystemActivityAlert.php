@@ -20,7 +20,7 @@ class SystemActivityAlert extends Notification
         private readonly string $title,
         private readonly string $message,
         private readonly string $type,
-        private readonly string $causer = 'النظام',
+        private readonly string $causer = 'System',
         private readonly array $extra = []
     ) {}
 

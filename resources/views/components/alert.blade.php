@@ -15,7 +15,7 @@
     };
 
     $containerClasses = match($normalizedVariant) {
-        'primary' => 'bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800/80 text-orange-900 dark:text-orange-200',
+        'primary' => 'bg-brand-50 dark:bg-brand-950/30 border-brand-200 dark:border-brand-800/80 text-brand-900 dark:text-brand-200',
         'success' => 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/80 text-emerald-900 dark:text-emerald-200',
         'danger' => 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800/80 text-rose-900 dark:text-rose-200',
         'warning' => 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/80 text-amber-900 dark:text-amber-200',
@@ -24,7 +24,7 @@
     };
 
     $iconClasses = match($normalizedVariant) {
-        'primary' => 'text-orange-500 dark:text-orange-400',
+        'primary' => 'text-brand-600 dark:text-brand-400',
         'success' => 'text-emerald-600 dark:text-emerald-400',
         'danger' => 'text-rose-600 dark:text-rose-400',
         'warning' => 'text-amber-500 dark:text-amber-400',
@@ -33,11 +33,11 @@
     };
 
     $closeHoverClasses = match($normalizedVariant) {
-        'primary' => 'hover:bg-orange-100 dark:hover:bg-orange-900/50 text-orange-600 dark:text-orange-300',
+        'primary' => 'hover:bg-brand-100 dark:hover:bg-brand-900/50 text-brand-700 dark:text-brand-300',
         'success' => 'hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-600 dark:text-emerald-300',
         'danger' => 'hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-300',
         'warning' => 'hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-600 dark:text-amber-300',
-        'info' => 'hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300',
+        'info' => 'hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300',
         'neutral' => 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300',
     };
 @endphp

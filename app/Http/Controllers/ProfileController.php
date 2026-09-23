@@ -5,17 +5,20 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\MediaOptimizationService;
 use App\Services\UserService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    public function __construct(protected UserService $userService) {}
+    public function __construct(
+        protected UserService $userService,
+        protected MediaOptimizationService $mediaOptimizationService,
+    ) {}
 
     /**
      * Display the user's profile form.
@@ -41,13 +44,13 @@ class ProfileController extends Controller
         ];
 
         if ($request->hasFile('photo')) {
-            if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
-                Storage::disk('public')->delete($user->profile_photo_path);
+            if ($user->profile_photo_path) {
+                $this->mediaOptimizationService->safeDelete($user->profile_photo_path, 'public', $user->id);
             }
-            $updateData['profile_photo_path'] = $request->file('photo')->store('photos', 'public');
+            $updateData['profile_photo_path'] = $this->mediaOptimizationService->optimizeAvatar($request->file('photo'), 'photos', 'public');
         } elseif ($request->boolean('remove_photo')) {
-            if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
-                Storage::disk('public')->delete($user->profile_photo_path);
+            if ($user->profile_photo_path) {
+                $this->mediaOptimizationService->safeDelete($user->profile_photo_path, 'public', $user->id);
             }
             $updateData['profile_photo_path'] = null;
         }

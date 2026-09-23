@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -110,7 +110,7 @@
                             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-gray-100 dark:border-gray-700/60">
                                 <div>
                                     <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                                        <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
                                         <span>{{ __('Global Pruning Engine Switch') }}</span>
                                     </h3>
                                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -120,7 +120,7 @@
                                 <div class="flex items-center gap-3">
                                     <label class="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" name="enabled" value="1" class="sr-only peer" {{ $effectiveConfig['enabled'] ? 'checked' : '' }}>
-                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-orange-500"></div>
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-brand-600"></div>
                                         <span class="ms-3 text-xs font-semibold text-gray-700 dark:text-gray-300">{{ __('Engine Master Power') }}</span>
                                     </label>
                                 </div>
@@ -131,7 +131,7 @@
                                     <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300 mb-1">
                                         {{ __('Batch Deletion Chunk Size') }}
                                     </label>
-                                    <input type="number" name="chunk_size" value="{{ $effectiveConfig['chunk_size'] ?? 1000 }}" min="50" max="10000" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-orange-500 focus:ring-orange-500">
+                                    <input type="number" name="chunk_size" value="{{ $effectiveConfig['chunk_size'] ?? 1000 }}" min="50" max="10000" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-brand-600">
                                     <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
                                         {{ __('Number of records deleted per database chunk iteration (prevents lock contention).') }}
                                     </p>
@@ -142,7 +142,7 @@
                                         {{ __('Task Scheduler Timing') }}
                                     </label>
                                     <div class="flex items-center gap-2 p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700/60 text-xs font-mono text-gray-700 dark:text-gray-300">
-                                        <svg class="w-4 h-4 text-orange-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <svg class="w-4 h-4 text-brand-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                         <span>02:00 {{ __('Daily (Midnight Schedule)') }}</span>
                                     </div>
                                     <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
@@ -156,7 +156,7 @@
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
                             <div>
                                 <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                    <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                    <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                                     <span>{{ __('Target Tables Lifecycle Rules') }}</span>
                                 </h3>
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -181,7 +181,7 @@
                             <div class="rounded-2xl bg-white dark:bg-gray-800 p-5 shadow-sm border border-gray-100 dark:border-gray-700/60 flex flex-col justify-between">
                                 <div>
                                     <div class="flex items-center justify-between mb-3">
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-orange-500/10 text-orange-600 dark:text-orange-400 text-xs font-bold font-mono">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-brand-600/10 text-brand-700 dark:text-brand-400 text-xs font-bold font-mono">
                                             activity_log
                                         </span>
                                         <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">
@@ -199,7 +199,7 @@
                                         <div>
                                             <label class="relative inline-flex items-center cursor-pointer">
                                                 <input type="checkbox" name="tables[activity_log][enabled]" value="1" class="sr-only peer" {{ !empty($actCfg['enabled']) ? 'checked' : '' }}>
-                                                <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-orange-500"></div>
+                                                <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-brand-600"></div>
                                                 <span class="ms-2.5 text-xs font-medium text-gray-700 dark:text-gray-300">{{ __('Enable Table Pruning') }}</span>
                                             </label>
                                         </div>
@@ -208,7 +208,7 @@
                                             <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">
                                                 {{ __('Retention Days (Date)') }}
                                             </label>
-                                            <input type="number" name="tables[activity_log][retention_days]" value="{{ $actCfg['retention_days'] ?? 90 }}" min="0" max="3650" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-orange-500 focus:ring-orange-500">
+                                            <input type="number" name="tables[activity_log][retention_days]" value="{{ $actCfg['retention_days'] ?? 90 }}" min="0" max="3650" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-brand-600">
                                             <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-1">{{ __('Delete logs older than N days.') }}</p>
                                         </div>
 
@@ -216,7 +216,7 @@
                                             <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">
                                                 {{ __('Max Records (Capacity)') }}
                                             </label>
-                                            <input type="number" name="tables[activity_log][max_records]" value="{{ $actCfg['max_records'] ?? 100000 }}" min="0" max="10000000" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-orange-500 focus:ring-orange-500">
+                                            <input type="number" name="tables[activity_log][max_records]" value="{{ $actCfg['max_records'] ?? 100000 }}" min="0" max="10000000" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-brand-600">
                                             <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-1">{{ __('Purge excess oldest records beyond this limit.') }}</p>
                                         </div>
                                     </div>
@@ -230,7 +230,7 @@
                             <div class="rounded-2xl bg-white dark:bg-gray-800 p-5 shadow-sm border border-gray-100 dark:border-gray-700/60 flex flex-col justify-between">
                                 <div>
                                     <div class="flex items-center justify-between mb-3">
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold font-mono">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-indigo-500/10 text-brand-700 dark:text-indigo-400 text-xs font-bold font-mono">
                                             notifications
                                         </span>
                                         <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">
@@ -248,7 +248,7 @@
                                         <div>
                                             <label class="relative inline-flex items-center cursor-pointer">
                                                 <input type="checkbox" name="tables[notifications][enabled]" value="1" class="sr-only peer" {{ !empty($notifCfg['enabled']) ? 'checked' : '' }}>
-                                                <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-orange-500"></div>
+                                                <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-brand-600"></div>
                                                 <span class="ms-2.5 text-xs font-medium text-gray-700 dark:text-gray-300">{{ __('Enable Table Pruning') }}</span>
                                             </label>
                                         </div>
@@ -257,7 +257,7 @@
                                             <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">
                                                 {{ __('Retention Days (Date)') }}
                                             </label>
-                                            <input type="number" name="tables[notifications][retention_days]" value="{{ $notifCfg['retention_days'] ?? 60 }}" min="0" max="3650" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-orange-500 focus:ring-orange-500">
+                                            <input type="number" name="tables[notifications][retention_days]" value="{{ $notifCfg['retention_days'] ?? 60 }}" min="0" max="3650" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-brand-600">
                                             <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-1">{{ __('Delete notifications older than N days.') }}</p>
                                         </div>
 
@@ -265,13 +265,13 @@
                                             <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">
                                                 {{ __('Max Records (Capacity)') }}
                                             </label>
-                                            <input type="number" name="tables[notifications][max_records]" value="{{ $notifCfg['max_records'] ?? 50000 }}" min="0" max="10000000" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-orange-500 focus:ring-orange-500">
+                                            <input type="number" name="tables[notifications][max_records]" value="{{ $notifCfg['max_records'] ?? 50000 }}" min="0" max="10000000" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-brand-600">
                                             <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-1">{{ __('Purge excess oldest records beyond this limit.') }}</p>
                                         </div>
 
                                         <div class="pt-2">
                                             <label class="flex items-center gap-2 cursor-pointer">
-                                                <input type="checkbox" name="tables[notifications][only_read]" value="1" class="rounded border-gray-300 dark:border-gray-600 text-orange-500 focus:ring-orange-500 dark:bg-gray-900" {{ !empty($notifCfg['only_read']) ? 'checked' : '' }}>
+                                                <input type="checkbox" name="tables[notifications][only_read]" value="1" class="rounded border-gray-300 dark:border-gray-600 text-brand-600 focus:ring-brand-600 dark:bg-gray-900" {{ !empty($notifCfg['only_read']) ? 'checked' : '' }}>
                                                 <span class="text-xs text-gray-600 dark:text-gray-300 font-medium">{{ __('Prune only read notifications') }}</span>
                                             </label>
                                         </div>
@@ -304,7 +304,7 @@
                                         <div>
                                             <label class="relative inline-flex items-center cursor-pointer">
                                                 <input type="checkbox" name="tables[failed_jobs][enabled]" value="1" class="sr-only peer" {{ !empty($failCfg['enabled']) ? 'checked' : '' }}>
-                                                <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-orange-500"></div>
+                                                <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-brand-600"></div>
                                                 <span class="ms-2.5 text-xs font-medium text-gray-700 dark:text-gray-300">{{ __('Enable Table Pruning') }}</span>
                                             </label>
                                         </div>
@@ -313,7 +313,7 @@
                                             <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">
                                                 {{ __('Retention Days (Date)') }}
                                             </label>
-                                            <input type="number" name="tables[failed_jobs][retention_days]" value="{{ $failCfg['retention_days'] ?? 30 }}" min="0" max="3650" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-orange-500 focus:ring-orange-500">
+                                            <input type="number" name="tables[failed_jobs][retention_days]" value="{{ $failCfg['retention_days'] ?? 30 }}" min="0" max="3650" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-brand-600">
                                             <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-1">{{ __('Delete failures older than N days.') }}</p>
                                         </div>
 
@@ -321,7 +321,7 @@
                                             <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">
                                                 {{ __('Max Records (Capacity)') }}
                                             </label>
-                                            <input type="number" name="tables[failed_jobs][max_records]" value="{{ $failCfg['max_records'] ?? 10000 }}" min="0" max="10000000" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-orange-500 focus:ring-orange-500">
+                                            <input type="number" name="tables[failed_jobs][max_records]" value="{{ $failCfg['max_records'] ?? 10000 }}" min="0" max="10000000" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-brand-600">
                                             <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-1">{{ __('Purge excess oldest records beyond this limit.') }}</p>
                                         </div>
                                     </div>
@@ -335,7 +335,7 @@
                                         <div>
                                             <div class="flex items-center justify-between mb-3">
                                                 <div class="flex items-center gap-1.5">
-                                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold font-mono">
+                                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-indigo-500/10 text-brand-700 dark:text-indigo-400 text-xs font-bold font-mono">
                                                         {{ $tblKey }}
                                                     </span>
                                                     <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
@@ -358,16 +358,16 @@
                                                 </button>
                                             </div>
                                             <div class="mt-1 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                                                <span>PK: <code class="text-indigo-600 dark:text-indigo-400 font-bold">{{ $cfg['primary_key'] ?? 'id' }}</code></span>
+                                                <span>PK: <code class="text-brand-700 dark:text-indigo-400 font-bold">{{ $cfg['primary_key'] ?? 'id' }}</code></span>
                                                 <span>&bull;</span>
-                                                <span>{{ __('Date:') }} <code class="text-indigo-600 dark:text-indigo-400 font-bold">{{ $cfg['date_column'] ?? 'created_at' }}</code></span>
+                                                <span>{{ __('Date:') }} <code class="text-brand-700 dark:text-indigo-400 font-bold">{{ $cfg['date_column'] ?? 'created_at' }}</code></span>
                                             </div>
 
                                             <div class="space-y-4 pt-3 border-t border-gray-100 dark:border-gray-700/60 mt-3">
                                                 <div>
                                                     <label class="relative inline-flex items-center cursor-pointer">
                                                         <input type="checkbox" name="tables[{{ $tblKey }}][enabled]" value="1" class="sr-only peer" {{ !empty($cfg['enabled']) ? 'checked' : '' }}>
-                                                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-orange-500"></div>
+                                                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-brand-600"></div>
                                                         <span class="ms-2.5 text-xs font-medium text-gray-700 dark:text-gray-300">{{ __('Enable Table Pruning') }}</span>
                                                     </label>
                                                 </div>
@@ -376,7 +376,7 @@
                                                     <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">
                                                         {{ __('Retention Days (Date)') }}
                                                     </label>
-                                                    <input type="number" name="tables[{{ $tblKey }}][retention_days]" value="{{ $cfg['retention_days'] ?? 30 }}" min="0" max="3650" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-orange-500 focus:ring-orange-500">
+                                                    <input type="number" name="tables[{{ $tblKey }}][retention_days]" value="{{ $cfg['retention_days'] ?? 30 }}" min="0" max="3650" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-brand-600">
                                                     <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-1">{{ __('Delete logs older than N days.') }}</p>
                                                 </div>
 
@@ -384,7 +384,7 @@
                                                     <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">
                                                         {{ __('Max Records (Capacity)') }}
                                                     </label>
-                                                    <input type="number" name="tables[{{ $tblKey }}][max_records]" value="{{ $cfg['max_records'] ?? 10000 }}" min="0" max="10000000" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-orange-500 focus:ring-orange-500">
+                                                    <input type="number" name="tables[{{ $tblKey }}][max_records]" value="{{ $cfg['max_records'] ?? 10000 }}" min="0" max="10000000" class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-brand-600">
                                                     <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-1">{{ __('Purge excess oldest records beyond this limit.') }}</p>
                                                 </div>
                                             </div>
@@ -440,7 +440,7 @@
                     <x-table>
                         <x-slot:toolbar>
                             <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 <span>{{ __('Pruning Audit Trail') }}</span>
                             </h3>
                             <span class="text-xs text-gray-500 font-mono">{{ $history->count() }} {{ __('events') }}</span>
@@ -456,7 +456,7 @@
                             <x-table.tr>
                                 <x-table.td class="font-medium text-gray-900 dark:text-white">
                                     <div class="flex items-center gap-2">
-                                        <span class="w-2 h-2 rounded-full bg-orange-500 shrink-0"></span>
+                                        <span class="w-2 h-2 rounded-full bg-brand-600 shrink-0"></span>
                                         <span>{{ $item->translated_description ?? $item->description }}</span>
                                     </div>
                                 </x-table.td>
@@ -514,7 +514,7 @@
                     <div class="p-6">
                         <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-700">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                                <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-brand-700 dark:text-indigo-400 flex items-center justify-center">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                                 </div>
                                 <div>
@@ -533,14 +533,14 @@
 
                         <div class="py-5">
                             <div x-show="isLoadingDryRun" class="text-center py-8">
-                                <div class="inline-block animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full mb-3"></div>
+                                <div class="inline-block animate-spin w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full mb-3"></div>
                                 <p class="text-xs text-gray-500 font-medium">{{ __('Analyzing database tables and lifecycle rules...') }}</p>
                             </div>
 
                             <div x-show="!isLoadingDryRun && dryRunReport" class="space-y-4">
                                 <div class="p-3.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-800 text-xs text-indigo-900 dark:text-indigo-200 flex items-center justify-between font-semibold">
                                     <span>{{ __('Total records targeted for pruning:') }}</span>
-                                    <span class="text-base font-mono text-indigo-600 dark:text-indigo-400" x-text="dryRunReport ? dryRunReport.total_pruned : 0"></span>
+                                    <span class="text-base font-mono text-brand-700 dark:text-indigo-400" x-text="dryRunReport ? dryRunReport.total_pruned : 0"></span>
                                 </div>
 
                                 <div class="border border-gray-100 dark:border-gray-700/60 rounded-xl overflow-hidden">
@@ -710,7 +710,7 @@
 
                         <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-700">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center">
+                                <div class="w-10 h-10 rounded-xl bg-brand-600/10 text-brand-700 dark:text-brand-400 flex items-center justify-center">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                                 </div>
                                 <div>
@@ -736,7 +736,7 @@
                                     x-model="selectedTable"
                                     @change="onTableSelected($event.target.value)"
                                     required
-                                    class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-orange-500 focus:ring-orange-500 font-mono">
+                                    class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-brand-600 font-mono">
                                 <option value="" disabled>{{ __('Select a database table...') }}</option>
                                 <template x-for="t in eligibleTables" :key="t.name">
                                     <option :value="t.name" x-text="t.name + ' (' + t.count + ' {{ __('rows') }})'"></option>
@@ -753,7 +753,7 @@
                                 <select name="primary_key"
                                         x-model="primaryKey"
                                         required
-                                        class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-orange-500 focus:ring-orange-500 font-mono">
+                                        class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-brand-600 font-mono">
                                     <template x-for="col in selectedTableColumns" :key="col">
                                         <option :value="col" x-text="col"></option>
                                     </template>
@@ -768,7 +768,7 @@
                                 <select name="date_column"
                                         x-model="dateColumn"
                                         required
-                                        class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-orange-500 focus:ring-orange-500 font-mono">
+                                        class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-brand-600 font-mono">
                                     <template x-for="col in selectedTableColumns" :key="col">
                                         <option :value="col" x-text="col"></option>
                                     </template>
@@ -788,7 +788,7 @@
                                        min="0"
                                        max="3650"
                                        required
-                                       class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-orange-500 focus:ring-orange-500">
+                                       class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-brand-600">
                                 <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-1">{{ __('Delete logs older than N days.') }}</p>
                             </div>
 
@@ -803,7 +803,7 @@
                                        min="0"
                                        max="10000000"
                                        required
-                                       class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-orange-500 focus:ring-orange-500">
+                                       class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-brand-600">
                                 <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-1">{{ __('Purge excess oldest records beyond this limit.') }}</p>
                             </div>
                         </div>
@@ -812,7 +812,7 @@
                         <div class="pt-2">
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" name="enabled" value="1" class="sr-only peer" checked>
-                                <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-orange-500"></div>
+                                <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-brand-600"></div>
                                 <span class="ms-2.5 text-xs font-medium text-gray-700 dark:text-gray-300">{{ __('Enable Table Pruning') }}</span>
                             </label>
                         </div>

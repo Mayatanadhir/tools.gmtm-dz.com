@@ -36,9 +36,11 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 - If the user doesn't see a frontend change reflected in the UI, it could mean they need to run `npm run build`, `npm run dev`, or `composer run dev`. Ask them.
 
-## Documentation Files & Living Memory
+## Documentation Files & Living Memory (Token-Efficient Protocol)
 - Do not create arbitrary scratch markdown files unless requested.
-- **Mandatory Project Documentation:** Every modification, feature, or architectural change MUST be systematically documented in `docs/project_state.md`, `docs/changelog.md`, and `docs/ARCHITECTURE_LOG.md`.
+- **Smart Pre-Flight:** Inspect `docs/project_state.md` for active schema and system state. Do NOT read `docs/ARCHITECTURE_LOG.md` or `docs/changelog.md` up front; read specific ADRs or changelog entries only when relevant to the active task domain.
+- **Proportional Post-Flight:** Always log concise entries in `docs/changelog.md`; update `docs/project_state.md` only when models, schema, routes, services, or commands change; record ADRs in `docs/ARCHITECTURE_LOG.md` ONLY for major structural decisions (no ADRs for bug fixes or UI tweaks).
+- **Token-Economy Response Directive:** Never echo or dump full document contents into chat responses. Output only the file path and a concise bullet-point diff summary (max 3-5 lines).
 
 ## Replies
 
@@ -171,3 +173,142 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
   - Never inject `<style>` blocks or raw CSS rules inside PHP files or JavaScript components unless architecturally required (and even then, keep it isolated).
 - **Multi-File Response Mandate:** When a feature requires both backend changes and frontend/CSS changes, output them as completely separate code blocks with distinct file paths.
 
+## Mandatory Trilingual Localization Across All Views & Features (Strict UI & Language Rule)
+1. **Absolute Mandate: 100% English Translation Master Keys (إلزام كتابة كل مفاتيح الترجمة بالإنجليزية حصراً):**
+   - **In Code:** Every single translation key passed to `__('...')`, `@lang('...')`, Form Requests, validation attributes, status flashes, or notification messages MUST be written in English as a single unified master key language.
+   - **In JSON Dictionaries:** In all three dictionary files (`lang/en.json`, `lang/ar.json`, `lang/fr.json`), the **key** (JSON property name on left side of `:`) MUST strictly and exclusively be in English.
+   - **Zero Tolerance Prohibition:** Using Arabic, French, or any non-English string as a dictionary key or inside `__('...')` in code is strictly prohibited. Arabic and French text may ONLY appear as the translated values in `ar.json` and `fr.json`.
+2. **3-Language Dictionary Parity:** Every translation key MUST be present in `lang/en.json`, `lang/ar.json`, and `lang/fr.json` simultaneously, with 100% exact 1-to-1 key parity and identical English key names.
+3. **Zero Hardcoded Strings:** No raw unlocalized user-facing strings in views or backend responses. Everything must use `__('...')`.
+
+## Mandatory RBAC Authorization & Static Permissions Registry Integration (Strict Rule)
+1. **Mandatory Permission Shield:** Every new service, module, route, or new page MUST be integrated with and protected by RBAC permissions (`permission:...` middleware, `$this->authorize()`, `@can`).
+2. **Mandatory Static Catalog Registration:** Any new service or page entity MUST be formally declared in `config/permissions.php` under `$groups` and synchronized with `php artisan permissions:sync-tables`.
+3. **Mandatory Developer Clarification Protocol:** If the AI assistant is unsure of the exact permission names or grouping for the new service/page, it MUST ask the developer before proceeding:
+   > *"ما هي أسماء وصيغ الصلاحيات المعتمدة لهذه الخدمة/الصفحة الجديدة لإضافتها إلى القائمة الثابتة (`config/permissions.php`)؟"*
+
+## Mandatory Media Processing, CAS Deduplication & Zero Disk Space Leak Engine (Strict Architecture & Storage Rule)
+Every AI agent writing, modifying, or extending file uploads, image handling, document attachments, avatar management, or file deletion in this project is strictly mandated to adhere to the media optimization and storage protocol:
+1. **Mandatory Centralized Gateway (`MediaOptimizationService`):**
+   - Direct, uncompressed file storage via raw Laravel methods (e.g. `$request->file('...')->store('...')`, `Storage::putFile(...)`) is **strictly forbidden**.
+   - All uploaded images, avatars, profile photos, documents, and media attachments MUST pass through `app(MediaOptimizationService::class)`:
+     - `optimizeImage($file, $directory, $disk)` for images.
+     - `optimizePdf($file, $directory, $disk)` for PDF documents.
+     - `optimize($file, $directory, $disk)` for automatic MIME-based routing.
+2. **Compulsory WebP Conversion & Image Compression Standard:**
+   - All uploaded images (JPEG, PNG, JPG, etc.) must be compulsory converted to **WebP** format.
+   - Quality must be set to **80%**.
+   - Width must be proportionately scaled down capped at **1920px** (Full HD standard) using `scaleDown(width: 1920)`. Upscaling smaller images is strictly prohibited.
+   - All EXIF, camera metadata, and GPS geolocation data must be stripped for privacy and storage optimization (`strip: true`).
+3. **Ghostscript PDF Optimization:**
+   - PDF documents must be processed via Ghostscript (`gs`) using the `/ebook` profile (150dpi resolution, compatibility 1.4).
+   - Resilient fallback (`fallback_to_original`) is enforced if Ghostscript is unavailable on the host.
+4. **Mandatory Content-Addressable Storage (CAS) Deduplication:**
+   - All stored media artifacts must be named using their cryptographic SHA-256 content hash (`{sha256}.webp` / `{sha256}.pdf`).
+   - If an identical image or document is uploaded (by the same user or different users), the system MUST detect the existing physical file on disk and reuse its path immediately, creating zero redundant duplicate files on disk.
+5. **Mandatory Reference-Aware Safe Deletion Protocol:**
+   - Direct, unconditional deletion from disk via raw `Storage::delete($path)` is **strictly forbidden** for shared media assets.
+   - Before any file is unlinked from storage, the system MUST check whether other users or database entities still reference that path using `MediaOptimizationService::isAssetInUse($path, $excludeEntityId)` or invoke `MediaOptimizationService::safeDelete($path, $disk, $excludeEntityId)`.
+   - If other records in the system are still referencing the file, the physical file on disk MUST BE PRESERVED.
+   - The physical file on disk is only permanently deleted (`Storage::delete()`) when the active reference count reaches zero.
+6. **Strict "Process & Destroy" Protocol (The Kill-Step):**
+   - Temporary upload copies and intermediate scratch files in `storage/app/temp-media` or system temp must be immediately and permanently destroyed via `@unlink()` (`destroyTempFiles()`) upon completion.
+   - Zero raw, unoptimized, or temporary files may linger on the server disk.
+
+## Mandatory Single Source of Truth for Colors, Badge System & Semantic Functional Classification (Strict UI Rule)
+Every AI agent writing, modifying, or refactoring UI views, badge chips, status indicators, or PHP Enums in this project is strictly mandated to adhere to the color unification and functional classification protocol:
+1. **Single Source of Truth (`<x-badge>` & `tokens.css`):**
+   - The project's unified design system (`resources/css/tokens.css` and `resources/views/components/badge.blade.php`) is the sole authoritative source of truth for colors and badges.
+   - Writing raw `<span>` elements with ad-hoc Tailwind color classes (e.g. `bg-amber-50 ... dark:bg-amber-950/60`, `bg-cyan-50`, `border-emerald-500/30`) is **strictly forbidden**.
+   - All badges, status labels, job position chips, and category tags across the entire application **MUST** exclusively use the unified `<x-badge>` component (`<x-badge :variant="...">`).
+   - **Pure PHP Isolation in Enums:** PHP Enums must never return raw HTML or CSS class strings (e.g. `badgeClass()`). Instead, Enums must strictly declare a `badgeVariant(): string` method returning a recognized semantic token (`primary`, `info`, `neutral`, `success`, `danger`, `warning`).
+2. **Mandatory Functional Role & Hierarchy Classification (No "Rainbow / Confetti UI"):**
+   - Positions, roles, and categories must strictly be classified into coherent functional tiers rather than assigning arbitrary random colors:
+     - **Management & Executive Leadership (`isManagement()`):** Must use the **`primary`** variant (`bg-brand-600/10 text-brand-800 dark:text-brand-300 border-brand-500/20`), representing the official GMTM corporate industrial brand identity.
+     - **Engineering & Specialist Roles (`isEngineer()`):** Must use the **`info`** variant (`bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/20`), representing technical domain authority.
+     - **Field Operations & Technicians (`isTechnician()`):** Must use the **`neutral`** variant (`bg-gray-500/10 text-gray-700 dark:text-gray-300 border-gray-500/20 dark:border-gray-600/30`), maintaining a clean, operational baseline.
+3. **Decoupling Operational State/Status from Role/Position:**
+   - Operational states (Active, Inactive, Suspended, On Leave, Pending, Completed, Failed) must never be visually confused with functional job positions.
+   - Status indicators must use state semantics paired with status dots (`:dot="true"`):
+     - `success` (Emerald / Brand) with dot for Active / Completed.
+     - `danger` (Rose / Red) with dot for Inactive / Suspended / Failed.
+     - `warning` (Amber) with dot for On Leave / Pending / Paused.
+4. **Harmonized Light & Dark Mode Standards:**
+   - All badges and status elements must rely on curated alpha-transparency tokens (`bg-*/10`, `border-*/20`, `text-* dark:text-*`) managed centrally by `<x-badge>`.
+   - Never inject opaque dark classes like `dark:bg-*-950/60` or manual dark overrides that break contrast or look muddy/jarring.
+   - Interactive form inputs, select dropdowns, and search filters must strictly use brand-aligned focus states (`focus:border-brand-600 focus:ring-brand-600`) across both light and dark themes.
+
+## Mandatory Unified Search, Filter & State Persistence Architecture (Strict Rule)
+Every AI agent writing, modifying, or refactoring table views, repositories, controllers, or filter components in this project is strictly mandated to adhere to the unified search, filtering, and query state persistence protocol:
+1. **Single Source of Truth for Search & Filters (`<x-global-filter>`):**
+   - The `<x-global-filter>` component is the sole authoritative standard for all table search inputs, status/position dropdowns, and date-range filters across the entire application.
+   - Writing ad-hoc, unstyled search bars or custom one-off filter containers is **strictly forbidden**.
+2. **Mandatory Functional Role Grouping in Selectors (`<optgroup>`):**
+   - In all position filters, dropdowns, and create/edit modal selects, job positions MUST be grouped into the 3 standardized functional tiers using `<optgroup>`:
+     - `<optgroup label="{{ __('Management & Executive Leadership') }}">` (`isManagement()`)
+     - `<optgroup label="{{ __('Engineering & Specialist Roles') }}">` (`isEngineer()`)
+     - `<optgroup label="{{ __('Field Operations & Technicians') }}">` (`isTechnician()`)
+   - Flat, unorganized, or arbitrary position lists in dropdowns are strictly prohibited.
+3. **Mandatory Filter & Search State Persistence Across All Lifecycle Events:**
+   Active search queries and filter parameters (`search`, `position`, `status`, `from_date`, etc.) MUST be permanently preserved without data loss across all operations:
+   - **Language Switching (تغيير اللغة):** The language switcher component must retain all active query parameters (`LaravelLocalization::getLocalizedURL($localeCode, null, [], true)`).
+   - **Pagination Navigation (رقم صفحة الجدول):** All repositories and controllers returning paginated results MUST append `->withQueryString()` to the paginator instance. Navigating between pages must never strip active search or filter criteria.
+   - **Record Creation (الإنشاء الجديد):** Modal form actions must pass active query parameters (`route('...', request()->query())`), and controller store actions must redirect back preserving `$request->query()`.
+   - **Record Editing (التعديل):** Modal edit form actions must pass active query parameters (`route('...', array_merge(['model' => $id], request()->query()))`), and controller update actions must redirect back preserving `$request->query()`.
+   - **Record Deletion (الحذف):** Delete confirmation forms and modal action URLs must pass active query parameters, and controller destroy actions must redirect back preserving `$request->query()`.
+
+## Mandatory Unified Alerts, Notifications, Functional Classification & Trilingual Parity (Strict Rule)
+Every AI agent creating, modifying, or refactoring user alerts, session messages, notifications, or activity feeds in this project is strictly mandated to adhere to the unified alert and notification architecture:
+1. **Single Source of Truth for In-Page Alerts (`<x-alert>`):**
+   - All in-page alerts, operational notices, and flash feedback MUST exclusively use the `<x-alert>` component (`<x-alert :variant="...">`).
+   - Ad-hoc alert boxes, raw `<div>` containers with custom background colors, and inline styles are strictly prohibited.
+   - Semantic Variants Standard: `success` (Emerald Green), `danger` (Rose Red), `warning` (Amber Yellow), `info` (Indigo Blue), `primary` (Brand Green).
+   - Standardized Session Flash Keys: Controllers must strictly pass standardized session keys: `with('success', __('...'))`, `with('error', __('...'))`, `with('warning', __('...'))`, and `with('info', __('...'))`. Views rendering session messages must map these keys directly into the corresponding `<x-alert>` variant.
+2. **Unified Notification Architecture (`SystemActivityAlert` & Database Notifications):**
+   - All system activity notifications must follow the structured schema (`title`, `message`, `type`, `causer`, `extra`), with `type` mapping to semantic badge tokens (`created` -> `success`, `updated` -> `warning`, `deleted` -> `danger`, `info` -> `info`).
+3. **Mandatory Functional Role Classification (التصنيف حسب الوظيفة):**
+   - Targeting & Recipient Scoping: Alerts and notifications must strictly be classified and scoped according to the 3 functional tiers: Management & Executive Leadership (`isManagement()`) for administrative/security notices to `Super-Admin`/`Admin`; Engineering & Specialist Roles (`isEngineer()`) for technical and calibration alerts; Field Operations & Technicians (`isTechnician()`) for logistics and field execution notices.
+   - Role Badge Harmonization: Inside notification details, modals, and audit feeds, actor roles and employee positions MUST strictly use `<x-badge>` categorized into the 3 functional tiers (`primary`, `info`, `neutral`). State dots (`:dot="true"`) must be reserved for operational status (Read/Unread) to decouple state from role.
+4. **Mandatory Trilingual Localization Across 3 Languages (AR, EN, FR):**
+   - 100% English Master Keys: Every alert message, notification title, notification body, flash text, and modal description MUST be authored in English as the master key inside `__('...')`.
+   - Simultaneous 3-Language Parity: Every key MUST immediately and simultaneously be registered and translated into all 3 dictionary files (`lang/en.json`, `lang/ar.json`, `lang/fr.json`) with zero non-English keys as dictionary keys.
+
+## Mandatory Comprehensive Ecosystem & Dependency Synchronization Upon Adding New Services or Pages (Strict Rule)
+Every AI agent adding or modifying any **new service** (`app/Services/`, Actions, Repositories, Jobs) or **new page/view** (`resources/views/`, Controllers, Routes) is strictly prohibited from considering the task complete until it systematically reviews, updates, and synchronizes **ALL directly and indirectly connected ecosystem files**:
+1. **Trilingual Localization Synchronization (`lang/en.json`, `lang/ar.json`, `lang/fr.json`):** Extract 100% of user-facing strings, headers, labels, and descriptions into English master keys inside `__('...')`, and simultaneously synchronize with `lang/en.json`, `lang/ar.json`, and `lang/fr.json` with 1-to-1 parity and zero non-English dictionary keys.
+2. **Alerts, Flash Messages & UI Feedback (`<x-alert>`, Controllers):** Standardize all controller flash redirects using uniform keys: `with('success', __('...'))`, `with('error', __('...'))`, `with('warning', __('...'))`, and `with('info', __('...'))`. The corresponding Blade template MUST contain `<x-alert>` components bound to session status/errors to guarantee immediate visual feedback to the user.
+3. **Audit Trail Forensics & Description Localization (`activity_log`, `SystemTableService`):** Record Spatie activity logs with actor (`causedBy`), subject (`performedOn`), and payload properties. Any new dynamic activity log description format MUST immediately be registered with regex matchers in `SystemTableService::translateActivityDescription()` and translated across Arabic, French, and English.
+4. **Notifications & System Activity Alerts (`app/Notifications/`, `SystemActivityAlert`):** Dispatched notifications must follow the structured `SystemActivityAlert` schema (`title`, `message`, `type`, `causer`, `extra`) and be scoped strictly by the 3 functional tiers: Management, Engineering, and Technicians.
+5. **Search, Filter & Query State Persistence (`<x-global-filter>`, Repositories):** Tabular views MUST integrate `<x-global-filter>`, group positions into the 3 functional `<optgroup>` tiers, append `->withQueryString()` to paginators, and preserve `$request->query()` across CRUD redirects.
+6. **Unified Design System & Semantic Color Tokens (`<x-table>`, `<x-badge>`, `<x-*-button>`):** Use the standardized `<x-table>` suite, polymorphic action buttons, `<x-badge>` functional variants (`primary`, `info`, `neutral`), and zero inline styles.
+7. **RBAC Permissions & Navigation Hierarchy (`config/permissions.php`, Menus, Tabs):** Declare entity permissions in `config/permissions.php`, synchronize using `php artisan permissions:sync-tables`, guard routes/views with `@can`, and integrate the new page into navigation tabs/sidebars.
+8. **Automated Feature Verification & Pint Formatting:** Add Feature tests verifying page rendering, permissions, CRUD flows, query state persistence, and translation parity. Run `vendor/bin/pint --dirty --format agent`.
+9. **Mandatory Post-Flight Living Memory Updates:** Apply Proportional Post-Flight Living Memory updates (always `changelog.md`, `project_state.md` for structural changes, ADRs only for major architecture).
+
+## Mandatory Legacy Code Modernization & Migration Protocol (Strict Architectural Directive)
+Every AI agent tasked with modernizing legacy codebase artifacts (spaghetti code, legacy SQL tables, raw PHP scripts, or old views) into **SARL GMTM Core Kernel** is strictly and non-negotiably bound by the following enterprise rules:
+1. **Role: Strict Enterprise Architect:** The agent operates as a Strict Enterprise Architect. It is strictly forbidden to copy or mirror the legacy spaghetti structure, queries, or architectural flaws. The agent's sole task is **Business Logic Mining**—extracting raw rules, formulas, validations, and workflow constraints, and cleanly rebuilding them inside SARL GMTM Core Kernel.
+2. **Mandatory Laravel Eloquent Naming Standards:**
+   - **Models:** Singular in `PascalCase` (`User`, `Invoice`, `Mission`, `SparePart`).
+   - **Tables:** Plural in `snake_case` (`users`, `invoices`, `missions`, `spare_parts`).
+   - **Pivot Tables:** Singular for both models, sorted **Alphabetically**, in `snake_case` (`mission_user`, `permission_role`). Never plural or unordered (`users_missions`).
+   - **Foreign Keys:** Singular model name followed by `_id` (`employee_id`, `supplier_id`). Never plural (`employees_id`).
+3. **Mandatory Gatekeeper Step: Naming Convention Fixes Table (جدول تدقيق وتصحيح التسميات):**
+   For ambiguous, irregular, or non-standard legacy identifiers, before generating executable code, the AI MUST generate the Naming Convention Fixes Table comparing legacy vs. new names with applied rule justifications, and await explicit developer review. Obvious standard 1-to-1 migrations do not require blocking on this step.
+
+4. **Clean Architecture Enforcement:** Ultra-skinny controllers (zero queries/calculations/file handling), dedicated domain services (`app/Services/`), dedicated FormRequests (`app/Http/Requests/`), and strict backed Enums (`app/Enums/`) with `badgeVariant(): string`.
+5. **UI & Blade Component Standards:** Zero raw HTML `<table>` elements and zero inline styles (`style="..."`). Exclusively use GMTM component suites (`<x-table>`, `<x-badge>`, `<x-*-button>`, `<x-global-filter>`, `<x-alert>`). 100% English master translation keys in code (`__('...')`) synchronized across `lang/en.json`, `lang/ar.json`, and `lang/fr.json`.
+6. **Data Migration & Foreign Key Integrity:** Exact mapping of legacy IDs to new standard foreign keys, preventing orphan records or misaligned relations, respecting soft deletes, timestamps, and audit trails.
+7. **Sequential Execution Order:**
+   1. Naming Convention Fixes Table
+   2. Migrations & Eloquent Models
+   3. PHP Enums
+   4. Form Requests
+   5. Domain Services
+   6. Ultra-Skinny Controllers
+   7. Blade Views
+   8. Data Migration Script / Seeder
+   9. Trilingual Dictionaries Synchronization (`en.json`, `ar.json`, `fr.json`)
+8. **Mandatory Confirmation Trigger:**
+   When asked if ready to modernize legacy code under these standards, the AI agent must respond exclusively with:
+   **"مستعد لتطبيق معايير التسمية القياسية"**

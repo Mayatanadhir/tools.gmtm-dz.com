@@ -1,4 +1,4 @@
-@props([
+﻿@props([
     'show'          => 'showFormModal',
     'actionUrl'     => '',
     'alpineAction'  => null,  // Alpine.js variable name for dynamic action URLs (edit forms)
@@ -20,10 +20,10 @@
     // Icon background + text color tokens by semantic color
     $iconTheme = match($iconColor) {
         'amber'   => 'bg-amber-500/10  dark:bg-amber-500/20  text-amber-600  dark:text-amber-400',
-        'indigo'  => 'bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400',
+        'indigo'  => 'bg-indigo-500/10 dark:bg-indigo-500/20 text-brand-700 dark:text-indigo-400',
         'emerald' => 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400',
         'rose'    => 'bg-rose-500/10   dark:bg-rose-500/20   text-rose-600   dark:text-rose-400',
-        default   => 'bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400',
+        default   => 'bg-brand-600/10 dark:bg-brand-600/20 text-brand-700 dark:text-brand-400',
     };
 
     $maxWidthClass = match($maxWidth) {
@@ -47,7 +47,7 @@
             method="POST"
             :title="__('Create New User')"
             :description="__('Add a new user account.')"
-            icon-color="orange"
+            icon-color="green"
             :submit-text="__('Create User')"
         >
             <x-text-input name="name" ... />

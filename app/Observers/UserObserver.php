@@ -6,6 +6,7 @@ namespace App\Observers;
 
 use App\Models\User;
 use App\Notifications\SystemActivityAlert;
+use App\Services\MediaOptimizationService;
 use App\Services\PermissionDiscoveryService;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
@@ -20,6 +21,11 @@ class UserObserver
     public function saving(User $user): void
     {
         if ($user->isDirty('profile_photo_path')) {
+            $oldPath = $user->getOriginal('profile_photo_path');
+            if (! blank($oldPath) && $oldPath !== $user->profile_photo_path) {
+                app(MediaOptimizationService::class)->safeDelete((string) $oldPath, 'public', $user->id);
+            }
+
             if (blank($user->profile_photo_path)) {
                 $user->photo_hash = null;
             } else {
@@ -50,12 +56,12 @@ class UserObserver
         }
 
         try {
-            $causer = auth()->user()?->name ?? 'النظام';
+            $causer = auth()->user()?->name ?? 'System';
             $admins = User::role(['Super-Admin', 'Admin'])->get();
 
             Notification::send($admins, new SystemActivityAlert(
-                title: 'مستخدم جديد',
-                message: "تمت إضافة مستخدم جديد باسم: {$user->name}",
+                title: 'New User',
+                message: "New user added: {$user->name}",
                 type: 'created',
                 causer: $causer,
                 extra: [
@@ -74,13 +80,17 @@ class UserObserver
      */
     public function deleted(User $user): void
     {
+        if (! blank($user->profile_photo_path)) {
+            app(MediaOptimizationService::class)->safeDelete($user->profile_photo_path, 'public', $user->id);
+        }
+
         try {
-            $causer = auth()->user()?->name ?? 'النظام';
+            $causer = auth()->user()?->name ?? 'System';
             $admins = User::role(['Super-Admin', 'Admin'])->get();
 
             Notification::send($admins, new SystemActivityAlert(
-                title: 'حذف مستخدم',
-                message: "تم حذف المستخدم: {$user->name}",
+                title: 'User Deleted',
+                message: "User deleted: {$user->name}",
                 type: 'deleted',
                 causer: $causer,
                 extra: [

@@ -1,0 +1,2435 @@
+@media screen {
+
+/* ==========================================================================
+   GMTM — Dark Mode (Full Glassmorphism)
+   يُطبَّق فقط عند وجود data-theme="dark" على <html>
+   كل العناصر تحصل على تأثير زجاجي ناعم موحّد
+   ========================================================================== */
+
+/* ==========================================================================
+   1. CSS VARIABLES
+   ========================================================================== */
+[data-theme="dark"] {
+    --primary:            #10b981;
+    --primary-dark:       #059669;
+    --primary-light:      #34d399;
+    --secondary:          #34d399;
+    --secondary-dark:     #10b981;
+    --secondary-light:    #6ee7b7;
+
+    --bg-white:           rgba(255, 255, 255, 0.04);
+    --bg-light:           #0a0f1a;
+    --bg-lighter:         rgba(255, 255, 255, 0.02);
+    --bg-dark:            rgba(0, 0, 0, 0.5);
+
+    --text-primary:       #e2e8f0; /* رمادي فاتح لكسر حدة الأبيض */
+    --text-secondary:     #cbd5e1;
+    --text-muted:         #64748b;
+    --text-light:         #e2e8f0;
+    --text-dark:          #e2e8f0;
+
+    --border:             rgba(255, 255, 255, 0.09);
+    --border-light:       rgba(255, 255, 255, 0.06);
+    --border-dark:        rgba(255, 255, 255, 0.14);
+    --table-border:       rgba(16, 185, 129, 0.08);
+    --table-hover:        rgba(16, 185, 129, 0.04);
+
+    --gmtm_shadow:        0 20px 60px rgba(0, 0, 0, 0.6);
+    --gmtm_shadow_light:  0 8px 30px rgba(0, 0, 0, 0.35);
+    --shadow-sm:          0 4px 20px rgba(0, 0, 0, 0.4);
+    --shadow-md:          0 10px 35px rgba(0, 0, 0, 0.5);
+
+    --gmtm_color:         #10b981;
+    --gmtm_border_light:  rgba(16, 185, 129, 0.2);
+    --gmtm_border:        rgba(16, 185, 129, 0.35);
+
+    /* Glass tokens — أزرق ليلي رمادي (Slate Gray) يحافظ على اللمعة الخضراء من الخلفية */
+    --glass-bg:           rgba(16, 22, 28, 0.55); /* رمادي داكن مائل للأزرق الخفيف */
+    --glass-bg-strong:    rgba(26, 32, 40, 0.45); /* رمادي داكن شفاف للبطاقات */
+    --glass-border:       rgba(255, 255, 255, 0.09);
+    --glass-blur:         blur(16px);
+    --glass-blur-sm:      blur(8px);
+}
+
+/* ==========================================================================
+   2. BODY & BASE
+   ========================================================================== */
+[data-theme="dark"] body {
+    background-color: #0a0f1a;
+    background-image:
+        radial-gradient(ellipse at 15% 15%, rgba(16, 185, 129, 0.06) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 85%, rgba(16, 185, 129, 0.04) 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 50%, rgba(15, 23, 42, 0.8) 0%, transparent 80%);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .particles {
+    background: linear-gradient(135deg, #0a0f1a 0%, #0f172a 100%);
+}
+
+/* ==========================================================================
+   3. LAYOUT — Containers & Wrappers
+   ========================================================================== */
+[data-theme="dark"] .background {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--gmtm_shadow);
+}
+
+[data-theme="dark"] .bord {
+    border: 1px solid rgba(16, 185, 129, 0.15);
+    background: rgba(16, 185, 129, 0.03);
+}
+
+/* ==========================================================================
+   4. CARDS & PANELS
+   ========================================================================== */
+[data-theme="dark"] .card {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-sm);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-card {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    border: 1px solid var(--glass-border);
+}
+
+/* ==========================================================================
+   5. TABLES
+   ========================================================================== */
+[data-theme="dark"] .table-container {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+}
+
+[data-theme="dark"] table {
+    border: 1px solid var(--table-border);
+    background: transparent;
+}
+
+[data-theme="dark"] table thead tr {
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 2px solid var(--primary);
+}
+
+[data-theme="dark"] table th {
+    color: var(--primary);
+    background: transparent;
+}
+
+[data-theme="dark"] table td {
+    border-bottom: 1px solid var(--table-border);
+    color: var(--text-secondary);
+    background: transparent;
+}
+
+[data-theme="dark"] table tbody tr:hover {
+    background-color: rgba(16, 185, 129, 0.05);
+}
+
+/* ==========================================================================
+   6. FORMS & INPUTS
+   ========================================================================== */
+[data-theme="dark"] label {
+    color: var(--secondary);
+}
+
+[data-theme="dark"] .inputA,
+[data-theme="dark"] .inputD,
+[data-theme="dark"] .floating-input,
+[data-theme="dark"] .form-control {
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+}
+
+[data-theme="dark"] .inputA::placeholder,
+[data-theme="dark"] .inputD::placeholder,
+[data-theme="dark"] .floating-input::placeholder,
+[data-theme="dark"] .form-control::placeholder {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .inputA:focus,
+[data-theme="dark"] .inputD:focus,
+[data-theme="dark"] .floating-input:focus,
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] .form-select:focus {
+    border-color: var(--primary);
+    background: rgba(16, 185, 129, 0.06);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    outline: none;
+}
+
+[data-theme="dark"] select,
+[data-theme="dark"] .form-select {
+    background: var(--glass-bg-strong) url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba(255, 255, 255, 0.6)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") no-repeat right 0.75rem center/16px 12px;
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+}
+
+[data-theme="dark"] select option,
+[data-theme="dark"] .form-select option {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .filter-item input,
+[data-theme="dark"] .filter-item select {
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    color-scheme: dark; /* يجبر متصفحات الويب على إظهار منتقي التاريخ بالوضع المظلم */
+}
+
+/* عكس لون أيقونة التقويم لتناسب الخلفيات المظلمة */
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.7;
+    cursor: pointer;
+}
+
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* Choices.js Dark Mode Overrides */
+[data-theme="dark"] .choices__inner {
+    background: var(--glass-bg-strong) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-primary) !important;
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+}
+
+[data-theme="dark"] .choices__list--dropdown {
+    background: #1e293b !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-primary);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .choices__list--dropdown .choices__item--selectable.is-highlighted {
+    background: rgba(16, 185, 129, 0.15) !important;
+    color: #34d399 !important;
+}
+
+[data-theme="dark"] .choices__list--multiple .choices__item {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+    color: #34d399 !important;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+[data-theme="dark"] .choices__input {
+    background: transparent !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .choices__input::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 1;
+}
+
+[data-theme="dark"] .choices__placeholder {
+    color: var(--text-muted) !important;
+    opacity: 1;
+}
+
+[data-theme="dark"] .readonly-input {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-muted);
+    border-color: var(--glass-border);
+}
+
+[data-theme="dark"] .readonly-box {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   7. BUTTONS
+   ========================================================================== */
+[data-theme="dark"] .back-btn {
+    background: var(--glass-bg-strong);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+}
+
+[data-theme="dark"] .back-btn:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+[data-theme="dark"] .btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    cursor: pointer;
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+}
+
+[data-theme="dark"] .btn-action-edit {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+[data-theme="dark"] .btn-action-edit:hover {
+    background: #10b981;
+    color: #ffffff;
+    border-color: #10b981;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    transform: translateY(-2px) scale(1.03);
+}
+
+[data-theme="dark"] .btn-action.btn-back {
+    background: rgba(255, 255, 255, 0.05);
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .btn-action.btn-back:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px) scale(1.03);
+}
+
+/* ==========================================================================
+   8. BADGES & STATUS LABELS
+   ========================================================================== */
+[data-theme="dark"] .badge-success,
+[data-theme="dark"] .badge-normal   { background: rgba(34, 197, 94, 0.12);  color: #86efac; border: 1px solid rgba(134, 239, 172, 0.2); }
+
+[data-theme="dark"] .badge-danger,
+[data-theme="dark"] .badge-expired  { background: rgba(239, 68, 68, 0.12);  color: #fca5a5; border: 1px solid rgba(252, 165, 165, 0.2); }
+
+[data-theme="dark"] .badge-warning  { background: rgba(245, 158, 11, 0.12); color: #fde047; border: 1px solid rgba(253, 224, 71, 0.2); }
+[data-theme="dark"] .badge-critical { background: rgba(249, 115, 22, 0.12); color: #fdba74; border: 1px solid rgba(253, 186, 116, 0.2); }
+[data-theme="dark"] .badge-secondary{ background: rgba(100, 116, 139, 0.15);color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }
+[data-theme="dark"] .badge-primary  { background: rgba(59, 130, 246, 0.12); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.2); }
+[data-theme="dark"] .badge-info     { background: rgba(6, 182, 212, 0.12);  color: #67e8f9; border: 1px solid rgba(103, 232, 249, 0.2); }
+
+[data-theme="dark"] .badge-measurement { background: rgba(16, 185, 129, 0.22); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.4); font-weight: 700; font-size: 0.85rem; }
+[data-theme="dark"] .badge-source      { background: rgba(14, 165, 233, 0.22);  color: #7dd3fc; border: 1px solid rgba(125, 211, 252, 0.4); font-weight: 700; font-size: 0.85rem; }
+[data-theme="dark"] .badge-symbol      { background: rgba(255, 255, 255, 0.08);   color: #f8fafc; border: 1px solid rgba(255, 255, 255, 0.2); font-weight: 800; font-size: 0.9rem; }
+
+[data-theme="dark"] .unit-badge {
+    background: var(--glass-bg-strong);
+    color: var(--text-muted);
+    border: 1px solid var(--glass-border);
+}
+
+[data-theme="dark"] .role-badge.super_admin  { background: rgba(239, 68, 68, 0.12);  color: #fca5a5; }
+[data-theme="dark"] .role-badge.admin        { background: rgba(245, 158, 11, 0.12); color: #fde047; }
+[data-theme="dark"] .role-badge.engineer     { background: rgba(6, 182, 212, 0.12);  color: #67e8f9; }
+[data-theme="dark"] .role-badge.technician   { background: rgba(34, 197, 94, 0.12);  color: #86efac; }
+[data-theme="dark"] .role-badge.office-admin { background: rgba(100, 116, 139, 0.12);color: #94a3b8; }
+
+[data-theme="dark"] .badge-manager         { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(165, 180, 252, 0.25); }
+[data-theme="dark"] .badge-senior-engineer { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(110, 231, 183, 0.25); }
+[data-theme="dark"] .badge-engineer        { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; border: 1px solid rgba(125, 211, 252, 0.25); }
+[data-theme="dark"] .badge-technician      { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(252, 211, 77, 0.25); }
+[data-theme="dark"] .badge-user            { background: rgba(148, 163, 184, 0.12);color: #cbd5e1; border: 1px solid rgba(203, 213, 225, 0.2); }
+
+[data-theme="dark"] .system-role-badge {
+    background: var(--glass-bg-strong);
+    color: var(--text-secondary);
+    border: 1px solid var(--glass-border);
+}
+
+/* ==========================================================================
+   9. ALERTS & NOTIFICATIONS
+   ========================================================================== */
+[data-theme="dark"] .alert-success {
+    background: rgba(34, 197, 94, 0.1);
+    color: #86efac;
+    border: 1px solid rgba(134, 239, 172, 0.2);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+}
+
+[data-theme="dark"] .alert-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: #fca5a5;
+    border: 1px solid rgba(252, 165, 165, 0.2);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+}
+
+[data-theme="dark"] .notification-card:hover {
+    background: var(--glass-bg-strong);
+}
+
+[data-theme="dark"] .alert-validation {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.25);
+    color: #fca5a5;
+}
+
+/* ==========================================================================
+   10. PAGINATION
+   ========================================================================== */
+[data-theme="dark"] .pagination a,
+[data-theme="dark"] .pagination span {
+    background: var(--glass-bg-strong);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    color: var(--primary);
+    border: 1px solid var(--glass-border);
+}
+
+[data-theme="dark"] .pagination a:hover,
+[data-theme="dark"] .pagination .active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+}
+
+[data-theme="dark"] .pagination .disabled {
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   11. SECTION TITLES & UTILITIES
+   ========================================================================== */
+[data-theme="dark"] .section-title {
+    color: var(--secondary);
+    border-bottom: 1px solid var(--glass-border);
+    border-right: 4px solid var(--primary);
+}
+
+[data-theme="dark"] .count {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: var(--primary);
+}
+
+[data-theme="dark"] .reg-number {
+    background: var(--glass-bg-strong);
+    color: var(--text-muted);
+    border: 1px solid var(--glass-border);
+}
+
+[data-theme="dark"] .empty-message {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .empty-state { color: var(--text-muted); }
+
+/* ==========================================================================
+   12. ACTION BUTTONS IN TABLES
+   ========================================================================== */
+[data-theme="dark"] .butonHover a,
+[data-theme="dark"] .butonHover button,
+[data-theme="dark"] .action-btn {
+    color: var(--text-muted);
+    background: transparent;
+    border-color: transparent;
+}
+
+[data-theme="dark"] .butonHover a:hover,
+[data-theme="dark"] .butonHover button:hover,
+[data-theme="dark"] .action-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .butonHover .edite-button { border-color: transparent; }
+[data-theme="dark"] .butonHover .edite-button:hover,
+[data-theme="dark"] .btn-edit:hover {
+    background: rgba(34, 197, 94, 0.12);
+    color: #4ade80;
+    border-color: rgba(74, 222, 128, 0.2);
+}
+
+[data-theme="dark"] .butonHover .delete-button { border-color: transparent; }
+[data-theme="dark"] .butonHover .delete-button:hover,
+[data-theme="dark"] .btn-delete:hover {
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.2);
+}
+
+[data-theme="dark"] .btn-view:hover {
+    background: rgba(59, 130, 246, 0.12);
+    color: #93c5fd;
+    border-color: rgba(147, 197, 253, 0.2);
+}
+
+[data-theme="dark"] .btn-lock.locked         { color: #f87171; border-color: transparent; }
+[data-theme="dark"] .btn-lock.locked:hover   { background: rgba(239, 68, 68, 0.12); border-color: rgba(248, 113, 113, 0.2); }
+[data-theme="dark"] .btn-lock.unlocked       { color: #4ade80; border-color: transparent; }
+[data-theme="dark"] .btn-lock.unlocked:hover { background: rgba(34, 197, 94, 0.12); border-color: rgba(74, 222, 128, 0.2); }
+
+
+/* ==========================================================================
+   13. SHOW PAGES — Details Container (Full Glassmorphism)
+   ========================================================================== */
+[data-theme="dark"] .details-container {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--gmtm_shadow);
+    border-radius: 20px;
+}
+
+[data-theme="dark"] .info-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+}
+
+[data-theme="dark"] .info-card h4,
+[data-theme="dark"] .info-card-title {
+    color: var(--text-secondary) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+}
+
+[data-theme="dark"] .info-row {
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.07);
+}
+
+[data-theme="dark"] .info-label { color: var(--text-muted); }
+[data-theme="dark"] .info-value { color: var(--text-primary); }
+
+[data-theme="dark"] .a4-document {
+    background: rgba(10, 15, 26, 0.9);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+}
+
+/* ==========================================================================
+   14. CONTROLS BAR & INPUTS
+   ========================================================================== */
+[data-theme="dark"] .controls-bar {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .control-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    border-radius: 8px;
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+}
+
+[data-theme="dark"] .control-input option {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .control-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    background: rgba(16, 185, 129, 0.05);
+}
+
+/* ==========================================================================
+   15. CERTIFICATE TABLES (Results)
+   ========================================================================== */
+[data-theme="dark"] .unit-header {
+    background: rgba(16, 185, 129, 0.1);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    border-bottom: none;
+}
+
+[data-theme="dark"] .results-table {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+}
+
+[data-theme="dark"] .results-table th {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-secondary);
+    border: 1px solid var(--glass-border);
+}
+
+[data-theme="dark"] .results-table td {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .results-table tbody tr:hover td {
+    background: rgba(16, 185, 129, 0.04);
+}
+
+/* ==========================================================================
+   16. STATUS LABELS
+   ========================================================================== */
+[data-theme="dark"] .status-in {
+    color: #34d399;
+    background: rgba(52, 211, 153, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.2);
+    border-radius: 8px;
+    padding: 4px 10px;
+}
+
+[data-theme="dark"] .status-out {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+    border-radius: 8px;
+    padding: 4px 10px;
+}
+
+/* ==========================================================================
+   17. CHART CONTAINERS
+   ========================================================================== */
+[data-theme="dark"] .chart-container-box,
+[data-theme="dark"] .chart-glass-container {
+    background: rgba(255, 255, 255, 0.02) !important;
+    backdrop-filter: var(--glass-blur-sm) !important;
+    -webkit-backdrop-filter: var(--glass-blur-sm) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 12px;
+}
+
+/* ==========================================================================
+   18. IMAGES & MEDIA
+   ========================================================================== */
+[data-theme="dark"] .img-thumb,
+[data-theme="dark"] .equipment-image,
+[data-theme="dark"] .header-image {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    mix-blend-mode: normal !important;
+}
+
+[data-theme="dark"] .equip-preview {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .equipment-header {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-md);
+}
+
+/* ==========================================================================
+   19. CALIBRATION / POINTS TABLE
+   ========================================================================== */
+[data-theme="dark"] .unit-container {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+}
+
+[data-theme="dark"] .unit-title {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.25);}
+
+
+
+
+[data-theme="dark"] .points-table {
+    background: transparent;
+}
+
+[data-theme="dark"] .points-table th {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-secondary);
+    border-color: var(--glass-border);
+}
+
+[data-theme="dark"] .points-table td {
+    border-color: var(--glass-border);
+}
+
+[data-theme="dark"] .points-table input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .points-table input.filled-input {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.35);
+    color: #86efac;
+}
+
+/* ==========================================================================
+   20. MOVEMENT REPORT TABLES
+   ========================================================================== */
+[data-theme="dark"] .table-report th {
+    background: rgba(255, 255, 255, 0.04) !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid var(--glass-border) !important;
+}
+
+[data-theme="dark"] .table-report td {
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .table-report th.table-warning {
+    background: rgba(245, 158, 11, 0.1) !important;
+    color: #fbbf24 !important;
+}
+
+[data-theme="dark"] .table-report th.table-info {
+    background: rgba(14, 165, 233, 0.1) !important;
+    color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .table-report th.table-secondary {
+    background: rgba(148, 163, 184, 0.1) !important;
+    color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .bg-glass-light {
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ==========================================================================
+   21. GRANDEURS & EQUIPMENT FORMS
+   ========================================================================== */
+[data-theme="dark"] .grandeur-block {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    border: 1px solid var(--glass-border);
+}
+
+[data-theme="dark"] .grandeur-block:hover {
+    border-color: rgba(16, 185, 129, 0.4);
+    background: rgba(16, 185, 129, 0.04);
+}
+
+/* ── Dark: Measurement Section (Vert / Teal) ─────────────────── */
+[data-theme="dark"] .section-measurement {
+    background: linear-gradient(135deg, rgba(16,185,129,0.06) 0%, rgba(5,150,105,0.03) 100%);
+    border: 1px solid rgba(16,185,129,0.2);
+}
+[data-theme="dark"] .section-measurement .section-subtitle {
+    color: #34d399;
+    border-right-color: #34d399;
+}
+[data-theme="dark"] .section-measurement .grandeur-block {
+    background: rgba(16,185,129,0.04);
+    border: 1px solid rgba(16,185,129,0.18);
+}
+[data-theme="dark"] .section-measurement .grandeur-block:hover {
+    border-color: rgba(16,185,129,0.5);
+    background: rgba(16,185,129,0.08);
+    box-shadow: 0 6px 20px rgba(16,185,129,0.15);
+}
+[data-theme="dark"] .section-measurement .grandeur-title { color: #6ee7b7; }
+[data-theme="dark"] .section-measurement .grandeur-symbol {
+    background: rgba(16,185,129,0.15);
+    color: #34d399;
+}
+[data-theme="dark"] .section-measurement .unit-item {
+    background: rgba(16,185,129,0.04);
+    border: 1px solid rgba(16,185,129,0.15);
+}
+[data-theme="dark"] .section-type-badge-measurement {
+    background: rgba(16,185,129,0.12);
+    color: #34d399;
+    border-color: rgba(16,185,129,0.3);
+}
+
+/* ── Dark: Source Section (Orange / Amber) ───────────────────── */
+[data-theme="dark"] .section-source {
+    background: linear-gradient(135deg, rgba(245,158,11,0.06) 0%, rgba(217,119,6,0.03) 100%);
+    border: 1px solid rgba(245,158,11,0.2);
+}
+[data-theme="dark"] .section-source .section-subtitle {
+    color: #fbbf24;
+    border-right-color: #fbbf24;
+}
+[data-theme="dark"] .section-source .grandeur-block {
+    background: rgba(245,158,11,0.04);
+    border: 1px solid rgba(245,158,11,0.18);
+}
+[data-theme="dark"] .section-source .grandeur-block:hover {
+    border-color: rgba(245,158,11,0.5);
+    background: rgba(245,158,11,0.08);
+    box-shadow: 0 6px 20px rgba(245,158,11,0.15);
+}
+[data-theme="dark"] .section-source .grandeur-title { color: #fde68a; }
+[data-theme="dark"] .section-source .grandeur-symbol {
+    background: rgba(245,158,11,0.15);
+    color: #fbbf24;
+}
+[data-theme="dark"] .section-source .unit-item {
+    background: rgba(245,158,11,0.04);
+    border: 1px solid rgba(245,158,11,0.15);
+}
+[data-theme="dark"] .section-type-badge-source {
+    background: rgba(245,158,11,0.12);
+    color: #fbbf24;
+    border-color: rgba(245,158,11,0.3);
+}
+
+[data-theme="dark"] .unit-item {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+}
+
+[data-theme="dark"] .mini-upload-zone {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed var(--glass-border);
+}
+
+[data-theme="dark"] .mini-upload-zone:hover {
+    border-color: rgba(16, 185, 129, 0.4);
+    background: rgba(16, 185, 129, 0.04);
+}
+
+[data-theme="dark"] .mini-upload-zone span { 
+    color: #cbd5e1; 
+}
+
+[data-theme="dark"] .upload-label { 
+    color: #e2e8f0; 
+}
+
+[data-theme="dark"] .preview-thumbnail { 
+    border-color: var(--glass-border); 
+    background: rgba(255, 255, 255, 0.03); 
+}
+
+[data-theme="dark"] .chief-box {
+    background: rgba(16, 185, 129, 0.06);
+    border: 1px dashed rgba(16, 185, 129, 0.25);
+}
+
+[data-theme="dark"] .calibration-checkbox-wrapper {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+}
+
+/* ==========================================================================
+   22. PERMISSIONS & ROLES
+   ========================================================================== */
+[data-theme="dark"] .role-name-box {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    border: 1px solid var(--glass-border);
+}
+
+[data-theme="dark"] .permission-group-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    border: 1px solid var(--glass-border);
+}
+
+[data-theme="dark"] .group-title {
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .perm-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .perm-item.active-perm {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.25);
+    color: var(--primary);
+}
+
+[data-theme="dark"] .permissions-table tbody tr {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+}
+
+[data-theme="dark"] .mini-btn {
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .mini-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+/* ==========================================================================
+   23. SOFT BADGES
+   ========================================================================== */
+[data-theme="dark"] .badge-soft-primary   { background: rgba(59, 130, 246, 0.12) !important;  color: #93c5fd !important; border-color: rgba(147, 197, 253, 0.2) !important; }
+[data-theme="dark"] .badge-soft-secondary { background: rgba(100, 116, 139, 0.12) !important; color: #94a3b8 !important; border-color: rgba(148, 163, 184, 0.2) !important; }
+[data-theme="dark"] .badge-soft-success   { background: rgba(34, 197, 94, 0.12) !important;   color: #86efac !important; border-color: rgba(134, 239, 172, 0.2) !important; }
+[data-theme="dark"] .badge-soft-danger    { background: rgba(239, 68, 68, 0.12) !important;   color: #fca5a5 !important; border-color: rgba(252, 165, 165, 0.2) !important; }
+[data-theme="dark"] .badge-soft-warning   { background: rgba(245, 158, 11, 0.12) !important;  color: #fde047 !important; border-color: rgba(253, 224, 71, 0.2) !important; }
+[data-theme="dark"] .badge-soft-info      { background: rgba(6, 182, 212, 0.12) !important;   color: #67e8f9 !important; border-color: rgba(103, 232, 249, 0.2) !important; }
+[data-theme="dark"] .badge-soft-dark      { background: rgba(255, 255, 255, 0.1) !important;  color: #e2e8f0 !important; border-color: rgba(255, 255, 255, 0.15) !important; }
+
+/* ==========================================================================
+   ERROR BADGE — Overrides لألوان Bootstrap في Dark Mode
+   يُطبَّق على .error-badge المستخدم في جداول المعايرة (checkout / checkin)
+   ========================================================================== */
+
+/* 🟢 خطأ ضمن الحدود (drift ≤ 5%) */
+[data-theme="dark"] .error-badge.bg-success {
+    background: rgba(34, 197, 94, 0.12) !important;
+    color: #86efac !important;
+    border: 1px solid rgba(134, 239, 172, 0.25) !important;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.15);
+}
+
+/* 🟡 خطأ تحذيري (drift 5-10%) */
+[data-theme="dark"] .error-badge.bg-warning {
+    background: rgba(245, 158, 11, 0.12) !important;
+    color: #fde047 !important;
+    border: 1px solid rgba(253, 224, 71, 0.25) !important;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.15);
+}
+
+/* 🔴 خطأ حرج (drift > 10%) */
+[data-theme="dark"] .error-badge.bg-danger {
+    background: rgba(239, 68, 68, 0.12) !important;
+    color: #fca5a5 !important;
+    border: 1px solid rgba(252, 165, 165, 0.25) !important;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.15);
+}
+
+/* ⚫ الحالة الابتدائية (لم يُدخَل بعد) */
+[data-theme="dark"] .error-badge.bg-secondary {
+    background: rgba(100, 116, 139, 0.15) !important;
+    color: #94a3b8 !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+}
+
+/* إزالة لون النص الفاتح الافتراضي (text-white/text-dark) الذي يُضاف عبر JS */
+[data-theme="dark"] .error-badge.text-white { color: inherit !important; }
+[data-theme="dark"] .error-badge.text-dark  { color: inherit !important; }
+
+/* ==========================================================================
+   CALIBRATION TEMPLATES — نقاط ومقاييس المعايرة (Dark Mode Glassmorphism)
+   ========================================================================== */
+
+/* نقطة معايرة (P1، P2، P3…) */
+[data-theme="dark"] .point-badge {
+    background: rgba(16, 185, 129, 0.08) !important;
+    color: #6ee7b7 !important;
+    border: 1px solid rgba(16, 185, 129, 0.22) !important;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+/* شارة الكمية/الوحدة (grandeur) */
+[data-theme="dark"] .grandeur-badge {
+    background: rgba(56, 189, 248, 0.10) !important;
+    color: #7dd3fc !important;
+    border: 1px solid rgba(56, 189, 248, 0.22) !important;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+/* ==========================================================================
+   24. SETTINGS & OFFCANVAS
+   ========================================================================== */
+[data-theme="dark"] .settings-btn {
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: var(--primary);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+}
+
+[data-theme="dark"] .settings-btn:hover {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+/* ==========================================================================
+   25. PAGE HEADERS
+   ========================================================================== */
+[data-theme="dark"] .page-header-custom {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    border: 1px solid var(--glass-border);
+    border-left: 4px solid #0dcaf0;
+}
+
+[data-theme="dark"] .notes-container {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    border-right: 4px solid var(--glass-border);
+}
+
+[data-theme="dark"] .notes-text { color: var(--text-secondary); }
+
+/* ==========================================================================
+   26. PROFILE
+   ========================================================================== */
+[data-theme="dark"] .avatar-wrapper {
+    background: rgba(255, 255, 255, 0.04);
+    border: 2px solid var(--glass-border);
+}
+
+/* ==========================================================================
+   27. NAV LINK & ACTIONS
+   ========================================================================== */
+[data-theme="dark"] .nav-link {
+    background: rgba(16, 185, 129, 0.15);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: #34d399;
+}
+
+[data-theme="dark"] .nav-link:hover {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+/* ==========================================================================
+   28. DASHBOARD
+   ========================================================================== */
+[data-theme="dark"] .hover-elevate:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5) !important;
+    transform: translateY(-5px);
+}
+
+/* ==========================================================================
+   29. SIDEBARS — Glassmorphism Dark Mode
+   ========================================================================== */
+
+/* ── الشريط العام ────────────────────────────────────────────── */
+[data-theme="dark"] .sidebar {
+    box-shadow: 4px 0 30px rgba(0, 0, 0, 0.5);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── الشريط الأيسر (أخضر زجاجي) ────────────────────────────── */
+[data-theme="dark"] .sidebar-left {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(16, 185, 129, 0.18) 0%,
+            rgba(5, 150, 105, 0.10) 60%,
+            rgba(10, 15, 26, 0.95) 100%
+        );
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+[data-theme="dark"] .sidebar-left::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(16, 185, 129, 0.05) 0%,
+        transparent 100%
+    );
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ── الشريط الأيمن (داكن زجاجي) ────────────────────────────── */
+[data-theme="dark"] .sidebar-right {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(30, 41, 59, 0.55) 0%,
+            rgba(15, 23, 42, 0.80) 100%
+        );
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow: -4px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+/* ── روابط التنقل داخل الشريط ─────────────────────────────── */
+[data-theme="dark"] .sidebar nav a {
+    color: rgba(255, 255, 255, 0.6);
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .sidebar nav a:hover,
+[data-theme="dark"] .sidebar nav a.active {
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #fff;
+}
+
+[data-theme="dark"] .sidebar-left nav a:hover,
+[data-theme="dark"] .sidebar-left nav a.active {
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    border-right: none;
+}
+
+[data-theme="dark"] .sidebar nav a:hover i {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.5));
+}
+
+/* مؤشر الرابط النشط */
+[data-theme="dark"] .sidebar a.active::before {
+    background: #34d399;
+    box-shadow: 0 0 12px rgba(52, 211, 153, 0.6);
+}
+
+/* ── زر الخروج ──────────────────────────────────────────────── */
+[data-theme="dark"] .sidebar nav a.logout,
+[data-theme="dark"] .sidebar nav a.devlopeur {
+    color: rgba(252, 165, 165, 0.8);
+}
+
+[data-theme="dark"] .sidebar nav a.logout:hover,
+[data-theme="dark"] .sidebar nav a.devlopeur:hover {
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+}
+
+/* ==========================================================================
+   30. OFFCANVAS PANELS — Glassmorphism Dark Mode
+   ========================================================================== */
+
+/* ── الطبقة الخلفية المظلمة ──────────────────────────────────── */
+[data-theme="dark"] .offcanvas-overlay,
+[data-theme="dark"] .sidebar-overlay {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+/* ── الشريط المنزلق الأخضر (Advanced Management) ─────────────── */
+[data-theme="dark"] .gmtm-offcanvas {
+    background:
+        linear-gradient(
+            160deg,
+            rgba(16, 185, 129, 0.12) 0%,
+            rgba(5, 150, 105, 0.06) 40%,
+            rgba(10, 15, 26, 0.95) 100%
+        );
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-left: 1px solid rgba(16, 185, 129, 0.2);
+    box-shadow: -10px 0 50px rgba(0, 0, 0, 0.6);
+}
+
+/* ── الشريط المنزلق الداكن (Developer/Settings) ────────────── */
+[data-theme="dark"] .offcanvas-sidebar {
+    background:
+        linear-gradient(
+            160deg,
+            rgba(30, 41, 59, 0.6) 0%,
+            rgba(15, 23, 42, 0.9) 100%
+        );
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6);
+}
+
+/* ── رأس الشريط المنزلق ─────────────────────────────────────── */
+[data-theme="dark"] .offcanvas-header {
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .offcanvas-title {
+    color: #34d399;
+}
+
+[data-theme="dark"] .close-btn {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="dark"] .close-btn:hover {
+    color: #f87171;
+}
+
+/* ── روابط الشريط المنزلق ───────────────────────────────────── */
+[data-theme="dark"] .offcanvas-nav a {
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .offcanvas-nav a:hover,
+[data-theme="dark"] .offcanvas-nav a.active {
+    background: rgba(16, 185, 129, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.15);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* ── قسم المطوّر (Dev Section) ──────────────────────────────── */
+[data-theme="dark"] .dev-section {
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+[data-theme="dark"] .dev-title,
+[data-theme="dark"] .section-label {
+    color: #f87171;
+}
+
+[data-theme="dark"] .fast-link,
+[data-theme="dark"] .dev-link {
+    color: rgba(252, 165, 165, 0.8) !important;
+}
+
+[data-theme="dark"] .fast-link:hover {
+    color: #34d399 !important;
+}
+
+[data-theme="dark"] .dev-link:hover {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #fca5a5 !important;
+}
+
+/* ── مقسّم الشريط ───────────────────────────────────────────── */
+[data-theme="dark"] .sidebar-divider {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ── قسم الروابط السريعة ────────────────────────────────────── */
+[data-theme="dark"] .developer-fast-links,
+[data-theme="dark"] .dev-section {
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* ==========================================================================
+   31. MISSIONS — Glassmorphism Dark Mode (جميع الصفحات)
+   ========================================================================== */
+
+/* ── شارات الحالة (badges) ──────────────────────────────────── */
+[data-theme="dark"] .badge-status {
+    border-radius: 8px;
+    padding: 4px 12px;
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+[data-theme="dark"] .badge-active,
+[data-theme="dark"] .badge-phase_checkin {
+    background: rgba(14, 165, 233, 0.15);
+    color: #38bdf8;
+    border: 1px solid rgba(14, 165, 233, 0.3);
+}
+
+[data-theme="dark"] .badge-planned,
+[data-theme="dark"] .badge-phase_checkout {
+    background: rgba(245, 158, 11, 0.12);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+[data-theme="dark"] .badge-completed {
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+[data-theme="dark"] .row-active,
+[data-theme="dark"] .row-phase_checkin {
+    border-left-color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .row-planned,
+[data-theme="dark"] .row-phase_checkout {
+    border-left-color: #fbbf24 !important;
+}
+
+[data-theme="dark"] .row-completed {
+    border-left-color: #34d399 !important;
+}
+
+[data-theme="dark"] .badge-cancelled {
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* ── صفوف الجدول الملوّنة ────────────────────────────────────── */
+[data-theme="dark"] .row-active    { border-left: 4px solid rgba(14, 165, 233, 0.7) !important; }
+[data-theme="dark"] .row-planned   { border-left: 4px solid rgba(245, 158, 11, 0.7) !important; }
+[data-theme="dark"] .row-completed { border-left: 4px solid rgba(16, 185, 129, 0.7) !important; }
+
+/* ── زر الموقع ───────────────────────────────────────────────── */
+[data-theme="dark"] .action-btn.btn-site {
+    background: rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .badge-site {
+    background: rgba(59, 130, 246, 0.18);
+    color: #93c5fd;
+    border: 1px solid rgba(147, 197, 253, 0.3);
+}
+
+[data-theme="dark"] .badge-site:hover {
+    background: rgba(59, 130, 246, 0.28);
+    border-color: rgba(147, 197, 253, 0.5);
+}
+
+/* ==========================================================================
+   31A. MISSIONS SHOW — وثيقة A4 الزجاجية
+   ========================================================================== */
+[data-theme="dark"] .show-wrapper {
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+[data-theme="dark"] .a4-document {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    color: var(--text-primary);
+    border-radius: 16px;
+}
+
+/* رأس الوثيقة */
+[data-theme="dark"] .doc-header {
+    border-bottom: 2px solid rgba(16, 185, 129, 0.3);
+}
+
+/* عنوان الوثيقة */
+[data-theme="dark"] .doc-title h1 {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .doc-title .reference {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+    color: #34d399;
+    font-family: monospace;
+    border-radius: 6px;
+    padding: 4px 12px;
+}
+
+/* الأقسام داخل الوثيقة */
+[data-theme="dark"] .section {
+    border-radius: 12px;
+}
+
+[data-theme="dark"] .section-title {
+    color: #34d399;
+    border-bottom: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+/* شبكة المعلومات */
+[data-theme="dark"] .info-grid {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+}
+
+[data-theme="dark"] .info-item .info-label {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .info-item .info-value {
+    color: var(--text-primary);
+}
+
+/* جدول البيانات (فريق العمل / المعدات) */
+[data-theme="dark"] .data-table {
+    background: transparent;
+}
+
+[data-theme="dark"] .data-table th {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .data-table td {
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.01);
+}
+
+[data-theme="dark"] .data-table tbody tr:hover td {
+    background: rgba(16, 185, 129, 0.05);
+}
+
+/* صف القائد */
+[data-theme="dark"] .leader-row td {
+    background: rgba(16, 185, 129, 0.06) !important;
+}
+
+/* شارة القائد */
+[data-theme="dark"] .leader-badge {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* بطاقة المركبة */
+[data-theme="dark"] .vehicle-card-show {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+}
+
+[data-theme="dark"] .vehicle-card-label {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .vehicle-card-value {
+    color: var(--text-primary);
+}
+
+/* بديل الصورة */
+[data-theme="dark"] .thumb-placeholder {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* رسالة فارغة */
+[data-theme="dark"] .empty-items-msg {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* صناديق التواقيع */
+[data-theme="dark"] .signatures {
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    padding-top: 2rem;
+}
+
+[data-theme="dark"] .signature-box {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+}
+
+[data-theme="dark"] .signature-title {
+    color: var(--text-secondary);
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+/* ختم الحالة */
+[data-theme="dark"] .stamp-planned   { border-color: rgba(245, 158, 11, 0.6);  color: #fbbf24; }
+[data-theme="dark"] .stamp-active    { border-color: rgba(59, 130, 246, 0.6);  color: #93c5fd; }
+[data-theme="dark"] .stamp-completed { border-color: rgba(16, 185, 129, 0.6);  color: #34d399; }
+[data-theme="dark"] .stamp-cancelled { border-color: rgba(239, 68, 68, 0.6);   color: #f87171; }
+
+/* أزرار الإجراءات */
+[data-theme="dark"] .action-buttons .btn-back {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+[data-theme="dark"] .action-buttons .btn-back:hover {
+    background: rgba(255, 255, 255, 0.09);
+    color: var(--text-primary);
+}
+
+/* btn-print — يعمل في جميع السياقات */
+[data-theme="dark"] .btn-print,
+[data-theme="dark"] .action-buttons .btn-print {
+    background: rgba(16, 185, 129, 0.12) !important;
+    color: #34d399 !important;
+    border: 1px solid rgba(16, 185, 129, 0.25) !important;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.08) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+[data-theme="dark"] .btn-print:hover,
+[data-theme="dark"] .action-buttons .btn-print:hover {
+    background: rgba(16, 185, 129, 0.22) !important;
+    color: #6ee7b7 !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2) !important;
+    transform: translateY(-2px);
+}
+
+/* btn-curve — زر طباعة المنحنيات */
+[data-theme="dark"] .btn-curve {
+    background: rgba(56, 189, 248, 0.1) !important;
+    color: #7dd3fc !important;
+    border: 1px solid rgba(56, 189, 248, 0.25) !important;
+    box-shadow: 0 4px 15px rgba(56, 189, 248, 0.08) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+[data-theme="dark"] .btn-curve:hover {
+    background: rgba(56, 189, 248, 0.18) !important;
+    color: #bae6fd !important;
+    border-color: rgba(56, 189, 248, 0.4) !important;
+    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.15) !important;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   31B. MISSIONS CREATE/EDIT — نماذج الإنشاء
+   ========================================================================== */
+[data-theme="dark"] .title {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .alert-validation {
+    background: rgba(239, 68, 68, 0.08);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #fca5a5;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] .alert-validation i {
+    color: #f87171;
+}
+
+[data-theme="dark"] .chief-box {
+    background: rgba(16, 185, 129, 0.04);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1.5px dashed rgba(16, 185, 129, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .section-divider {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 20px;
+}
+
+[data-theme="dark"] .quick-actions {
+    gap: 10px;
+}
+
+[data-theme="dark"] .btn-quick-select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    border-radius: 8px;
+}
+
+[data-theme="dark"] .btn-quick-select:hover {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: #34d399;
+}
+
+[data-theme="dark"] .btn-quick-reset {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border-radius: 8px;
+}
+
+[data-theme="dark"] .btn-quick-reset:hover {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ==========================================================================
+   31C. MISSIONS EMPLOYEES / EQUIPMENTS — صفحات التفاصيل
+   ========================================================================== */
+[data-theme="dark"] .badge-leader {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 20px;
+}
+
+[data-theme="dark"] .mission-info-flex {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .mission-title-text {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .action-buttons-top .btn-back {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .print-btn {
+    background: rgba(71, 85, 105, 0.4);
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .print-btn:hover {
+    background: rgba(71, 85, 105, 0.7);
+    color: var(--text-primary);
+}
+
+/* ==========================================================================
+   31C2. CHECKOUT PAGE — Glassmorphism Dark Mode
+   ========================================================================== */
+[data-theme="dark"] .checkout-card-header {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(2, 6, 23, 0.7) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .checkout-thead th {
+    background: rgba(255, 255, 255, 0.04) !important;
+    color: var(--text-muted) !important;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+[data-theme="dark"] .lab-readonly-badge {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .error-badge-cell {
+    background: rgba(148, 163, 184, 0.08);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    color: var(--text-muted);
+}
+
+/* Dark Mode Error Glass Variants */
+[data-theme="dark"] .error-glass-stable {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1.5px solid rgba(16, 185, 129, 0.35);
+    color: #34d399;
+}
+
+[data-theme="dark"] .error-glass-warning {
+    background: rgba(245, 158, 11, 0.12);
+    border: 1.5px solid rgba(245, 158, 11, 0.35);
+    color: #fbbf24;
+}
+
+[data-theme="dark"] .error-glass-danger {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1.5px solid rgba(239, 68, 68, 0.35);
+    color: #f87171;
+}
+
+[data-theme="dark"] .error-glass-empty {
+    background: rgba(148, 163, 184, 0.06);
+    border: 1.5px solid rgba(148, 163, 184, 0.2);
+    color: #64748b;
+}
+
+/* ==========================================================================
+   31D. MISSIONS EDIT ORDER — صفحة تحرير الطلب
+   ========================================================================== */
+[data-theme="dark"] .page-header-custom {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 4px solid rgba(13, 202, 240, 0.6);
+}
+
+/* ==========================================================================
+   31E. MOVEMENTS — Analysis Badges
+   ========================================================================== */
+[data-theme="dark"] .analysis-badge {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .analysis-badge:hover {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.25);
+    color: #34d399;
+}
+
+/* ==========================================================================
+   32. GLOBAL FORM BUTTONS — Glassmorphism Dark Mode
+   يشمل: صفحات الإنشاء، التعديل، والعرض في كل وحدات النظام
+   ========================================================================== */
+
+/* ── زر الحفظ / الإرسال الرئيسي (.submit) ──────────────────── */
+[data-theme="dark"] .submit {
+    background: rgba(16, 185, 129, 0.15);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #34d399;
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .submit:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+    box-shadow: 0 6px 25px rgba(16, 185, 129, 0.3);
+    transform: translateY(-2px);
+}
+
+/* ── زر الرجوع / الإلغاء (.back-btn) ───────────────────────── */
+[data-theme="dark"] .back-btn {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .back-btn:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.18);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+/* ── أزرار التحديد السريع (.btn-quick-select) ───────────────── */
+[data-theme="dark"] .btn-quick-select {
+    background: rgba(16, 185, 129, 0.08);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+}
+
+[data-theme="dark"] .btn-quick-select:hover {
+    background: rgba(16, 185, 129, 0.18);
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+    transform: translateY(-1px);
+}
+
+/* ── زر إعادة التعيين (.btn-quick-reset) ───────────────────── */
+[data-theme="dark"] .btn-quick-reset {
+    background: rgba(239, 68, 68, 0.08);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+}
+
+[data-theme="dark"] .btn-quick-reset:hover {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.35);
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.15);
+    transform: translateY(-1px);
+}
+
+/* ── زر التخصيص المبسّط (.btn-cancel-form) ──────────────────── */
+[data-theme="dark"] .btn-cancel-form {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .btn-cancel-form:hover {
+    background: rgba(255, 255, 255, 0.09);
+    color: var(--text-primary);
+}
+
+/* ── أزرار تحديد كل / إلغاء الكل ───────────────────────────── */
+[data-theme="dark"] .btn-select-all {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    color: #93c5fd;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+[data-theme="dark"] .btn-select-all:hover {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="dark"] .btn-select-all.btn-red {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.25);
+    color: #f87171;
+}
+
+[data-theme="dark"] .btn-select-all.btn-red:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+[data-theme="dark"] .btn-deselect-all {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .btn-deselect-all:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+/* ── زر Upload Excel ────────────────────────────────────────── */
+[data-theme="dark"] .btn-upload-excel {
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    color: #93c5fd;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+[data-theme="dark"] .btn-upload-excel:hover {
+    background: rgba(59, 130, 246, 0.22);
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
+
+/* ── chief-label ────────────────────────────────────────────── */
+[data-theme="dark"] .chief-label {
+    color: #34d399;
+}
+
+/* ── chief-radio-label ──────────────────────────────────────── */
+[data-theme="dark"] .chief-radio-label {
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .chief-radio-label:hover {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+/* ==========================================================================
+   31C. USERS INDEX & GENERAL UTILITIES — صفحات الموظفين و الإضافات
+   ========================================================================== */
+[data-theme="dark"] .table-container {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    margin-bottom: 20px;
+}
+
+[data-theme="dark"] .reg-number {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .count {
+    color: #34d399;
+    font-weight: bold;
+}
+
+[data-theme="dark"] .empty-message {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--text-muted);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .level-tag {
+    background: rgba(0, 0, 0, 0.2);
+    color: #cbd5e1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    margin-inline-end: 5px;
+}
+
+[data-theme="dark"] .page-title {
+    color: var(--text-primary);
+}
+
+/* ==========================================================================
+   31D. EQUIPMENT INDEX & UTILITIES — الأجهزة والمعدات
+   ========================================================================== */
+[data-theme="dark"] .card-container {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+[data-theme="dark"] .equipment-table {
+    border: none;
+}
+
+[data-theme="dark"] .text-slate-800 {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] code {
+    background: rgba(255, 255, 255, 0.08);
+    color: #34d399;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+[data-theme="dark"] .text-emerald {
+    color: #34d399;
+}
+
+[data-theme="dark"] .text-rose {
+    color: #f87171;
+}
+
+/* ==========================================================================
+   31E. EQUIPMENT CREATION & FORMS — نصوص نماذج الإضافة 
+   ========================================================================== */
+[data-theme="dark"] label,
+[data-theme="dark"] .form-group label,
+[data-theme="dark"] .upload-label,
+[data-theme="dark"] .radio-group label,
+[data-theme="dark"] .calibration-checkbox-label {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .grandeur-title,
+[data-theme="dark"] .section-title,
+[data-theme="dark"] .section-subtitle {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .param-activate-text {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .radio-group label {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .grandeur-block {
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+}
+
+/* ==========================================================================
+   31F. EQUIPMENT SHOW PAGE — صفحة عرض تفاصيل الجهاز
+   ========================================================================== */
+[data-theme="dark"] .header-image {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="dark"] img.header-image,
+[data-theme="dark"] img.img-thumb {
+    background: rgba(255, 255, 255, 0.03) !important;
+    mix-blend-mode: normal !important;
+    filter: none !important;
+    opacity: 1 !important;
+}
+
+[data-theme="dark"] .header-image.icon-placeholder {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-color: var(--icon-border-dark, rgba(255, 255, 255, 0.2)) !important;
+    box-shadow: none !important;
+}
+
+[data-theme="dark"] .icon-thumb-box {
+    background: transparent !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+[data-theme="dark"] .equipment-header .status-badge {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-weight: 600;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);
+}
+
+[data-theme="dark"] .equipment-header .status-badge.status-broken {
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+}
+
+[data-theme="dark"] .header-info h1 {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .header-meta-info {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .info-row {
+    border-bottom: 1px solid var(--glass-border);
+}
+
+[data-theme="dark"] .info-row .label {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .info-row .value {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .cert-download-link {
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .cert-download-link:hover {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+[data-theme="dark"] .sub-table-title {
+    color: var(--text-primary);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+}
+
+[data-theme="dark"] .params-table th {
+    background: var(--glass-bg-strong);
+    color: var(--text-secondary);
+    border: 1px solid var(--glass-border);
+}
+
+[data-theme="dark"] .params-table td {
+    color: var(--text-primary);
+    border: 1px solid var(--glass-border);
+}
+
+[data-theme="dark"] .unit-tag,
+[data-theme="dark"] .unit-tag-source {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .notes-container {
+    background: var(--glass-bg-strong);
+    border: 1px dashed var(--glass-border);
+}
+
+[data-theme="dark"] .notes-title {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .notes-text {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .empty-params-container {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed var(--glass-border);
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   31G. FILTER BUTTONS — أزرار الفلترة والبحث
+   ========================================================================== */
+[data-theme="dark"] .filter-action-btn {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+    color: #34d399 !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1) !important;
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .filter-action-btn:hover {
+    background: rgba(16, 185, 129, 0.25) !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+[data-theme="dark"] .filter-action-btn.bg-secondary {
+    background: rgba(148, 163, 184, 0.15) !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    color: #cbd5e1 !important;
+    box-shadow: 0 4px 15px rgba(148, 163, 184, 0.1) !important;
+}
+
+[data-theme="dark"] .filter-action-btn.bg-secondary:hover {
+    background: rgba(148, 163, 184, 0.25) !important;
+    border-color: rgba(148, 163, 184, 0.4) !important;
+}
+
+/* ==========================================================================
+   31H. CERTIFICATE ACTION BUTTONS — أزرار الإجراءات في صفحة الشهادات
+   ========================================================================== */
+[data-theme="dark"] .btn-excel {
+    background: rgba(16, 185, 129, 0.1) !important;
+    color: #34d399 !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+[data-theme="dark"] .btn-excel:hover {
+    background: rgba(16, 185, 129, 0.2) !important;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
+}
+
+[data-theme="dark"] .btn-autofill {
+    background: rgba(59, 130, 246, 0.1) !important; /* لون أزرق زجاجي للأوتوفيل */
+    color: #60a5fa !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    backdrop-filter: blur(8px);
+}
+
+[data-theme="dark"] .btn-autofill:hover {
+    background: rgba(59, 130, 246, 0.2) !important;
+}
+
+[data-theme="dark"] .btn-clear-draft,
+[data-theme="dark"] .btn-cancel-form {
+    background: rgba(239, 68, 68, 0.1) !important; /* أحمر زجاجي لإلغاء/مسح */
+    color: #f87171 !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+    backdrop-filter: blur(8px);
+}
+
+[data-theme="dark"] .btn-clear-draft:hover,
+[data-theme="dark"] .btn-cancel-form:hover {
+    background: rgba(239, 68, 68, 0.2) !important;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15);
+}
+
+/* ==========================================================================
+   31I. MOVEMENT REPORT PAGE — أزرار التحكم وجداول صفحة التقرير
+   ========================================================================== */
+
+/* أزرار رجوع وطباعة */
+[data-theme="dark"] .report-btn {
+    background: var(--glass-bg-strong) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+    border-right: 1px solid rgba(255,255,255,0.06) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255,255,255,0.06) !important;
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .report-btn:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255,255,255,0.15) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255,255,255,0.08) !important;
+    transform: translateY(-2px);
+}
+
+/* ترويسة التقرير */
+[data-theme="dark"] .report-header {
+    border-bottom-color: var(--glass-border) !important;
+}
+
+[data-theme="dark"] .report-header h2 {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .color-text-primary {
+    color: var(--text-secondary) !important;
+}
+
+/* بطاقة معلومات الجهاز */
+[data-theme="dark"] .bg-glass-light {
+    background: rgba(255, 255, 255, 0.04) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border: 1px solid var(--glass-border) !important;
+}
+
+/* رؤوس الجداول — Bootstrap table-warning / table-info / table-secondary */
+[data-theme="dark"] .table-report th.table-warning,
+[data-theme="dark"] th.table-warning {
+    background: rgba(245, 158, 11, 0.1) !important;
+    color: #fcd34d !important;
+    border-color: rgba(245, 158, 11, 0.2) !important;
+}
+
+[data-theme="dark"] .table-report th.table-info,
+[data-theme="dark"] th.table-info {
+    background: rgba(14, 165, 233, 0.1) !important;
+    color: #7dd3fc !important;
+    border-color: rgba(14, 165, 233, 0.2) !important;
+}
+
+[data-theme="dark"] .table-report th.table-secondary,
+[data-theme="dark"] th.table-secondary {
+    background: rgba(100, 116, 139, 0.12) !important;
+    color: #94a3b8 !important;
+    border-color: rgba(100, 116, 139, 0.2) !important;
+}
+
+/* خلايا الجدول العادية */
+[data-theme="dark"] .table-report td.text-slate-800,
+[data-theme="dark"] .table-report td {
+    color: var(--text-secondary) !important;
+}
+
+/* عناوين القياس/المصدر */
+[data-theme="dark"] h2.text-primary {
+    color: #34d399 !important;
+}
+
+[data-theme="dark"] h2.text-warning {
+    color: #fcd34d !important;
+}
+
+/* قسم التوقيعات */
+[data-theme="dark"] .signatures strong,
+[data-theme="dark"] .signatures span {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .signature-line {
+    border-top-color: var(--glass-border) !important;
+}
+
+/* Unit Symbol Badge — Dark Mode */
+[data-theme="dark"] .unit-symbol-badge {
+    background: rgba(16, 185, 129, 0.1) !important;
+    color: #34d399 !important;
+    border: 1px solid rgba(16, 185, 129, 0.22) !important;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.08);
+}
+
+[data-theme="dark"] .unit-symbol-badge:hover {
+    background: rgba(16, 185, 129, 0.18) !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.15);
+}
+
+/* ==========================================================================
+   CALIBRATION TEMPLATES FORM — تلميح نطاق القياس (range-hint)
+   بديل زجاجي لـ Bootstrap text-info fw-bold
+   ========================================================================== */
+[data-theme="dark"] .range-hint {
+    color: #7dd3fc;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: rgba(56, 189, 248, 0.07);
+    border: 1px solid rgba(56, 189, 248, 0.18);
+    border-radius: 8px;
+    padding: 6px 12px;
+    display: inline-block;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+[data-theme="dark"] .range-hint:empty {
+    display: none;
+}
+
+} 
+/* Dynamic Sequence Group Colors - Dark Mode */
+[data-theme=""dark""] .group-color-0 { background-color: rgba(99, 102, 241, 0.15) !important; }
+[data-theme=""dark""] .group-color-1 { background-color: rgba(16, 185, 129, 0.15) !important; }
+[data-theme=""dark""] .group-color-2 { background-color: rgba(244, 63, 94, 0.15) !important; }
+[data-theme=""dark""] .group-color-3 { background-color: rgba(245, 158, 11, 0.15) !important; }
+[data-theme=""dark""] .group-color-4 { background-color: rgba(6, 182, 212, 0.15) !important; }
+[data-theme=""dark""] .group-color-5 { background-color: rgba(139, 92, 246, 0.15) !important; }
+[data-theme=""dark""] .group-color-6 { background-color: rgba(249, 115, 22, 0.15) !important; }
+[data-theme="dark"] .group-color-7 { background-color: rgba(217, 70, 239, 0.15) !important; }
+
+/* ==========================================================================
+   NOTIFICATIONS PAGE — Dark Mode
+   متوافق مع نظام Glassmorphism الخاص بـ GMTM
+   ========================================================================== */
+
+/* --- Card wrapper --- */
+[data-theme="dark"] .notif-card-wrap {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-md);
+}
+
+/* --- Row item --- */
+[data-theme="dark"] .notif-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .notif-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .notif-item.is-unread {
+    background: rgba(79, 124, 247, 0.06);
+}
+
+/* --- Title & body text --- */
+[data-theme="dark"] .notif-title-group h2 {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .notif-body h5 {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .notif-body p {
+    color: var(--text-secondary);
+}
+
+/* --- Count pill --- */
+[data-theme="dark"] .notif-count-pill {
+    background: rgba(79, 124, 247, 0.15);
+    color: #90aeff;
+}
+
+/* --- Mark all button --- */
+[data-theme="dark"] .btn-mark-all {
+    border-color: rgba(79, 124, 247, 0.5);
+    color: #90aeff;
+    background: rgba(79, 124, 247, 0.08);
+}
+
+[data-theme="dark"] .btn-mark-all:hover {
+    background: #4f7cf7;
+    color: #fff;
+    border-color: #4f7cf7;
+    box-shadow: 0 4px 14px rgba(79, 124, 247, 0.3);
+}
+
+/* --- Type icons — subtle glass tint --- */
+[data-theme="dark"] .notif-icon.type-primary  { background: rgba(79, 124, 247, 0.15); color: #90aeff; }
+[data-theme="dark"] .notif-icon.type-danger   { background: rgba(239, 68,  68,  0.12); color: #fca5a5; }
+[data-theme="dark"] .notif-icon.type-success  { background: rgba(34,  197, 94,  0.12); color: #86efac; }
+[data-theme="dark"] .notif-icon.type-info     { background: rgba(14,  165, 233, 0.12); color: #7dd3fc; }
+[data-theme="dark"] .notif-icon.type-warning  { background: rgba(245, 158, 11,  0.12); color: #fcd34d; }
+
+/* --- Time text --- */
+[data-theme="dark"] .notif-time { color: #475569; }
+
+/* --- Action buttons --- */
+[data-theme="dark"] .notif-btn-read {
+    color: #86efac;
+    border-color: rgba(134, 239, 172, 0.2);
+    background: rgba(34, 197, 94, 0.08);
+}
+
+[data-theme="dark"] .notif-btn-read:hover {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+}
+
+[data-theme="dark"] .notif-btn-delete {
+    color: #fca5a5;
+    border-color: rgba(252, 165, 165, 0.2);
+    background: rgba(239, 68, 68, 0.08);
+}
+
+[data-theme="dark"] .notif-btn-delete:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+/* --- Empty state --- */
+[data-theme="dark"] .notif-empty-icon {
+    background: rgba(255, 255, 255, 0.04);
+    color: #334155;
+}
+
+[data-theme="dark"] .notif-empty h4 { color: #475569; }
+[data-theme="dark"] .notif-empty p  { color: #334155; }
+
+
+/* Text Utility Colors Fix */
+[data-theme="dark"] .text-success { color: #34d399 !important; }
+[data-theme="dark"] .text-danger { color: #f87171 !important; }
+[data-theme="dark"] .text-primary { color: #38bdf8 !important; }

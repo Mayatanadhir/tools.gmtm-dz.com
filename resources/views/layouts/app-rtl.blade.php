@@ -7,6 +7,9 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
+        <!-- Favicon -->
+        <link rel="icon" type="image/x-icon" href="{{ asset('images/LogoP.jpg') }}">
+
         <!-- Arabic Fonts (Noto Kufi Arabic) -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=noto-kufi-arabic:400,500,600&display=swap" rel="stylesheet" />
@@ -33,7 +36,7 @@
 
             <!-- Page Heading -->
             @isset($header)
-                <header class="bg-white dark:bg-gray-800 shadow dark:shadow-gray-950/50">
+                <header x-data class="bg-white dark:bg-gray-800 shadow dark:shadow-gray-950/50">
                     <div class="w-full py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
@@ -45,5 +48,7 @@
                 {{ $slot }}
             </main>
         </div>
+
+        @stack('scripts')
     </body>
 </html>

@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-colors duration-200">
+﻿<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-colors duration-200">
     <!-- Primary Navigation Menu -->
     <div class="w-full px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -13,11 +13,40 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 space-x-reverse sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                        {{ __('Workspace') }}
                     </x-nav-link>
+
+                    {{-- 🔬 Metrology & Equipments --}}
+                    @can('view metrology')
+                    <x-nav-link :href="route('dashboard_metrology')" :active="request()->routeIs('dashboard_metrology') || request()->routeIs('metrology.*')">
+                        {{ __('Metrology') }}
+                    </x-nav-link>
+                    @endcan
+
+                    {{-- 💼 Operations & Projects --}}
+                    @can('view operations')
+                    <x-nav-link :href="route('dashboard_operations')" :active="request()->routeIs('dashboard_operations') || request()->routeIs('operations.*')">
+                        {{ __('Operations') }}
+                    </x-nav-link>
+                    @endcan
+
+                    {{-- 📈 Internal and Analytical Management --}}
+                    @can('view analytics')
+                    <x-nav-link :href="route('dashboard_analytics')" :active="request()->routeIs('dashboard_analytics') || request()->routeIs('analytics.*')">
+                        {{ __('Analytics') }}
+                    </x-nav-link>
+                    @endcan
+
+                    {{-- 🗂️ Master Data --}}
+                    @can('view master data')
+                    <x-nav-link :href="route('dashboard_master_data')" :active="request()->routeIs('dashboard_master_data') || request()->routeIs('master-data.*')">
+                        {{ __('Master Data') }}
+                    </x-nav-link>
+                    @endcan
+
                     @if(Auth::user()?->isSuperAdmin() || Auth::user()?->hasRole('Super-Admin'))
                         <x-nav-link :href="route('system-tables.index')" :active="request()->routeIs('system-tables.*')">
-                            {{ __('System Tables') }}
+                            {{ __('System Control') }}
                         </x-nav-link>
                     @endif
                 </div>
@@ -38,11 +67,11 @@
                 <div class="hidden sm:flex sm:items-center sm:ms-2">
                     <x-dropdown align="right" width="80" contentClasses="p-0 bg-white dark:bg-gray-800 overflow-hidden">
                         <x-slot name="trigger">
-                            <button type="button" class="relative flex items-center justify-center p-0.5 rounded-full ring-2 ring-gray-200 dark:ring-gray-700 hover:ring-orange-500 dark:hover:ring-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 dark:focus:ring-offset-gray-800 transition-all duration-200" title="{{ Auth::user()->name }}">
-                                @if(Auth::user()->profile_photo_path)
-                                    <img class="h-9 w-9 rounded-full object-cover" src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" alt="{{ Auth::user()->name }}">
+                            <button type="button" class="relative flex items-center justify-center p-0.5 rounded-full ring-2 ring-gray-200 dark:ring-gray-700 hover:ring-brand-500 dark:hover:ring-brand-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-600 dark:focus:ring-offset-gray-800 transition-all duration-200" title="{{ Auth::user()->name }}">
+                                @if(Auth::user()->profile_photo_url)
+                                    <img class="h-9 w-9 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}">
                                 @else
-                                    <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 text-white font-bold text-sm flex items-center justify-center shadow-inner">
+                                    <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-brand-600 to-brand-800 text-white font-bold text-sm flex items-center justify-center shadow-inner">
                                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                                     </div>
                                 @endif
@@ -58,10 +87,10 @@
 
                                 <!-- Large Centered Avatar with Camera Badge -->
                                 <div class="relative inline-block mx-auto mb-3">
-                                    @if(Auth::user()->profile_photo_path)
-                                        <img class="w-20 h-20 rounded-full object-cover ring-4 ring-orange-100 dark:ring-orange-950/60 shadow-md mx-auto" src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" alt="{{ Auth::user()->name }}">
+                                    @if(Auth::user()->profile_photo_url)
+                                        <img class="w-20 h-20 rounded-full object-cover ring-4 ring-brand-100 dark:ring-brand-950/60 shadow-md mx-auto" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}">
                                     @else
-                                        <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 text-white font-bold text-3xl flex items-center justify-center ring-4 ring-orange-100 dark:ring-orange-950/60 shadow-md mx-auto">
+                                        <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-brand-600 to-brand-800 text-white font-bold text-3xl flex items-center justify-center ring-4 ring-brand-100 dark:ring-brand-950/60 shadow-md mx-auto">
                                             {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                                         </div>
                                     @endif
@@ -142,11 +171,36 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                {{ __('Workspace') }}
             </x-responsive-nav-link>
+
+            @can('view metrology')
+            <x-responsive-nav-link :href="route('dashboard_metrology')" :active="request()->routeIs('dashboard_metrology') || request()->routeIs('metrology.*')">
+                {{ __('Metrology') }}
+            </x-responsive-nav-link>
+            @endcan
+
+            @can('view operations')
+            <x-responsive-nav-link :href="route('dashboard_operations')" :active="request()->routeIs('dashboard_operations') || request()->routeIs('operations.*')">
+                {{ __('Operations') }}
+            </x-responsive-nav-link>
+            @endcan
+
+            @can('view analytics')
+            <x-responsive-nav-link :href="route('dashboard_analytics')" :active="request()->routeIs('dashboard_analytics') || request()->routeIs('analytics.*')">
+                {{ __('Analytics') }}
+            </x-responsive-nav-link>
+            @endcan
+
+            @can('view master data')
+            <x-responsive-nav-link :href="route('dashboard_master_data')" :active="request()->routeIs('dashboard_master_data') || request()->routeIs('master-data.*')">
+                {{ __('Master Data') }}
+            </x-responsive-nav-link>
+            @endcan
+
             @if(Auth::user()?->isSuperAdmin() || Auth::user()?->hasRole('Super-Admin'))
                 <x-responsive-nav-link :href="route('system-tables.index')" :active="request()->routeIs('system-tables.*')">
-                    {{ __('System Tables') }}
+                    {{ __('System Control') }}
                 </x-responsive-nav-link>
             @endif
         </div>
@@ -159,10 +213,10 @@
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-700">
             <div class="px-4 flex items-center gap-3">
-                @if(Auth::user()->profile_photo_path)
-                    <img class="h-10 w-10 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-700" src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" alt="{{ Auth::user()->name }}">
+                @if(Auth::user()->profile_photo_url)
+                    <img class="h-10 w-10 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-700" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}">
                 @else
-                    <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 text-white font-bold text-sm flex items-center justify-center ring-2 ring-gray-200 dark:ring-gray-700">
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-brand-600 to-brand-800 text-white font-bold text-sm flex items-center justify-center ring-2 ring-gray-200 dark:ring-gray-700">
                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                     </div>
                 @endif

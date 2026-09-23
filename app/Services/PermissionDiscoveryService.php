@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -68,7 +67,16 @@ class PermissionDiscoveryService
      */
     public function getSuperRoles(): array
     {
-        return $this->superRoles;
+        $configuredRoles = (array) config('permissions.roles', []);
+        $supers = [];
+
+        foreach ($configuredRoles as $roleName => $meta) {
+            if (! empty($meta['is_super'])) {
+                $supers[] = (string) $roleName;
+            }
+        }
+
+        return ! empty($supers) ? $supers : $this->superRoles;
     }
 
     /**
@@ -76,7 +84,7 @@ class PermissionDiscoveryService
      */
     public function isSuperRole(string $roleName): bool
     {
-        return in_array($roleName, $this->superRoles, true);
+        return in_array($roleName, $this->getSuperRoles(), true);
     }
 
     /**
@@ -84,6 +92,14 @@ class PermissionDiscoveryService
      */
     public function getDefaultRole(): string
     {
+        $configuredRoles = (array) config('permissions.roles', []);
+
+        foreach ($configuredRoles as $roleName => $meta) {
+            if (! empty($meta['is_default'])) {
+                return (string) $roleName;
+            }
+        }
+
         return $this->defaultRole;
     }
 
@@ -92,7 +108,7 @@ class PermissionDiscoveryService
      */
     public function isDefaultRole(string $roleName): bool
     {
-        return $roleName === $this->defaultRole;
+        return $roleName === $this->getDefaultRole();
     }
 
     /**
@@ -100,6 +116,12 @@ class PermissionDiscoveryService
      */
     public function getRoleFunctionalTitle(string $roleName): string
     {
+        $titleKey = config("permissions.roles.{$roleName}.title");
+
+        if ($titleKey) {
+            return __($titleKey);
+        }
+
         return match ($roleName) {
             'Super-Admin' => __('Super Administrator (Full Sovereign Access)'),
             'Admin' => __('System Administrator (Operations & Users)'),
@@ -113,50 +135,41 @@ class PermissionDiscoveryService
      */
     public function getRoleFunctionalScope(string $roleName): string
     {
+        $scopeKey = config("permissions.roles.{$roleName}.scope");
+
+        if ($scopeKey) {
+            return __($scopeKey);
+        }
+
         return match ($roleName) {
             'Super-Admin' => __('Full sovereign authority over system configurations, forensic tables, and all application data.'),
             'Admin' => __('Operational and user management with access to standard business tables, excluding security-critical tables.'),
             'User' => __('Access to general application tools and profile workspace without administrative privileges.'),
-            default => __('Custom user role with assigned granular table privileges.'),
+            default => __('Custom user role with assigned granular system privileges.'),
         };
     }
 
     /**
-     * Discover business tables from the active database schema, excluding blacklisted system tables.
+     * Get the configured static entities from the permissions registry.
      *
      * @return array<int, string>
      */
     public function getDiscoveredTables(?string $connection = null): array
     {
-        $db = DB::connection($connection);
-        $currentDatabase = $db->getDatabaseName();
+        $groups = (array) config('permissions.groups', []);
+        $modules = (array) config('permissions.modules', []);
         $discovered = [];
 
-        try {
-            $tables = Schema::connection($connection)->getTables();
+        foreach ($groups as $groupKey => $group) {
+            $entity = (string) ($group['entity'] ?? str_replace('_management', '', (string) $groupKey));
+            $discovered[] = strtolower($entity);
+        }
 
-            foreach ($tables as $tableInfo) {
-                $tableName = (string) $tableInfo['name'];
-                $tableSchema = (string) ($tableInfo['schema'] ?? '');
-
-                // Ensure table belongs to the current database if schema info is present on MySQL
-                $driver = $db->getDriverName();
-                if ($driver === 'mysql' && $tableSchema !== '' && $tableSchema !== $currentDatabase) {
-                    continue;
-                }
-
-                if (! in_array(strtolower($tableName), self::SYSTEM_BLACKLIST, true)) {
-                    $discovered[] = strtolower($tableName);
-                }
-            }
-        } catch (\Throwable) {
-            // Fallback for drivers or configurations that do not support getTables()
-            $allTables = Schema::connection($connection)->getTableListing();
-            foreach ($allTables as $rawName) {
-                $cleanName = strtolower(basename(str_replace('.', '/', (string) $rawName)));
-                if (! in_array($cleanName, self::SYSTEM_BLACKLIST, true)) {
-                    $discovered[] = $cleanName;
-                }
+        // Also register module-level view permission entities (e.g. "metrology", "operations").
+        foreach ($modules as $modKey => $modMeta) {
+            $viewPerm = (string) ($modMeta['view_permission'] ?? '');
+            if ($viewPerm !== '' && preg_match('/^view\s+(.+)$/i', $viewPerm, $m)) {
+                $discovered[] = strtolower(trim($m[1]));
             }
         }
 
@@ -167,7 +180,7 @@ class PermissionDiscoveryService
     }
 
     /**
-     * Remove standard CRUD permissions for entities that no longer exist in the active database schema.
+     * Remove standard CRUD permissions for entities that no longer exist in the configured static registry.
      *
      * @param  array<int, string>  $validTables
      * @return array<int, string> List of pruned permission names
@@ -194,7 +207,7 @@ class PermissionDiscoveryService
     }
 
     /**
-     * Generate standard CRUD permissions for discovered or specified tables and prune obsolete permissions.
+     * Generate standard permissions from the static catalog and prune obsolete permissions.
      *
      * @param  array<int, string>|null  $tables
      * @return array{
@@ -206,26 +219,43 @@ class PermissionDiscoveryService
      */
     public function generateCrudPermissionsForTables(?array $tables = null): array
     {
+        $groups = (array) config('permissions.groups', []);
         $tablesToProcess = $tables ?? $this->getDiscoveredTables();
         $pruned = $this->pruneStaleCrudPermissions($tablesToProcess);
         $created = [];
 
-        foreach ($tablesToProcess as $table) {
-            foreach (self::CRUD_ACTIONS as $action) {
-                $permName = "{$action} {$table}";
+        foreach ($groups as $group) {
+            $perms = (array) ($group['perms'] ?? []);
+            foreach ($perms as $permName) {
                 $permission = Permission::firstOrCreate([
-                    'name' => $permName,
+                    'name' => (string) $permName,
                     'guard_name' => 'web',
                 ]);
 
                 if ($permission->wasRecentlyCreated) {
-                    $created[] = $permName;
+                    $created[] = (string) $permName;
+                }
+            }
+        }
+
+        // Also create module-level view permissions (e.g. "view metrology").
+        $modules = (array) config('permissions.modules', []);
+        foreach ($modules as $modMeta) {
+            $modPerms = (array) ($modMeta['perms'] ?? []);
+            foreach ($modPerms as $permName) {
+                $permission = Permission::firstOrCreate([
+                    'name' => (string) $permName,
+                    'guard_name' => 'web',
+                ]);
+
+                if ($permission->wasRecentlyCreated) {
+                    $created[] = (string) $permName;
                 }
             }
         }
 
         $missingSuperRole = false;
-        foreach ($this->superRoles as $superRoleName) {
+        foreach ($this->getSuperRoles() as $superRoleName) {
             if (! Role::where('name', $superRoleName)->exists()) {
                 $missingSuperRole = true;
                 break;
@@ -255,7 +285,7 @@ class PermissionDiscoveryService
     {
         $allPermissions = Permission::all();
 
-        foreach ($this->superRoles as $superRoleName) {
+        foreach ($this->getSuperRoles() as $superRoleName) {
             $role = Role::firstOrCreate([
                 'name' => $superRoleName,
                 'guard_name' => 'web',
@@ -273,6 +303,18 @@ class PermissionDiscoveryService
      *
      * @param  bool  $autoSync  Whether to automatically generate missing permissions for discovered tables
      * @return array{
+     *     modules: array<string, array{
+     *         key: string,
+     *         name: string,
+     *         icon: string,
+     *         color: string,
+     *         entities: array<string, array{
+     *             display_name: string,
+     *             icon: string,
+     *             actions: array<string, string>
+     *         }>,
+     *         all_permissions: array<int, string>
+     *     }>,
      *     entities: array<string, array<string, string>>,
      *     custom: array<int, string>,
      *     actions: array<int, string>,
@@ -290,6 +332,8 @@ class PermissionDiscoveryService
         $custom = [];
         $allNames = [];
 
+        $discoveredTables = $this->getDiscoveredTables();
+
         foreach ($permissions as $perm) {
             $name = (string) $perm->name;
             $allNames[] = $name;
@@ -298,8 +342,10 @@ class PermissionDiscoveryService
                 $action = strtolower($matches[1]);
                 $entity = strtolower(trim($matches[2]));
 
-                // Double check that blacklisted entities are never included in the matrix
-                if (in_array($entity, self::SYSTEM_BLACKLIST, true)) {
+                // Only group entities registered in the static permissions catalog
+                if (! in_array($entity, $discoveredTables, true)) {
+                    $custom[] = $name;
+
                     continue;
                 }
 
@@ -315,7 +361,71 @@ class PermissionDiscoveryService
         ksort($entities);
         sort($custom);
 
+        $modulesConfig = (array) config('permissions.modules', []);
+        $groupsConfig = (array) config('permissions.groups', []);
+
+        $entityMeta = [];
+        foreach ($groupsConfig as $groupKey => $group) {
+            $ent = strtolower((string) ($group['entity'] ?? str_replace('_management', '', (string) $groupKey)));
+            $mod = (string) ($group['module'] ?? 'other');
+            $entityMeta[$ent] = [
+                'module' => $mod,
+                'lang' => (string) ($group['lang'] ?? $ent),
+                'icon' => (string) ($group['icon'] ?? ''),
+            ];
+        }
+
+        $groupedByModule = [];
+        foreach ($modulesConfig as $modKey => $modMeta) {
+            $groupedByModule[$modKey] = [
+                'key' => (string) $modKey,
+                'name' => (string) ($modMeta['name'] ?? $modKey),
+                'icon' => (string) ($modMeta['icon'] ?? ''),
+                'color' => (string) ($modMeta['color'] ?? 'gray'),
+                'view_permission' => (string) ($modMeta['view_permission'] ?? ''),
+                'entities' => [],
+                'all_permissions' => [],
+            ];
+        }
+
+        foreach ($entities as $entity => $actions) {
+            $modKey = $entityMeta[$entity]['module'] ?? 'other';
+            if (! isset($groupedByModule[$modKey])) {
+                $groupedByModule[$modKey] = [
+                    'key' => (string) $modKey,
+                    'name' => ucfirst((string) $modKey),
+                    'icon' => '',
+                    'color' => 'gray',
+                    'view_permission' => '',
+                    'entities' => [],
+                    'all_permissions' => [],
+                ];
+            }
+
+            $groupedByModule[$modKey]['entities'][$entity] = [
+                'display_name' => $entityMeta[$entity]['lang'] ?? $entity,
+                'icon' => $entityMeta[$entity]['icon'] ?? '',
+                'actions' => $actions,
+            ];
+
+            foreach ($actions as $actPerm) {
+                $groupedByModule[$modKey]['all_permissions'][] = $actPerm;
+            }
+        }
+
+        // Prepend the module-level view permission (e.g. "view metrology") to all_permissions
+        // so that "Toggle Category" also toggles the top-level module access permission.
+        foreach ($groupedByModule as $modKey => $modData) {
+            $viewPerm = (string) ($modData['view_permission'] ?? '');
+            if ($viewPerm !== '' && ! empty($modData['entities'])) {
+                array_unshift($groupedByModule[$modKey]['all_permissions'], $viewPerm);
+            }
+        }
+
+        $groupedByModule = array_filter($groupedByModule, fn (array $m): bool => ! empty($m['entities']));
+
         return [
+            'modules' => $groupedByModule,
             'entities' => $entities,
             'custom' => $custom,
             'actions' => self::CRUD_ACTIONS,

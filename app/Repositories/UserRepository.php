@@ -39,6 +39,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     {
         return $this->model->newQuery()
             ->whereNotNull('email_verified_at')
-            ->paginate($perPage);
+            ->paginate($perPage)
+            ->withQueryString();
     }
 }

@@ -2,7 +2,7 @@
   <img src="public/build/assets/logo.svg" width="120" height="120" alt="Core Kernel Logo" onerror="this.src='https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg'">
 </p>
 
-<h1 align="center">ENGI-MATE Core Kernel — Point Zero Master Template</h1>
+<h1 align="center">ENGI-GMTM Core Kernel — Point Zero Master Template</h1>
 
 <p align="center">
   <strong>Production-Ready Enterprise SaaS & Application Foundation for Laravel 13 & PHP 8.4+</strong>
@@ -21,7 +21,7 @@
 
 ## 🌟 Overview (نظرة عامة)
 
-**ENGI-MATE Core Kernel (Point Zero)** هو القالب المعماري الأساسي والنواة الأم المجهزة للانطلاق في تطوير أي مشروع أو نظام برمجي ضخم (Enterprise Application / Multi-Tenant SaaS / ERP / CRM / eCommerce).
+**ENGI-GMTM Core Kernel (Point Zero)** هو القالب المعماري الأساسي والنواة الأم المجهزة للانطلاق في تطوير أي مشروع أو نظام برمجي ضخم (Enterprise Application / Multi-Tenant SaaS / ERP / CRM / eCommerce).
 
 بدلاً من قضاء أسابيع في بناء أنظمة المصادقة، الصلاحيات، دعم اللغات، الوضع الليلي، والاتصال بقواعد البيانات لكل مشروع جديد، توفر هذه النواة بنية تحتية برمجية ذاتية الشفاء والتهيئة (`Zero-Touch & Self-Healing`) تتيح لك إطلاق أي تطبيق جديد خلال **5 دقائق فقط**.
 

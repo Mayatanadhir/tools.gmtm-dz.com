@@ -83,7 +83,7 @@ class SystemTableTest extends TestCase
         $response->assertOk();
         $response->assertViewIs('system.index');
         $response->assertViewHasAll(['stats', 'recentActivities']);
-        $response->assertSee(__('System & Database Explorer'));
+        $response->assertSee(__('System & Database'));
     }
 
     public function test_authenticated_user_can_access_users_and_sessions_explorer(): void
@@ -576,25 +576,75 @@ class SystemTableTest extends TestCase
         $responseFr->assertSee("Nouvel utilisateur système 'Special User' créé");
     }
 
+    public function test_activity_logs_explorer_displays_causer_name_and_email_and_supports_causer_search(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->superAdmin()->create([
+            'name' => 'Super Auditor',
+            'email' => 'auditor@gmtm-dz.com',
+        ]);
+
+        /** @var User $actor */
+        $actor = User::factory()->create([
+            'name' => 'Jane Specialist',
+            'email' => 'jane.specialist@gmtm-dz.com',
+        ]);
+
+        activity('system_users')
+            ->causedBy($actor)
+            ->performedOn($admin)
+            ->log("Updated system user 'Super Auditor'");
+
+        $response = $this->actingAs($admin)->get(route('system-tables.activity-log'));
+        $response->assertOk();
+        $response->assertSee('Jane Specialist');
+        $response->assertSee('jane.specialist@gmtm-dz.com');
+
+        // Test search by causer name
+        $searchResponse = $this->actingAs($admin)->get(route('system-tables.activity-log', ['search' => 'Specialist']));
+        $searchResponse->assertOk();
+        $searchResponse->assertSee('Jane Specialist');
+
+        // Test search by causer email
+        $searchEmailResponse = $this->actingAs($admin)->get(route('system-tables.activity-log', ['search' => 'jane.specialist@gmtm-dz.com']));
+        $searchEmailResponse->assertOk();
+        $searchEmailResponse->assertSee('Jane Specialist');
+    }
+
     public function test_system_table_service_translates_activity_descriptions_accurately_across_locales(): void
     {
         $service = app(SystemTableService::class);
 
         app()->setLocale('ar');
         $this->assertSame('تم إنشاء المستخدم', $service->translateActivityDescription('User has been created'));
+        $this->assertSame('تم إنشاء الموظف', $service->translateActivityDescription('Employee has been created'));
+        $this->assertSame('تم تحديث الموظف', $service->translateActivityDescription('Employee has been updated'));
+        $this->assertSame('تم حذف الموظف', $service->translateActivityDescription('Employee has been deleted'));
         $this->assertSame("إنشاء دور نظام جديد 'Supervisor'", $service->translateActivityDescription("Created new system role 'Supervisor'"));
         $this->assertSame("حذف صلاحية النظام 'edit-users'", $service->translateActivityDescription("Deleted system permission 'edit-users'"));
         $this->assertSame("استعادة حالة قاعدة البيانات من اللقطة 'backup.zip'", $service->translateActivityDescription("Restored database state from snapshot 'backup.zip'"));
+        $this->assertSame("تغيير حالة المستخدم إلى 'نشطة' لـ 'John'", $service->translateActivityDescription("Changed user status to 'active' for 'John'"));
+        $this->assertSame("تحديث إعداد النظام 'allow_registration'", $service->translateActivityDescription("Updated system setting 'allow_registration'"));
+        $this->assertSame('تم تغيير حالة التسجيل إلى مفعّل', $service->translateActivityDescription('Changed registration status to enabled'));
 
         app()->setLocale('fr');
         $this->assertSame("L'utilisateur a été créé", $service->translateActivityDescription('User has been created'));
+        $this->assertSame("L'employé a été créé", $service->translateActivityDescription('Employee has been created'));
+        $this->assertSame("L'employé a été mis à jour", $service->translateActivityDescription('Employee has been updated'));
+        $this->assertSame("L'employé a été supprimé", $service->translateActivityDescription('Employee has been deleted'));
         $this->assertSame("Nouveau rôle système 'Supervisor' créé", $service->translateActivityDescription("Created new system role 'Supervisor'"));
         $this->assertSame("Permission système 'edit-users' supprimée", $service->translateActivityDescription("Deleted system permission 'edit-users'"));
         $this->assertSame("État de la base de données restauré à partir de l'instantané 'backup.zip'", $service->translateActivityDescription("Restored database state from snapshot 'backup.zip'"));
+        $this->assertSame("Statut de l'utilisateur changé à 'Active' pour 'John'", $service->translateActivityDescription("Changed user status to 'active' for 'John'"));
+        $this->assertSame("Paramètre système 'allow_registration' mis à jour", $service->translateActivityDescription("Updated system setting 'allow_registration'"));
+        $this->assertSame("Statut d'inscription changé à activé", $service->translateActivityDescription('Changed registration status to enabled'));
 
         app()->setLocale('en');
         $this->assertSame('User has been created', $service->translateActivityDescription('User has been created'));
+        $this->assertSame('Employee has been created', $service->translateActivityDescription('Employee has been created'));
         $this->assertSame("Created new system role 'Supervisor'", $service->translateActivityDescription("Created new system role 'Supervisor'"));
+        $this->assertSame("Changed user status to 'Active' for 'John'", $service->translateActivityDescription("Changed user status to 'active' for 'John'"));
+        $this->assertSame("Updated system setting 'allow_registration'", $service->translateActivityDescription("Updated system setting 'allow_registration'"));
     }
 
     public function test_authenticated_admin_can_create_user_with_status_and_photo_fields(): void

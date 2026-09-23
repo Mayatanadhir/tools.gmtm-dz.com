@@ -74,7 +74,7 @@ class FileUploadService extends BaseService
     }
 
     /**
-     * Safely delete a file from the specified storage disk.
+     * Safely delete a file from the specified storage disk using reference-aware check.
      */
     public function deleteFile(?string $path, string $disk = 'public'): bool
     {
@@ -82,11 +82,18 @@ class FileUploadService extends BaseService
             return false;
         }
 
-        if (! Storage::disk($disk)->exists($path)) {
-            return false;
-        }
+        return app(MediaOptimizationService::class)->safeDelete($path, $disk);
+    }
 
-        return Storage::disk($disk)->delete($path);
+    /**
+     * Optimize and store an uploaded media asset (image or document) using MediaOptimizationService.
+     */
+    public function optimizeMedia(
+        UploadedFile $file,
+        string $directory = 'uploads',
+        string $disk = 'public'
+    ): string {
+        return app(MediaOptimizationService::class)->optimize($file, $directory, $disk);
     }
 
     /**

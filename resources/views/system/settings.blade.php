@@ -10,8 +10,8 @@
                 </p>
             </div>
             <div class="flex items-center gap-2">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400 border border-orange-200 dark:border-orange-800/60">
-                    <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-50 text-brand-800 dark:bg-brand-950/40 dark:text-brand-400 border border-brand-200 dark:border-brand-800/60">
+                    <span class="w-2 h-2 rounded-full bg-brand-600 animate-pulse"></span>
                     {{ __('Dynamic Engine Active') }}
                 </span>
             </div>
@@ -117,7 +117,7 @@
                     <div class="rounded-2xl border border-gray-100 dark:border-gray-700/60 bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
                         <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-700/60 flex items-center justify-between">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 flex items-center justify-center font-bold">
+                                <div class="w-10 h-10 rounded-xl bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-400 flex items-center justify-center font-bold">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
                                 </div>
                                 <div>
@@ -131,13 +131,13 @@
                             </div>
                             <div>
                                 <span x-show="registrationOpen"
-                                      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60">
+                                      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                     {{ __('Registrations Open') }}
                                 </span>
                                 <span x-show="!registrationOpen"
                                       x-cloak
-                                      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60">
+                                      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20">
                                     <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                                     {{ __('Registrations Closed') }}
                                 </span>
@@ -237,7 +237,7 @@
                                 </x-table.td>
                                 <x-table.td class="font-mono text-xs">
                                     @if(is_bool($setting->value))
-                                        <span class="px-2 py-0.5 rounded text-[11px] font-semibold {{ $setting->value ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300' : 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300' }}">
+                                        <span class="px-2 py-0.5 rounded text-[11px] font-semibold {{ $setting->value ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20' }}">
                                             {{ $setting->value ? 'true' : 'false' }}
                                         </span>
                                     @elseif(is_array($setting->value))

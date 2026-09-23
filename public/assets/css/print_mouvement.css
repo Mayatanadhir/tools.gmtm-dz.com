@@ -1,0 +1,230 @@
+/* =============================
+   🔹 الأساسيات وتهيئة الصفحة
+============================= */
+:root {
+  --secondary: #4caf50;
+  --secondary-light: #6bc06f15;
+  --danger: #f44336;
+  --danger-light: #ff6659;
+  --warning: #ff9800;
+  --warning-light: #ffb74d;
+  --success: #4caf50;
+  --success-light: #6bc06f;
+
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-light: #888888;
+
+  --bg-white: #ffffff;
+  --bg-light: #f8f9fa;
+  --bg-lighter: #f0f2f5;
+
+  --border: #e0e0e0;
+  --border-light: #eeeeee;
+
+  --gmtm_color: #006838;
+  --gmtm_shadow: 0 5px 10px rgba(0, 104, 55, 0.444);
+  --gmtm_border_color: #0068373f;
+  --shadow: rgba(0, 0, 0, 0.458);
+  --shadow-light: rgba(0, 0, 0, 0.204);
+  --transition: all 0.3s ease;
+}
+
+* {
+  margin: 0px; 
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Cairo', sans-serif;
+}
+
+body {
+  background-color: var(--bg-light);
+  color: var(--text-primary);  
+  line-height: 1.25; 
+  max-width: 100%;
+  padding: 20px;
+}
+
+a {
+  text-decoration: none;
+  color: #161e29;
+}
+
+
+
+
+
+.imag_tabl img {
+  display: block;
+  width: 800px;
+  margin: 0 auto;
+}
+
+/* =============================
+   🔹 تنسيق الجداول
+============================= */
+table {
+  width: 90%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  page-break-inside: auto;
+}
+
+thead {
+  display: table-header-group;
+}
+
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 5px;
+  text-align: center;
+  font-size: 12px;
+}
+td {font-weight: bold;white-space: nowrap !important;}
+
+tr {
+  page-break-inside: avoid;
+}
+
+/* =============================
+   🔹 تنسيق عند الطباعة
+============================= */
+@media print {
+  .container {
+    display: none;
+  }
+
+  .pageNum {
+    display: none;
+  }
+
+  .no-print {
+    display: none;
+  }
+
+  .header {
+    display: block;
+    page-break-before: always;
+  }
+
+  table {
+    margin-top: 10px;
+  }
+
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media print {
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    color: #000;
+    font-size: 12px !important; /* تصغير النص ليتسع الجدول */
+  }
+
+   td {
+    padding: 3px !important;
+    white-space: nowrap !important; /* 🚫 لا يكسر السطر داخل الخلية */
+    overflow: hidden !important; /* يخفي الزائد عن المساحة */
+    text-overflow: ellipsis !important; /* يضيف ... عند تجاوز العرض */
+    vertical-align: middle !important;
+    font-weight: bold;
+    font-size: 12px;
+  }
+  
+
+  /* ✅ منع تقطيع الصفوف */
+  tr, td, th {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    zoom: 0.9;
+  }
+
+  /* ✅ ضبط الهوامش والصفحة */
+  @page {
+    size: A4 landscape; /* اطبع بالعرض لتكفي الأعمدة */
+    margin: 8mm;
+    
+  }
+
+
+
+  
+}
+ 
+ 
+
+  
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.buttonP {
+  background-color: var(--gmtm_color);
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--gmtm_shadow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.buttonP:hover {
+  background-color: #004d2a;
+  transform: scale(1.1);
+}
+
+
+
+
+
+
+
+
+
+/* إذا كانت اللغة العربية (RTL) */
+.date.rtl {
+    text-align: right;
+   
+}
+
+/* إذا كانت اللغة الإنجليزية أو الفرنسية (LTR) */
+.date.ltr {
+    text-align: left;
+    
+}
+

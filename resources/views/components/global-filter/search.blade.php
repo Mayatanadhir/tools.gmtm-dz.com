@@ -1,4 +1,4 @@
-@props([
+﻿@props([
     'name' => 'search',
     'placeholder' => __('Search...'),
     'value' => null,
@@ -20,7 +20,7 @@ $currentValue = $value ?? request($name, '');
            name="{{ $name }}"
            x-model="query"
            placeholder="{{ $placeholder }}"
-           {{ $attributes->merge(['class' => 'w-full ps-8 pe-8 py-1.5 text-xs rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/80 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:focus:border-orange-500 transition-colors shadow-sm']) }} />
+           {{ $attributes->merge(['class' => 'w-full ps-8 pe-8 py-1.5 text-xs rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/80 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 focus:border-brand-600 focus:ring-1 focus:ring-brand-600 dark:focus:border-brand-600 transition-colors shadow-sm']) }} />
 
     <button type="button"
             x-show="query && query.length > 0"

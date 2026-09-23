@@ -21,6 +21,17 @@ enum AccountStatus: string
     }
 
     /**
+     * Get the semantic badge variant for the status.
+     */
+    public function badgeVariant(): string
+    {
+        return match ($this) {
+            self::Active => 'success',
+            self::Suspended => 'danger',
+        };
+    }
+
+    /**
      * Get the semantic color token for the status.
      */
     public function color(): string
@@ -37,8 +48,8 @@ enum AccountStatus: string
     public function badgeClass(): string
     {
         return match ($this) {
-            self::Active => 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400',
-            self::Suspended => 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400',
+            self::Active => 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20',
+            self::Suspended => 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20',
         };
     }
 

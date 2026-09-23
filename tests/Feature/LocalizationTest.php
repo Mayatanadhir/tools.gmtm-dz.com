@@ -83,15 +83,15 @@ class LocalizationTest extends TestCase
     public function test_json_translations_work_for_all_locales(): void
     {
         app()->setLocale('ar');
-        $this->assertSame('لوحة التحكم', __('Dashboard'));
+        $this->assertSame('مساحة العمل', __('Workspace'));
         $this->assertSame('الملف الشخصي', __('Profile'));
 
         app()->setLocale('en');
-        $this->assertSame('Dashboard', __('Dashboard'));
+        $this->assertSame('Workspace', __('Workspace'));
         $this->assertSame('Profile', __('Profile'));
 
         app()->setLocale('fr');
-        $this->assertSame('Tableau de bord', __('Dashboard'));
+        $this->assertSame('Espace de travail', __('Workspace'));
         $this->assertSame('Profil', __('Profile'));
     }
 
@@ -140,7 +140,7 @@ class LocalizationTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('dir="rtl"', false);
         $response->assertSee('lang="ar"', false);
-        $response->assertSee('لوحة التحكم');
+        $response->assertSee('مساحة العمل');
     }
 
     public function test_english_dashboard_renders_with_ltr_layout(): void
@@ -154,7 +154,7 @@ class LocalizationTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('dir="ltr"', false);
         $response->assertSee('lang="en"', false);
-        $response->assertSee('Dashboard');
+        $response->assertSee('Workspace');
     }
 
     public function test_french_dashboard_renders_with_ltr_layout(): void
@@ -168,7 +168,7 @@ class LocalizationTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('dir="ltr"', false);
         $response->assertSee('lang="fr"', false);
-        $response->assertSee('Tableau de bord');
+        $response->assertSee('Espace de travail');
     }
 
     public function test_login_page_renders_guest_rtl_in_arabic(): void
@@ -189,5 +189,51 @@ class LocalizationTest extends TestCase
         $response->assertSee('dir="ltr"', false);
         $response->assertSee('lang="en"', false);
         $response->assertSee('Log in');
+    }
+
+    public function test_all_locales_have_exact_translation_key_parity(): void
+    {
+        $en = json_decode((string) file_get_contents(base_path('lang/en.json')), true);
+        $ar = json_decode((string) file_get_contents(base_path('lang/ar.json')), true);
+        $fr = json_decode((string) file_get_contents(base_path('lang/fr.json')), true);
+
+        $enKeys = array_keys($en);
+        $arKeys = array_keys($ar);
+        $frKeys = array_keys($fr);
+
+        $missingInAr = array_diff($enKeys, $arKeys);
+        $missingInFr = array_diff($enKeys, $frKeys);
+        $extraInAr = array_diff($arKeys, $enKeys);
+        $extraInFr = array_diff($frKeys, $enKeys);
+
+        $this->assertEmpty($missingInAr, 'Keys present in en.json but missing in ar.json: '.implode(', ', $missingInAr));
+        $this->assertEmpty($missingInFr, 'Keys present in en.json but missing in fr.json: '.implode(', ', $missingInFr));
+        $this->assertEmpty($extraInAr, 'Keys present in ar.json but missing in en.json: '.implode(', ', $extraInAr));
+        $this->assertEmpty($extraInFr, 'Keys present in fr.json but missing in en.json: '.implode(', ', $extraInFr));
+    }
+
+    /**
+     * Ensure every translation key across all 3 dictionary files is strictly written in English (no Arabic characters in keys).
+     */
+    public function test_all_translation_keys_are_strictly_in_english(): void
+    {
+        $locales = ['en', 'ar', 'fr'];
+
+        foreach ($locales as $locale) {
+            $json = json_decode((string) file_get_contents(base_path("lang/{$locale}.json")), true);
+            $nonEnglishKeys = [];
+
+            foreach (array_keys($json) as $key) {
+                // Check if key contains Arabic characters (Unicode range \x{0600}-\x{06FF})
+                if (preg_match('/[\x{0600}-\x{06FF}]/u', (string) $key)) {
+                    $nonEnglishKeys[] = $key;
+                }
+            }
+
+            $this->assertEmpty(
+                $nonEnglishKeys,
+                "Found non-English (Arabic) translation keys in lang/{$locale}.json: ".implode(', ', $nonEnglishKeys)
+            );
+        }
     }
 }

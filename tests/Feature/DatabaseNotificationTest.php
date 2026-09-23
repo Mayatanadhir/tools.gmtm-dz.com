@@ -55,20 +55,20 @@ class DatabaseNotificationTest extends TestCase
         $admin = User::factory()->create();
 
         $admin->notify(new SystemActivityAlert(
-            title: 'مستخدم جديد',
-            message: 'تمت إضافة مستخدم جديد',
+            title: 'New User',
+            message: 'New user added',
             type: 'created',
-            causer: 'المدير',
+            causer: 'Admin',
             extra: ['user_id' => 99, 'email' => 'test@test.com']
         ));
 
         $notification = $admin->notifications()->latest()->first();
 
         $this->assertNotNull($notification);
-        $this->assertSame('مستخدم جديد', $notification->data['title']);
-        $this->assertSame('تمت إضافة مستخدم جديد', $notification->data['message']);
+        $this->assertSame('New User', $notification->data['title']);
+        $this->assertSame('New user added', $notification->data['message']);
         $this->assertSame('created', $notification->data['type']);
-        $this->assertSame('المدير', $notification->data['causer']);
+        $this->assertSame('Admin', $notification->data['causer']);
         $this->assertSame(['user_id' => 99, 'email' => 'test@test.com'], $notification->data['extra']);
     }
 
@@ -78,13 +78,16 @@ class DatabaseNotificationTest extends TestCase
         $admin = User::factory()->create();
 
         $admin->notify(new SystemActivityAlert(
-            title: 'Event',
-            message: 'System event occurred',
-            type: 'deleted'
+            title: 'New User',
+            message: 'New user added',
+            type: 'created',
+            extra: []
         ));
 
         $notification = $admin->notifications()->latest()->first();
-        $this->assertSame('النظام', $notification->data['causer']);
+
+        $this->assertNotNull($notification);
+        $this->assertSame('System', $notification->data['causer']);
     }
 
     // -----------------------------------------------------------------------
@@ -122,7 +125,7 @@ class DatabaseNotificationTest extends TestCase
         $this->assertNotNull($superAdminNotification);
         $this->assertNotNull($adminNotification);
 
-        $this->assertSame('مستخدم جديد', $superAdminNotification->data['title']);
+        $this->assertSame('New User', $superAdminNotification->data['title']);
         $this->assertSame('created', $superAdminNotification->data['type']);
         $this->assertStringContainsString('New Member', $superAdminNotification->data['message']);
         $this->assertSame($newUser->id, $superAdminNotification->data['extra']['user_id']);
@@ -149,7 +152,7 @@ class DatabaseNotificationTest extends TestCase
             ->first();
 
         $this->assertNotNull($notification);
-        $this->assertSame('حذف مستخدم', $notification->data['title']);
+        $this->assertSame('User Deleted', $notification->data['title']);
         $this->assertSame('deleted', $notification->data['type']);
         $this->assertSame($targetUserId, $notification->data['extra']['user_id']);
     }
@@ -306,5 +309,30 @@ class DatabaseNotificationTest extends TestCase
         // Must return 404 — User A cannot see User B's notifications
         $response->assertNotFound();
         $this->assertNotNull(DatabaseNotification::find($userBNotification->id));
+    }
+
+    public function test_system_notification_titles_have_exact_trilingual_parity(): void
+    {
+        $en = json_decode((string) file_get_contents(base_path('lang/en.json')), true);
+        $ar = json_decode((string) file_get_contents(base_path('lang/ar.json')), true);
+        $fr = json_decode((string) file_get_contents(base_path('lang/fr.json')), true);
+
+        $notificationKeys = [
+            'System Activity Alert',
+            'New User',
+            'User Deleted',
+            'View Payload',
+            'Delete Notification',
+            'Total Notifications',
+            'Internal database notifications, recipient targeting, and delivery payloads',
+        ];
+
+        foreach ($notificationKeys as $key) {
+            $this->assertArrayHasKey($key, $en, "Key '{$key}' missing in en.json");
+            $this->assertArrayHasKey($key, $ar, "Key '{$key}' missing in ar.json");
+            $this->assertArrayHasKey($key, $fr, "Key '{$key}' missing in fr.json");
+            $this->assertNotEmpty($ar[$key], "Arabic translation for '{$key}' is empty");
+            $this->assertNotEmpty($fr[$key], "French translation for '{$key}' is empty");
+        }
     }
 }

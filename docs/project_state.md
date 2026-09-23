@@ -1,7 +1,7 @@
-# Project State: ENGI-MATE Core Kernel (Point Zero)
+# Project State: ENGI-GMTM Core Kernel (Point Zero)
 
-**Last Updated:** 2026-09-10
-**Status:** Point Zero Master Core Kernel Baseline Active (v1.0.0)
+**Last Updated:** 2026-09-23
+**Status:** Point Zero Master Core Kernel Baseline Active (v1.0.51)
 
 > [!NOTE]
 > Historical state log prior to Point Zero Core Kernel extraction is preserved in `docs/archive/legacy_project_state.md`.
@@ -10,21 +10,33 @@
 
 ## 1. Application Overview
 - **Framework:** Laravel 13.x (PHP 8.4+)
-- **Application Brand:** ENGI-MATE ("Your Engineering Work Assistant")
+- **Application Brand:** ERP-GMTM (GMTM — "Générale Maintenance Et Travaux Montage")
+- **Corporate Logo System:** Dual-theme official GMTM vector assets (`Logo-black.png` for light theme, `Logo-white.png` for dark theme) served via `<x-application-logo>` across the navigation bar, guest auth screens, and executive workspace banner with aspect-ratio conscious responsive sizing.
 - **Frontend Stack:** Blade + Tailwind CSS (Class-based Dark Mode) + Alpine.js + Vite (Isolated RTL/LTR bundles)
 - **Locales Supported:** `ar` (Arabic, default, hidden prefix), `en` (English, `/en/`), `fr` (French, `/fr/`)
 - **Themes Supported:** `light`, `dark`, `system` (Zero-FOUC prevention script, Alpine.js reactive store, cross-instance sync)
-- **Database Engine:** MySQL (`gmtmdz_tools2` active, supports zero-touch auto-migration from fresh state)
+- **Database Engine:** MySQL (`gmtmdz_erp` active, supports zero-touch auto-migration from fresh state)
 - **Authentication:** Laravel Breeze (Session/Blade based with active `MustVerifyEmail` contract; registration immediately dispatches verification emails via `${APP_NAME} <${MAIL_FROM_ADDRESS}>`; registration routes guarded by dynamic cache-backed `EnsureRegistrationIsOpen` middleware)
 - **Automatic Migration & Auto-Creation Engine:** `EnsureDatabaseIsMigrated` middleware inspects pending schema and database existence. Automatically provisions missing MySQL/SQLite/PostgreSQL databases via raw PDO, runs `migrate --force`, `db:seed`, and permission discovery without user prompt.
 - **Database Error Fallback View:** `resources/views/errors/database.blade.php` rendered with HTTP 503 if database connection or auto-creation fails, preventing 500 crashes and offering connection diagnostics and troubleshooting steps.
 - **Zero-State Super Admin Setup Gate:** `EnsureSuperAdminExists` middleware intercepts all web traffic on zero-user databases, redirecting to `/system-tables/setup` to provision Super Admin, then permanently locks the route (404/403).
-- **Test Suite:** 261 tests, 1109 assertions (100% passing)
-- **Localization Parity:** Trilingual dictionary parity across Arabic, English, and French (559 keys each, 0 missing)
-- **Roles & Permissions Architecture:** Configured Roles section modernized to Unified Table Component (`<x-table>`) with localized functional titles, scopes, and privilege previews.
+- **Test Suite:** 306 tests, 1404 assertions (100% passing)
+- **Legacy Code Modernization & Migration Protocol (`ADR-042`):** Standardized enterprise directive binding the AI assistant to act as a *Strict Enterprise Architect*. Forbids copying spaghetti architecture, enforces Laravel Eloquent naming standards (Models singular PascalCase, Tables plural snake_case, Pivot tables singular alphabetical snake_case, Foreign keys singular_id), mandates a pre-execution Naming Convention Fixes Table, enforces clean architecture (skinny controllers, domain services, form requests, enums), GMTM Blade components only, and sequential 9-step execution order.
+- **Localization Parity & 100% English Master Keys Standard (`ADR-037`, `ADR-040`):** Trilingual dictionary parity across Arabic, English, and French (1,237 keys each, 0 missing, 0 non-English keys). Absolute rule enforced via automated test (`LocalizationTest::test_all_translation_keys_are_strictly_in_english`) and documented across all rule files.
+- **Forensic Audit Trail Causer Identity & Search Integration (`ADR-039`, `ADR-040`):** Full actor identity display (user profile photo / initial avatar, name in bold, email underneath in mono styling) in `resources/views/system/activity-log.blade.php`; polymorphic search by causer name and email in `SystemTableService::getActivityLogs()` with full query string persistence; 100% trilingual event badge labels, table headers, and activity description translation regex engines.
+- **Mandatory Comprehensive Ecosystem & Dependency Synchronization Protocol (`ADR-041`):** Enshrined cross-cutting rule obligating the AI assistant upon creating or modifying any new service or view to systematically verify and synchronize all connected ecosystem files (trilingual dictionaries, `<x-alert>` feedback, notifications, audit trail logs, `<x-global-filter>`, design system tokens, RBAC permissions, and tests).
+- **Unified Alerts, Notifications & Functional Classification Engine (`ADR-038`):** Centralized `<x-alert>` as the single source of truth for in-page operational alerts with semantic variants (`success`, `danger`, `warning`, `info`, `primary`); standardized session flash keys (`with('success')`, `with('error')`, `with('warning')`, `with('info')`); structured `SystemActivityAlert` notifications scoped by functional tiers (`Management` for security/admin notices, `Engineering` for metrology/calibration alerts, `Technicians` for field operations); actor role chips mapped to `<x-badge>` functional variants with 100% trilingual dictionary parity.
+- **Unified Search, Filter & State Persistence Engine (`ADR-036`):** Standardized `<x-global-filter>` as the single source of truth for table filtering across the application; position selectors categorized by 3 functional tiers via `<optgroup>` (`Management & Executive Leadership`, `Engineering & Specialist Roles`, `Field Operations & Technicians`); search and filter query string state permanently preserved across language switching, table pagination (`->withQueryString()`), create redirects, edit redirects, and delete redirects (`$request->query()`).
+- **Modular Rich Tool & Page Icons Architecture (`<x-tool-icon>`):** 22 standalone componentized micro-illustrations in `resources/views/components/icons/tools/` expressing business domains and operations, adhering to strict design token guidelines, unique gradient ID prefixing (`eq-`, `fc-`, `ms-`, `un-`, `rp-`, `ex-`, `em-`, `mod-md-`, `mod-met-`, `mod-ops-`, `mod-sys-`, `ct-`, `ins-`, `art-`, `at-`, `cm-`, `cl-`, etc.), and zero inline styles. Harmonized `equipment`, `forecasts`, `missions`, `units`, `reports`, `expenses`, `employees`, `module-master-data`, `module-metrology`, `module-operations`, `module-system`, `article-types`, `attachments`, `calibrator-movements` (Fluke 700G gauge with logistics motion arrow), `clients`, and `contracts`.
+- **Roles & Permissions Architecture:** Configured Roles and Role Modals (Create & Edit) fully bound to static registry (`config/permissions.php`), rendering 24 configured business entities organized into 5 visually isolated domain categories (`System Security & Administration`, `Metrology & Equipments`, `Operations & Projects`, `Internal and Analytical Management`, `Master Data / Reference Data`) with semantic color accents, category headers containing root module-level view permissions (`view metrology`, `view operations`, `view analytics`, `view master data`), one-click category toggles, and granular CRUD privileges (85 active permissions synchronized with `Super-Admin`, including `view employee compensation`).
+- **Business Modules Architecture:** Standardized 4 modular business groups (Metrology & Equipments [5 views], Operations & Projects [5 views], Internal & Analytical Management [4 views], Master Data / Reference Data [3 views]) with dedicated thin controllers (`MetrologyController`, `OperationsController`, `AnalyticsController`, `MasterDataController`), 4 dedicated executive dashboards with cards fully gated by granular Spatie view permissions (`metrology.index`, `operations.index`, `analytics.index`, `master-data.index`) sharing an identical 4-column responsive metrics grid layout (`grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4`), sidebar tab navigation suites (`<x-metrology-tabs>`, `<x-operations-tabs>`, `<x-analytics-tabs>`, `<x-master-data-tabs>`) integrated with rich `<x-tool-icon>` micro-illustrations, zero-permission fallback empty states (`No Accessible Explorers`), and responsive Blade views matching the System Control design layout.
+- **Executive Workspace Portal:** `workspace.blade.php` transformed into a central executive dashboard hub displaying role-gated business module cards with rich domain illustrations (`module-metrology`, `module-operations`, `module-analytics`, `module-master-data`), rapid exploration triggers, and direct administrative system infrastructure access.
+- **Employees Module & Legacy Migration (`ADR-031`, `ADR-034`):** Production-ready Employees management under Master Data (`/master-data/employees`) featuring complete CRUD, Clean Architecture (Repository/Service pattern), CAS WebP image optimization and avatar synchronization with linked user accounts, financial data quarantine masking compensation unless `view employee compensation` is held, full legacy data migration importing all 7 historical company staff records while strictly preserving original primary keys (1, 2, 3, 4, 5, 25, 26), and standardized `<x-badge>` token integration for positions (`badgeVariant()`) and statuses.
 - **Notifications Architecture:** Database notifications explorer updated with localized alert types, semantic action badges, payload title translation (`{{ __($notificationTitle) }}`), and preview modals with 100% key parity across AR, EN, and FR.
 - **System Settings Engine:** Enterprise key-value runtime configuration engine with zero-latency persistent caching (`86400` TTL), atomic cache updates, and Super-Admin interactive dashboard.
 - **Anti-Self-Action Security Policy:** Administrators are strictly prohibited from self-demotion/role changing, self-suspension, self-locking, or self-deletion via dual-layer protection (controller guards and UI action masking).
+- **Media Optimization, CAS Deduplication & Zero Disk Space Leak Engine (`ADR-009`):** Centralized processing gateway (`App\Services\MediaOptimizationService`, `config/media.php`) enforcing compulsory WebP conversion (80% quality, max 1920px width), Ghostscript PDF compression (/ebook 150dpi profile), SHA-256 Content-Addressable Storage (CAS) deduplication, reference-aware safe deletion (preserving shared assets), and the "Process & Destroy" protocol permanently purging temporary uploads and intermediate scratch artifacts from disk.
+- **Profile Photo & Media Storage Pipeline:** Public uploads processed via `MediaOptimizationService` directly into optimized `.webp` artifacts; storage linked via NTFS junction (`public/storage` -> `storage/app/public`); domain aligned with Herd virtual host (`http://erp.gmtm-dz.com.test`); instantaneous client-side preview powered by Alpine.js and `URL.createObjectURL(file)` with unified fallback avatars.
 
 ---
 
@@ -32,6 +44,7 @@
 
 ### Tables:
 - `users`: Standard authentication table (`id`, `name`, `email`, `status` (active/suspended, indexed), `email_verified_at`, `password`, `remember_token`, `profile_photo_path`, `photo_hash`, `timestamps`).
+- `employees`: Reference staff table (`id`, `user_id` (nullable FK to users), `full_name`, `registration_number` (unique), `position`, `status` (active/inactive/on_leave, indexed), `join_date`, `salary` (decimal 12,2), `daily_rate` (decimal 10,2), `address`, `profile_photo_path`, `photo_hash`, `timestamps`, `deleted_at` (soft deletes)).
 - `password_reset_tokens`: Password reset handling (`email`, `token`, `created_at`).
 - `sessions`: Database session driver table.
 - `cache` & `cache_locks`: Database cache storage.
@@ -40,14 +53,41 @@
 - `activity_log`: Spatie audit trail and event logging table.
 - `notifications`: Laravel database notifications table (`id (uuid)`, `type`, `notifiable_type`, `notifiable_id`, `data (json)`, `read_at`, `timestamps`).
 - `system_settings`: Key-value configuration table with JSON casting and caching (`id`, `key`, `value`, `group`, `description`, `timestamps`).
+- `grandeurs`: Metrological physical quantities and measurement standards (`id`, `name`, `symbol`, `type` (measurement/source, indexed), `timestamps`).
+- `equipment`: Metrology and field equipment catalog (`id`, `internal_code`, `full_name`, `short_name`, `serial_number` (unique), `category` (indexed), `package` (indexed), `requires_calibration` (boolean, indexed), `designation`, `status` (indexed), `image_path`, `image_hash` (indexed), `certificate_path`, `notes`, `timestamps`, `deleted_at` (soft deletes)).
+- `equipment_specifications`: Technical ranges and precision tolerances per equipment and physical quantity (`id`, `equipment_id` (FK cascade), `grandeur_id` (FK cascade), `range_min`, `range_max`, `accuracy_value`, `accuracy_type` (% / abs), `timestamps`).
 
 ---
 
 ## 3. Registered Models & Enums
-- `App\Enums\AccountStatus`: Backed string enum (`Active = 'active'`, `Suspended = 'suspended'`) with UI labels, badge color tokens, and translation helpers.
-- `App\Models\User`: Authenticatable user model (implements `MustVerifyEmail`; includes `FilterableTrait`, `HasActivity`, `HasFactory`, `HasRoles`, `Notifiable`; casts `'status' => AccountStatus::class`; attributes `profile_photo_path`, `photo_hash`, `profile_photo_url`). Automatically assigned default role `'User'` on creation via `UserObserver::created()`. Immediate verification email dispatched on registration.
+- `App\Enums\AccountStatus`: Backed string enum (`Active = 'active'`, `Suspended = 'suspended'`) with UI labels, translation helpers, and unified `badgeVariant(): string` contract returning `'success'` for `Active` and `'danger'` for `Suspended`.
+- `App\Enums\EmployeePosition`: Backed string enum (`GeneralManager`, `SeniorMeteringEngineer`, `MeteringEngineer`, `SeniorInstrumentationEngineer`, `MeteringTechnician`, `InstrumentationTechnician`) with unified semantic badge variants (`badgeVariant()` mapping Management to `primary`, Engineering to `info`, and Technicians to `neutral`) and category checks.
+- `App\Enums\EmployeeStatus`: Backed string enum (`Active`, `Inactive`, `OnLeave`) with unified semantic badge variants (`badgeVariant()` mapping to `success`, `danger`, `warning`) and translation helpers.
+- `App\Enums\EquipmentCategory`: Backed string enum (`MeasuringInstrument = 'measuring_instrument'`, `WorkTool = 'work_tool'`, `Vehicle = 'vehicle'`, `Other = 'other'`) with `badgeVariant()` and `requiresCalibrationByDefault()`.
+- `App\Enums\EquipmentStatus`: Backed string enum (`Active = 'active'`, `Maintenance = 'maintenance'`, `Deployed = 'deployed'`, `Retired = 'retired'`, `Inactive = 'inactive'`) with `badgeVariant()` and `isAvailable()`.
+- `App\Enums\EquipmentPackage`: Backed string enum (`Lot01 = 'lot_01'`, `Lot02 = 'lot_02'`, `VehicleLot = 'vehicle_lot'`, `None = 'none'`) with localized labels.
+- `App\Enums\GrandeurType`: Backed string enum (`Measurement = 'measurement'`, `Source = 'source'`) with semantic badges.
+- `App\Enums\AccuracyType`: Backed string enum (`Percentage = '%'`, `Absolute = 'abs'`).
+- `App\Models\User`: Authenticatable user model (implements `MustVerifyEmail`; includes `FilterableTrait`, `HasActivity`, `HasFactory`, `HasRoles`, `Notifiable`; casts `'status' => AccountStatus::class`; attributes `profile_photo_path`, `photo_hash`, `profile_photo_url`; relation `employee(): HasOne`). Automatically assigned default role `'User'` on creation via `UserObserver::created()`. Immediate verification email dispatched on registration.
+- `App\Models\Employee`: Master data staff model with soft deletes, Spatie activity logs, CAS image caching, `belongsTo(User::class)`, and filterable scopes.
+- `App\Models\Grandeur`: Metrological quantity model defining physical measurement and source units.
+- `App\Models\Equipment`: Enterprise equipment model with soft deletes, Spatie activity logs, CAS WebP image optimization, filterable scopes, and specifications relationships.
+- `App\Models\EquipmentSpecification`: Technical specification entity binding equipment to physical measurement/source ranges and accuracy limits.
+- `App\Observers\EquipmentObserver`: Forensic CAS image hash tracking and automatic media file deletion via `MediaOptimizationService::safeDelete()`.
 - `App\Models\SystemSetting`: System configuration overrides model with cached access and JSON value casting.
-- `App\Services\PermissionDiscoveryService`: Introspection and RBAC service defining super roles (`Super-Admin`) and default baseline role (`User`), with immutability guarantees.
+- `App\Services\PermissionDiscoveryService`: RBAC catalog and sync service reading code-first permissions from `config/permissions.php`, defining super roles (`Super-Admin`) and default baseline role (`User`), with immutability guarantees.
+- `App\Services\MediaOptimizationService`: Centralized media processing and compression gateway enforcing compulsory WebP conversion (80% quality, 1920px max width), Ghostscript PDF compression (/ebook 150dpi), and the Process & Destroy lifecycle eliminating temporary file storage leaks.
+- `App\Services\EmployeeService`: Business service orchestrating employee creation, update, mission safety validation, photo optimization, and synchronization with linked users.
+- `App\Repositories\EmployeeRepository`: Repository managing employee queries and eager loading user relationships to eliminate N+1 query bottlenecks.
+- `App\Policies\EmployeePolicy`: Granular policy gating CRUD operations and specialized financial compensation access.
+- `App\Services\EquipmentService`: Domain service managing equipment lifecycle, CAS WebP conversion, certificate PDF storage, specification synchronization, and statistics calculation.
+- `App\Repositories\EquipmentRepository`: Repository handling equipment queries, relations eager loading (`specifications.grandeur`), and filtering.
+- `App\Services\GrandeurService`: Domain service managing physical quantities and units, data integrity guards against equipment usage, and KPI counter analytics.
+- `App\Repositories\GrandeurRepository`: Repository handling physical quantities queries, eager loading specification counts, and type filtering.
+- `App\Http\Controllers\MetrologyController`: Thin controller managing Metrology & Equipment explorers with granular Gate permission authorization.
+- `App\Http\Controllers\OperationsController`: Thin controller managing Operations & Projects explorers with granular Gate permission authorization.
+- `App\Http\Controllers\AnalyticsController`: Thin controller managing Internal & Analytical Management explorers with granular Gate permission authorization.
+- `App\Http\Controllers\MasterDataController`: Thin controller managing Master Data explorers with granular Gate permission authorization and employee CRUD operations.
 
 ---
 
@@ -57,7 +97,31 @@
     - `GET /` -> Public welcome page (`welcome.blade.php`; automatically intercepts & redirects to `/system-tables/setup` when `User::count() === 0`).
     - `GET /system-tables/setup` -> First-Run Super Admin Setup Wizard (`SystemTableController@setup`; zero-user gate). **[NEW 2026-09-09]**
     - `POST /system-tables/setup` -> Provision First Super Admin Account (`SystemTableController@storeSetup`). **[NEW 2026-09-09]**
-    - `GET /dashboard` -> Authenticated user dashboard (`dashboard.blade.php`).
+    - `GET /dashboard` -> Authenticated user executive workspace portal (`workspace.blade.php`).
+    - `GET /metrology` & `GET /dashboard/metrology` -> Metrology & Equipments Dashboard (`MetrologyController@index`). **[NEW 2026-09-12]**
+    - `GET /metrology/instruments` -> Measuring Instruments Explorer (`MetrologyController@instruments`). **[NEW 2026-09-11]**
+    - `GET /metrology/equipment` -> Equipment Explorer (`MetrologyController@equipment`). **[NEW 2026-09-11]**
+    - `GET /metrology/calibrator-movements` -> Calibrator Movements Explorer (`MetrologyController@calibratorMovements`). **[NEW 2026-09-11]**
+    - `GET /metrology/calibration-certificates` -> Calibration Certificates Explorer (`MetrologyController@calibrationCertificates`). **[NEW 2026-09-11]**
+    - `GET /metrology/units` -> Quantities & Units Explorer (`MetrologyController@units`). **[NEW 2026-09-12]**
+    - `GET /operations` & `GET /dashboard/operations` -> Operations & Projects Dashboard (`OperationsController@index`). **[NEW 2026-09-12]**
+    - `GET /operations/missions` -> Mission Management Explorer (`OperationsController@missions`). **[NEW 2026-09-11]**
+    - `GET /operations/contracts` -> Contracts Explorer (`OperationsController@contracts`). **[NEW 2026-09-11]**
+    - `GET /operations/attachments` -> Attachments List Explorer (`OperationsController@attachments`). **[NEW 2026-09-11]**
+    - `GET /operations/warranties` -> Warranties Explorer (`OperationsController@warranties`). **[NEW 2026-09-11]**
+    - `GET /operations/article-types` -> Classification of Articles Explorer (`OperationsController@articleTypes`). **[NEW 2026-09-12]**
+    - `GET /analytics` & `GET /dashboard/analytics` -> Internal & Analytical Management Dashboard (`AnalyticsController@index`). **[NEW 2026-09-12]**
+    - `GET /analytics/expenses` -> Expenses & Charges Explorer (`AnalyticsController@expenses`). **[NEW 2026-09-11]**
+    - `GET /analytics/forecasts` -> Annual Forecasts Explorer (`AnalyticsController@forecasts`). **[NEW 2026-09-11]**
+    - `GET /analytics/statistics` -> Company Statistics Explorer (`AnalyticsController@statistics`). **[NEW 2026-09-11]**
+    - `GET /analytics/reports` -> Reports Management Explorer (`AnalyticsController@reports`). **[NEW 2026-09-11]**
+    - `GET /master-data` & `GET /dashboard/master-data` -> Master Data Dashboard (`MasterDataController@index`). **[NEW 2026-09-12]**
+    - `GET /master-data/clients` -> Clients Explorer (`MasterDataController@clients`). **[NEW 2026-09-11]**
+    - `GET /master-data/employees` -> Employees Explorer (`MasterDataController@employees`). **[NEW 2026-09-11]**
+    - `POST /master-data/employees` -> Store New Employee (`MasterDataController@storeEmployee`). **[NEW 2026-09-13]**
+    - `PUT /master-data/employees/{employee}` -> Update Employee (`MasterDataController@updateEmployee`). **[NEW 2026-09-13]**
+    - `DELETE /master-data/employees/{employee}` -> Soft Delete Employee (`MasterDataController@destroyEmployee`). **[NEW 2026-09-13]**
+    - `GET /master-data/sites` -> Sites Explorer (`MasterDataController@sites`). **[NEW 2026-09-11]**
     - `GET /profile` -> Edit user profile (`ProfileController@edit`).
     - `PATCH /profile` -> Update profile details (`ProfileController@update`).
     - `DELETE /profile` -> Delete account (`ProfileController@destroy`).
@@ -105,14 +169,14 @@
 - **Traits (`app/Traits`):** `ApiResponseTrait` (unified API responses with success/error envelopes), `FilterableTrait` (declarative dynamic request query filtering and search scope).
 - **Interfaces (`app/Interfaces`):** `BaseRepositoryInterface` (includes `filter` & `paginateWithFilter`), `UserRepositoryInterface`.
 - **Repositories (`app/Repositories`):** `BaseRepository` (abstract base with dynamic filtering), `UserRepository`.
-- **Services (`app/Services`):** `BaseService` (transaction manager & exception handling), `UserService` (domain logic), `ImageOptimizationService` (image compression & scaling), `FileUploadService` (standardized secure file uploads & storage management), `SystemTableService` (centralized queries, metrics aggregation, pagination for all 13 database tables), `DataPruningService` (central automated data pruning engine, lifecycle management, dynamic table discovery, eligible candidate filtering), `DatabaseBackupService` (wraps `Spatie\Backup\BackupDestination`, backup inspection, oldest/latest snapshot tagging, on-demand creation, secure download/delete with path traversal sanitization, point-in-time SQL extraction and database state restoration), `PermissionDiscoveryService` (core schema introspection engine, database table discovery, dynamic blacklist filtering, automatic standard CRUD permission generator, and dynamic matrix aggregation).
+- **Services (`app/Services`):** `BaseService` (transaction manager & exception handling), `UserService` (domain logic), `ImageOptimizationService` (image compression & scaling), `FileUploadService` (standardized secure file uploads & storage management), `SystemTableService` (centralized queries, metrics aggregation, pagination for all 13 database tables), `DataPruningService` (central automated data pruning engine, lifecycle management, dynamic table discovery, eligible candidate filtering), `DatabaseBackupService` (wraps `Spatie\Backup\BackupDestination`, backup inspection, oldest/latest snapshot tagging, on-demand creation, secure download/delete with path traversal sanitization, point-in-time SQL extraction and database state restoration), `PermissionDiscoveryService` (static code-first catalog engine reading from `config/permissions.php`, automatic standard CRUD permission generator, stale permission pruning, and dynamic matrix aggregation).
 - **Notifications (`app/Notifications`):** `SystemActivityAlert` (database-channel-only notification with unified payload: `title`, `message`, `type`, `causer`, `extra`).
 - **Observers (`app/Observers`):** `UserObserver` (captures `created` & `deleted` events on User model; auto-dispatches `SystemActivityAlert` to all `Super-Admin` and `Admin` role users; gracefully handles missing roles).
 - **Controllers:**
   - `App\Http\Controllers\ProfileController`: Refactored with `declare(strict_types=1);`, delegates `update` and `destroy` to `UserService` (transaction-wrapped).
   - `App\Http\Controllers\SystemTableController`: Thin controller orchestrating requests for the System Tables Explorer suite (includes `settings`, `toggleRegistration`, `updateSetting`).
   - `App\Http\Controllers\Api\NotificationController`: API (`index`, `unread`, `markAsRead`, `markAllAsRead`, `destroy`; uses `ApiResponseTrait`; enforces per-user notification isolation).
-- **Console Commands (`app/Console/Commands`):** `SetupProjectCommand` (`php artisan project:setup [--fresh] [--force]`), `OptimizeImagesCommand` (`php artisan images:optimize`), `SyncTablePermissionsCommand` (`php artisan permissions:sync-tables [--dry-run]`), `DataPruneCommand` (`php artisan data:prune`).
+- **Console Commands (`app/Console/Commands`):** `SetupProjectCommand` (`php artisan project:setup [--fresh] [--force]`), `OptimizeImagesCommand` (`php artisan images:optimize`), `SyncTablePermissionsCommand` (`php artisan permissions:sync-tables [--dry-run]`), `DataPruneCommand` (`php artisan data:prune`), `ImportLegacyEmployeesCommand` (`php artisan employees:import-legacy`), `ImportLegacyEquipmentCommand` (`php artisan equipment:import-legacy`), `ImportLegacyCustomersCommand` (`php artisan customers:import-legacy`), `ImportLegacySitesCommand` (`php artisan sites:import-legacy`), `ImportLegacyWarrantiesCommand` (`php artisan warranties:import-legacy`), `CheckExpiringCertificatesCommand` (`php artisan metrology:check-expiring-certificates`).
 - **Providers (`app/Providers`):** `RepositoryServiceProvider` (maps repository interfaces to implementations), `AppServiceProvider` (registers Blade `@registrationOpen` directive, super role bypass, and helper autoloading).
 - **Middleware (`app/Http/Middleware`):** `SetLocale` (guarantees runtime locale synchronization), `EnsureRegistrationIsOpen` (guards `/register` routes).
 - **Middleware Aliases (`bootstrap/app.php`):** `role` (RoleMiddleware), `permission` (PermissionMiddleware), `role_or_permission` (RoleOrPermissionMiddleware), `localize` (LaravelLocalizationRoutes), `localizationRedirect` (LaravelLocalizationRedirectFilter), `localeSessionRedirect` (LocaleSessionRedirect), `localeCookieRedirect` (LocaleCookieRedirect), `localeViewPath` (LaravelLocalizationViewPath), `setLocale` (SetLocale), `registration.open` (EnsureRegistrationIsOpen).
@@ -161,159 +225,26 @@
 
 ---
 
-## 8. Standing Architectural Directives
-- **Rule 12 (Strict Separation of Concerns):**
-  - Backend isolation: Pure PHP logic in `app/`, `routes/`, `database/`; no HTML, inline styles, or frontend scripts in PHP controllers, actions, services, or models.
-  - Frontend isolation: UI markup in `resources/views/` and `resources/js/`; no database queries or Eloquent business logic in views.
-  - CSS & Styling isolation: Absolute prohibition of inline `style="..."` attributes in HTML/Blade markup. Utility-first Tailwind classes in templates, or dedicated CSS files in `resources/css/`. Zero raw `<style>` tag injections in PHP or JS components.
-- **Rule 13 (Strict Security Quarantine & Mandatory Developer Verification):**
-  - High-Security Quarantine (`resources/views/system/**`, `app/Http/Controllers/SystemTableController.php`, `app/Services/SystemTableService.php`, `system-tables.*` routes): Confidential, internal system inspection module. Strictly isolated from standard public or user application flows.
-  - Mandatory Developer Pre-Approval: The AI assistant is strictly bound to request developer confirmation before adding or modifying any feature relating to this module, explicitly asking: *"هل هذه الإضافة تنتمي إلى هذا الملف/القسم الأمني السري أم لا؟"*.
-- **Rule 14 (Mandatory Unified Button & Semantic Color System):**
-  - Strict UI Component Reuse: Never use ad-hoc raw `<button>` elements with arbitrary styles.
-  - Standardized Semantic Roles: `<x-primary-button>` (Brand Orange for main actions), `<x-secondary-button>` (Bordered Gray for dismiss/cancel), `<x-danger-button>` (Rose Red for destructive operations), `<x-success-button>` (Emerald Green for approval/resolving), `<x-warning-button>` (Amber Yellow for retries/caution), `<x-info-button>` (Indigo Blue for inspection/diffs/payloads). Dual Light/Dark mode parity required across all button components.
-- **Rule 15 (Mandatory Unified Table Component Architecture):**
-  - Strict Table Component Reuse: Prohibit writing raw, unstructured HTML `<table>` elements with redundant utility classes.
-  - Component Hierarchy (`resources/views/components/table/` and `table.blade.php`):
-    - `<x-table>`: Primary table container offering card styling, optional `toolbar` slot, horizontal overflow scroll wrapper, `header` slot, default slot for rows, and `pagination` footer slot.
-    - `<x-table.th>`: Standardized uppercase table header cell with typography and responsive padding.
-    - `<x-table.tr>`: Standardized table body row with subtle hover state transitions in light and dark modes.
-    - `<x-table.td>`: Standardized table body cell with responsive alignment and text tokens.
-    - `<x-table.empty>`: Standardized empty state row with SVG icon, customizable `colspan`, and translated message.
-    - `<x-table.actions>`: Flex wrapper (`inline-flex items-center gap-1.5 whitespace-nowrap`) for row action buttons.
-    - `<x-table.action>`: Universal action component supporting `type` (`view`, `edit`, `delete`, `download`, `restore`, `primary`, `success`), `href` (polymorphic `<a>` or `<button>`), `buttonType` (`button`, `submit`), icons, and tooltips.
-    - `<x-table.action-view>`: Semantic Indigo action button with eye icon for viewing/inspecting.
-    - `<x-table.action-edit>`: Semantic Amber action button with pencil icon for edits.
-    - `<x-table.action-delete>`: Semantic Rose action button with trash icon for deletes/destructive operations. Supports `action-url` and `confirm-message` with `button-type="submit"`.
-    - `<x-table.action-download>`: Semantic Indigo action button with download archive icon for file exports/snapshots.
-    - `<x-table.action-restore>`: Semantic Amber action button with rotate/restore icon for point-in-time state recovery.
-  - Context-Aware Action Placement Matrix:
-    - `backups`: Create Backup (`<x-primary-button>`) in overview card; Restore Oldest Snapshot (`<x-warning-button>`); Download Archive (`<x-table.action-download>`), Restore Snapshot (`<x-table.action-restore>`), and Delete Snapshot (`<x-table.action-delete>`) in rows.
-    - `users`: Create User (`<x-primary-button>`) in toolbar; Edit & Delete (`<x-table.action-edit>`, `<x-table.action-delete>`) in rows.
-    - `sessions`: Terminate Session (`<x-table.action-delete :title="__('Terminate Session')">`) in rows.
-    - `roles`: Create Role (`<x-primary-button>`) in header; Edit & Delete (`<x-table.action-edit>`, `<x-table.action-delete>`) on role cards.
-    - `permissions`: Create Permission (`<x-primary-button>`) in toolbar; Edit & Delete (`<x-table.action-edit>`, `<x-table.action-delete>`) in rows.
-    - `jobs`: Cancel Job (`<x-table.action-delete :title="__('Cancel Job')">`) in rows.
-    - `failed_jobs`: View Trace (`<x-table.action-view>`), Retry Job (`<x-table.action type="primary">`), Delete Record (`<x-table.action-delete>`).
-    - `job_batches`: Delete Batch (`<x-table.action-delete :title="__('Delete Batch')">`) in rows.
-    - `cache`: Forget Key (`<x-table.action-delete :title="__('Forget Key')">`) in rows.
-    - `cache_locks`: Release Lock (`<x-table.action-delete :title="__('Release Lock')">`) in rows.
-    - `notifications`: View Payload (`<x-table.action-view>`), Delete Notification (`<x-table.action-delete :title="__('Delete Notification')">`).
-    - `activity_log`: Strictly read-only (`<x-table.action-view>`) to preserve forensic audit immutability.
-- **Rule 16 (Stateful Unified Global Filter Architecture):**
-  - Strict UI Reuse: Prohibit writing ad-hoc `<form>` and `<input>` blocks for table filtering and search. Always utilize `<x-global-filter>` and its sub-components (`<x-global-filter.search>`, `<x-global-filter.select>`, `<x-global-filter.sort>`).
-  - Zero Data Leakage: `<x-global-filter>` is strictly a presentation component submitting GET parameters to caller endpoints; backend endpoints enforce authorization and `FilterableTrait` column whitelisting.
-  - State Continuity: Query parameters remain the single source of truth across pagination (`withQueryString()`), language switches (`getLocalizedURL()`), and form operations.
-- **Rule 17 (Mandatory Trilingual Localization Across All Views & Features):**
-  - Zero Hardcoded Text: Strict prohibition against raw text, placeholders, or labels in `resources/views/**` and `resources/js/**`. All UI copy must be wrapped in `__('...')` or `@lang('...')`.
-  - Simultaneous 3-Language Sync: Any new key must immediately be translated and committed to `lang/ar.json`, `lang/en.json`, and `lang/fr.json`.
-  - Zero Fallback Policy: All 3 dictionaries maintain exact 1-to-1 key parity (408 keys each, 0 duplicates, 0 missing). Missing keys in any language constitute a failed task.
-  - Verification Mandate: Audit scripts must confirm 0 missing keys before closing UI work.
-- **Rule 18 (Unified Automated Data Pruning & Lifecycle Management):**
-  - Architecture: Centralized in `App\Services\DataPruningService` and `config/pruning.php`.
-  - Storage & Overrides: Custom dashboard configurations persist in `system_settings` table via `App\Models\SystemSetting` with Cache caching and fallback to `config/pruning.php`.
-  - Dynamic Table Onboarding: Administrators can onboard any eligible database table dynamically via `addCustomTable()` and Alpine.js modal with auto-suggested primary key and timestamp columns. Custom tables can be detached via `removeCustomTable()`.
-  - Sovereign Blacklist: Hardcoded immutable safeguard prohibiting pruning of `users`, `roles`, `permissions`, `model_has_roles`, `model_has_permissions`, `role_has_permissions`, `migrations`, `password_reset_tokens`, `sessions`, `cache`, `cache_locks`, and `jobs`.
-  - Chunked Processing: All deletions execute in batches (default 1,000) to protect database memory and avoid prolonged table locking.
-  - Dual Strategy: Combines date-based retention (`retention_days`) and maximum capacity count pruning (`max_records`).
-  - Audit Trail: Pruning executions, settings updates, and custom table onboarding/removal automatically log to Spatie activitylog (`log_name = 'data_pruning'`).
-  - Web Management Dashboard: Dedicated administrative view at `system-tables.pruning` (`resources/views/system/pruning.blade.php`) with global engine toggle, per-table policy cards (built-in and custom), live dry-run simulation modal, manual execution with safety confirmation, defaults reset, and "Add Table to Pruning" modal.
-  - CLI & Automation: Triggerable via `php artisan data:prune` (`--dry-run`, `--table`, `--chunk`) and scheduled daily at 02:00 in `routes/console.php`.
-- **Rule 19 (Unified Database Backups & Point-in-Time Disaster Recovery):**
-  - Architecture: Centralized in `App\Services\DatabaseBackupService` wrapping `Spatie\Backup\BackupDestination`.
-  - Storage & Discovery: Discovers backups from the `local` disk (default `storage/app/private/Laravel`), sorting chronologically descending, tagging `is_oldest` and `is_newest` snapshots.
-  - On-Demand Creation: Administrators can generate instant database dumps (`backup:run --only-db`) with activity audit tracking.
-  - Security & Path Traversal: Prohibits directory traversal in backup file operations via strict sanitization (`/`, `\`, `..` rejection) and `.zip` extension enforcement.
-  - Point-in-Time Restoration: Restores database state directly from compressed archives using `ZipArchive`, temporary directory extraction, database driver isolation (disabling foreign keys on MySQL), and executing SQL dumps via `DB::unprepared`.
-  - Oldest Snapshot Recovery: Fast CTA and dedicated action to roll back to the earliest recorded snapshot point.
-  - UI Safeguards: High-visibility Alpine.js red confirmation modal warning of irreversible database overwrites.
-  - Full Test Coverage: Complete feature test suite covering authentication, directory traversal defense, download, deletion, restoration, and edge cases with dedicated test namespace isolation (`TestingBackup`) safeguarding real backup files. (Overall test suite: 197/197 tests passing, 795 assertions).
-- **Rule 20 (Mandatory Unified CRUD Suite Architecture):**
-  - Component Standard (`resources/views/components/crud-modal/`):
-    - `<x-crud-modal.delete>`: Unified confirmation modal taking Alpine variable names as standard props (`show`, `action-url`, `item-name`). Eliminates hand-coded backdrop, layout, and modal boilerplate.
-    - `<x-crud-modal.form>`: Unified create/edit form modal with dynamic method (`POST`/`PUT`), dynamic action resolution (`alpine-action` or `action-url`), named `$hidden` slot, and configurable semantic icon color themes.
-  - Enhanced Inline Table Deletions (`<x-table.action-delete>`):
-    - Accepts optional `action-url`, `confirm-message`, and `method` props.
-    - When `action-url` is specified, automatically encapsulates a self-contained POST form with `@method('DELETE')`, `@csrf`, and confirmation prompt.
-    - When `action-url` is omitted, continues functioning as an Alpine modal trigger button.
-- **Rule 21 (Automated Table Discovery & Dynamic Permission Matrix Architecture):**
-  - Architecture: Centralized in `App\Services\PermissionDiscoveryService` and CLI command `App\Console\Commands\SyncTablePermissionsCommand`.
-  - Pure Live Schema Introspection: Exclusively queries the live database schema at runtime with zero hardcoded business entities; dynamically scopes to the active database connection and strictly excludes internal/system blacklisted tables (`migrations`, `sessions`, `cache`, `jobs`, `activity_log`, Spatie RBAC tables).
-  - Stale Permissions Pruning: Automatically detects and purges obsolete CRUD permissions for entities/tables that no longer physically exist in the database schema, preventing phantom permission pollution.
-  - Standard CRUD Generator & Real-Time Auto-Sync: Dynamically generates 4 standard permissions per discovered business table (`view [table]`, `create [table]`, `edit [table]`, `delete [table]`) and synchronizes newly generated permissions automatically to the `Super-Admin` role. Executes automatically in real-time when administrators access the Roles view (`/system-tables/roles`) or manually on-demand via `php artisan permissions:sync-tables`.
-  - Interactive Matrix UI: Roles view (`resources/views/system/roles.blade.php`) presents permissions as a structured interactive grid (Rows = Entities, Columns = View/Create/Edit/Delete, 1-click Row Toggle, and Global Select/Deselect All) bound via Alpine.js.
-  - Collapsible On-Demand Permissions Catalog: The legacy/raw permissions catalog table is collapsed and hidden by default behind an automated engine status banner; it expands smoothly on demand via an Alpine toggle (`showPermissionsCatalog`) for manual inspection, creation, or deletion.
-  - Anti-Lockout Defense: Hardcoded protection in `SystemTableController` and UI suppressing deletion or modification of the `Super-Admin` role, rendering a locked system badge (`Protected System Role`) in place of action buttons.
-- **Rule 22 (User Account Status Lifecycle & Profile Photo Architecture):**
-  - Schema: `status` (`varchar(32)`, default `'active'`, indexed), `profile_photo_path` (`varchar(2048)`, nullable), and `photo_hash` (`varchar(64)`, nullable) in `users` table.
-  - Enum: `App\Enums\AccountStatus` (`Active = 'active'`, `Suspended = 'suspended'`) providing localized labels, colors, and badge classes.
-  - Security Boundary: Suspended accounts are rejected at login by `App\Http\Requests\Auth\LoginRequest`. Self-suspension is strictly prohibited in `SystemTableController`.
-  - Background Integrity: `App\Observers\UserObserver` hooks `saving()` to automatically calculate SHA-256 `photo_hash` whenever `profile_photo_path` is present or modified, and resets it to `null` if cleared.
-  - Interactive UI: Standardized `<x-secondary-button>` file picker in `resources/views/system/users.blade.php` with live avatar preview, file name display, quick remove button, status filter toolbar, and table row quick toggle.
-  - Multi-part Modal: `resources/views/components/crud-modal/form.blade.php` supports `enctype="multipart/form-data"`. Photo files stored on `public` disk (`photos/`) and stale photos automatically purged.
-- **Rule 23 (Fluid Full-Width Container Architecture for High-Density Views):**
-  - Standard Container Token: All application pages, navigation bars, and views must use dynamic full width: `w-full px-4 sm:px-6 lg:px-8`.
-  - Fixed-Width Prohibition: Fixed-width maximum boundaries (such as `max-w-7xl` / `1280px`) are strictly prohibited on layout wrappers and data tables. Modals remain reasonably constrained (`max-w-lg`, `max-w-2xl`, `max-w-3xl`) for focused readability.
-  - Responsiveness: Preserves fluid adaptability across all viewports while granting data tables maximum horizontal breathing room (~1576px on 1080p desktop) to avoid column congestion.
-- **Rule 24 (Super Roles Authorization Bypass & Anti-Lockout Governance Architecture):**
-  - Configurable Property: `protected array $superRoles = ['Super-Admin'];` established in `App\Providers\AppServiceProvider` and `App\Services\PermissionDiscoveryService`.
-  - Authorization Interception: `Gate::before` in `AppServiceProvider::boot()` automatically approves any authorization check (`$user->can()`, `@can`, `authorize()`) for any authenticated user possessing a role configured in `$superRoles`, while returning `null` to evaluate specific assigned permissions and policies for other users.
-  - Automatic Discovery Synchronization: `PermissionDiscoveryService::syncSuperAdminPermissions()` ensures all roles listed in `$superRoles` exist in the database and inherit 100% of discovered active CRUD permissions upon schema discovery.
-  - System Security Quarantine & Anti-Lockout: `SystemTableController` enforces `isSuperRole()` checks to block modification or deletion of any super role via HTTP redirects and localized error notifications.
-  - Dynamic UI Protection: `resources/views/system/roles.blade.php` dynamically evaluates `$superRoles`, replacing edit and delete action buttons with the standardized locked system badge (`Protected System Role`).
-  - Model Convenience: `App\Models\User` exposes `isSuperAdmin(): bool` convenience method.
-- **Rule 25 (High-Security System Tables Quarantine & Super-Admin Exclusivity Lock):**
-  - Route Group Middleware Enforcement: All routes under `/system-tables` are strictly quarantined behind `['auth', 'verified', 'role:Super-Admin']`.
-  - Cloaked Navigation Links: In both `navigation-ltr.blade.php` and `navigation-rtl.blade.php`, the "System Tables" navigation link (desktop and mobile) is completely hidden from non-super admins via `@if(Auth::user()?->isSuperAdmin() || Auth::user()?->hasRole('Super-Admin'))`.
-  - Security Boundary Behavior: Unauthenticated requests redirect to login; authenticated requests lacking the `Super-Admin` role immediately receive HTTP `403 Forbidden`.
-  - Factory Convenience: `UserFactory` provides `superAdmin()` state automatically attaching the `Super-Admin` role.
-- **Rule 26 (Pruning Audit Trail Dynamic Operation Localization):**
-  - Separation of Concerns in Audit History: `SystemTableController::pruningSettings()` transforms the pruning history collection via `map()` to assign a localized `translated_description` attribute through `SystemTableService::translateActivityDescription()`, keeping Blade views free of service calls.
-  - Localized View Binding: `resources/views/system/pruning.blade.php` renders `{{ $item->translated_description ?? $item->description }}` in the Operation column.
-  - Regex & Interpolation Handling: Dynamic log strings (e.g. `Auto-pruned :total records from table ':table' (Date: :date, Capacity: :capacity)`, `Added custom table ':table' to automated data pruning`) and static messages (`Updated automated data pruning settings`) are seamlessly parsed and translated across all three languages (`ar`, `en`, `fr`).
-- **Rule 27 (User Dropdown Navigation Border Radius & Harmonized Action Toolbar):**
-  - Trigger Button Component Standard: The User Settings button in `navigation-ltr.blade.php` and `navigation-rtl.blade.php` must follow the uniform toolbar button token: `border border-gray-300 dark:border-gray-600 shadow-sm rounded-lg px-3 py-2 gap-2 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`.
-  - Dynamic Avatar Rendering: Includes user profile picture with fallback to initial badge (`h-5 w-5 rounded-full`) inside the trigger button.
-  - Dropdown Menu Margins & Radius: `<x-dropdown>` provides `rounded-lg shadow-lg p-1` container, and `<x-dropdown-link>` applies `rounded-md px-3 py-2` ensuring hover highlights have clean rounded corners and breathing room from the menu boundaries.
-- **Rule 28 (Google-Style Account Popover Card Architecture):**
-  - Circular Avatar Trigger: Header trigger displays an interactive circular avatar (`p-0.5 rounded-full ring-2 hover:ring-orange-500`) with live user photo or initial letter.
-  - Google Popover Structure: Rendered via `<x-dropdown width="80">` with centered email, large avatar (`w-20 h-20 ring-4 shadow-md`) with camera badge linking to profile photo edit, personalized greeting (`Hi, :name!`), role badge (`Super-Admin` shield or assigned role), active status badge, and the iconic rounded-full pill button (`Manage your Account`).
-  - Streamlined Focus & Exit: Redundant navigation links (Dashboard and System Tables) are omitted from the popover to avoid duplication with the navbar, transitioning smoothly from the "Manage your Account" pill button directly to the Google-style "Log Out" bottom footer card.
-  - Trilingual Dictionary Synchronization: All texts localized across `ar`, `en`, and `fr` dictionaries with 100% key parity.
-- **Rule 29 (Dropdown Viewport Bounds & Logical RTL Positioning):**
-  - Inward Projection Mandate: Dropdown menus situated on the end toolbar in navigation bars must always use logical `end-0` (`ltr:origin-top-right rtl:origin-top-left end-0`) so they project inward toward the center of the page, eliminating frame overflow in both LTR (expanding leftward) and RTL (expanding rightward).
-  - Safety Viewport Constraint: Dropdown containers in `<x-dropdown>` must include `max-w-[calc(100vw-2rem)]` to prevent horizontal viewport clipping or overflow on narrow displays.
-- **Rule 30 (Standardized Semantic Color Palette & Unified UI Token Architecture):**
-  - Six Curated Semantic Color Categories:
-    1. Primary / Brand: Safety Orange (`orange`) for primary calls to action, focus highlights, and active toggles.
-    2. Success / Positive: Emerald Green (`emerald`) for active statuses, successful operations, and confirmations.
-    3. Danger / Destructive: Rose Red (`rose`) for suspended accounts, failed jobs, deletions, and critical alerts.
-    4. Warning / Caution: Amber Yellow (`amber`) for protected system roles, retries, and cautionary hold states.
-    5. Info / Forensic: Indigo Blue (`indigo`) for technical counters, audit logs, caches, locks, payloads, and discovered permissions (eliminating random blue drift).
-    6. Neutral / Structure: Cool Gray (`gray`) for cards, borders, secondary actions, and subtitles.
-  - Standardized Components: `<x-badge>` (polymorphic badge with dot/ping options) and `<x-alert>` (dismissible flash message banner with semantic icons).
-  - Standardized Border Radiuses: `rounded-xl` for cards and tables, `rounded-2xl` for modals and popovers, `rounded-lg` for interactive controls and inputs, `rounded-full` for badges and pills.
-- **Rule 31 (Standardized Client Handoff & Project Setup Architecture):**
-  - Command: `php artisan project:setup` (`app/Console/Commands/SetupProjectCommand.php`).
-  - Automated Migration Pipeline: Runs `migrate` (or `migrate:fresh` when `--fresh` is specified) with production overrides (`--force`).
-  - Automated Seeding & RBAC Discovery: Runs `db:seed` to trigger `DatabaseSeeder`, `RolesAndPermissionsSeeder`, and `PermissionDiscoveryService` to introspect database schema, generate CRUD permissions, and define baseline roles (`Super-Admin`, `Admin`, `User`).
-  - Interactive Secure Super-Admin Creation: Masked terminal prompts (`secret()`) for password with length validation (>= 8 chars), email format validation, and confirmation match.
-  - Domain Integration: Explicitly assigns `'Super-Admin'` Spatie RBAC role, sets `AccountStatus::Active`, marks email as verified (`email_verified_at = now()`), and syncs all permissions.
-  - Zero Hardcoding Guarantee: Eliminates hardcoded administrative credentials in code or `.env` files during deployment and client handoffs.
-- **Rule 32 (Zero-State First-Run Super Admin Web Setup Architecture):**
-  - High-Security Quarantine Integration: Placed under the System Security Module per explicit developer pre-approval (`SystemTableController@setup`, `SystemTableController@storeSetup`, `SystemTableService::createInitialSuperAdmin`, `resources/views/system/setup.blade.php`).
-  - Automatic Zero-State Gate: Automatically intercepts root `/` traffic when the database contains 0 users or is unmigrated (`!Schema::hasTable('users') || User::count() === 0`) and safely redirects to `/system-tables/setup`.
-  - Zero-CLI Self-Installation Pipeline: If the database is completely empty/unmigrated, `SystemTableService::createInitialSuperAdmin` automatically executes `migrate` and `db:seed` before provisioning the first Super Admin account.
-  - Strict Anti-Hijacking Lockout: If any user exists in the database, `GET /system-tables/setup` immediately aborts with `404 Not Found` and `POST /system-tables/setup` is rejected via `InitialSystemSetupRequest` (`403 Forbidden`).
-  - Tabular Visual Layout: Renders a compact visual specifications table detailing assigned role (`Super-Admin`), initial status (`Active`), permission scope (`Full System Authority`), and database schema state (`Auto-Migration Required` or `Schema Ready`).
-  - Atomic Initialization Pipeline: Creates the user with `AccountStatus::Active`, sets `email_verified_at = now()`, synchronizes the protected `'Super-Admin'` role and CRUD permissions, logs an audit trail event, and immediately authenticates the session (`Auth::login($user)`).
-  - Trilingual Dictionary Parity: All 17 UI keys synchronized with 100% parity across `ar`, `en`, and `fr` (463 keys each).
+## 8. Standing Architectural Directives & Conventions
 
-
-
-
-
-
-
-
-
+- **Clean Architecture & Domain Decoupling:**
+  - Controllers are ultra-thin: only accept validated FormRequests, delegate execution to Services/Repositories, and return views or redirects with standard flash keys (`with('success')`, `with('error')`, `with('warning')`, `with('info')`). Zero Eloquent queries or transactions in controllers.
+  - Repositories (`app/Repositories/` implementing `app/Interfaces/`) encapsulate all data queries, eager loading (`with()`), and dynamic filtering (`FilterableTrait`) to eliminate N+1 bottlenecks.
+  - Domain Services (`app/Services/`) manage business logic, arithmetic computations, atomic database transactions (`DB::transaction`), and media pipeline processing.
+  - Dedicated FormRequests (`app/Http/Requests/`) are required for all mutative requests (`Store...Request`, `Update...Request`).
+- **Design System, UI Tokens & Component Suite:**
+  - Authoritative UI standards are centralized in [AGENTS.md](file:///c:/Project%20HARD/erp.gmtm-dz.com/AGENTS.md), `resources/css/tokens.css`, and core Blade components.
+  - Standard buttons only: `<x-primary-button>`, `<x-secondary-button>`, `<x-danger-button>`, `<x-success-button>`, `<x-warning-button>`, `<x-info-button>`.
+  - Standard table suite only: `<x-table>`, `<x-table.th>`, `<x-table.tr>`, `<x-table.td>`, `<x-table.actions>`, `<x-table.action-*>` (`action-view`, `action-edit`, `action-delete`).
+  - Standard filter: `<x-global-filter>` with permanent query string persistence (`->withQueryString()`, `$request->query()`).
+  - Standard badges: `<x-badge :variant="...">` using 3 functional tiers (Management: `primary`, Engineering: `info`, Technicians: `neutral`). Status indicators use status dots (`:dot="true"`). PHP Enums implement `badgeVariant(): string`.
+  - Zero inline styles (`style="..."` prohibited) and fluid full-width layout (`w-full px-4 sm:px-6 lg:px-8`).
+- **Trilingual Localization Parity (100% English Master Keys):**
+  - Canonical master keys in code (`__('...')`) MUST be in English. Arabic and French text exist exclusively as translated values in `lang/ar.json` and `lang/fr.json`. Exact 1-to-1 key parity is maintained (currently 1,237 keys).
+- **Static Code-First RBAC Architecture:**
+  - Permissions are statically declared in `config/permissions.php` under `$groups` and synchronized via `php artisan permissions:sync-tables`.
+  - Super role bypass (`Super-Admin`) is declared in `AppServiceProvider`. Anti-self-action policy strictly blocks self-demotion, self-suspension, or self-deletion.
+- **Media Optimization & CAS Engine (`MediaOptimizationService`):**
+  - All uploaded media must transit through `MediaOptimizationService` for compulsory WebP conversion (80% quality, max 1920px), SHA-256 CAS deduplication, and "Process & Destroy" temporary file unlinking.
+- **Security Quarantine:**
+  - System Administration (`resources/views/system/**`, `system-tables.*`) is quarantined behind `Super-Admin` role exclusivity and requires explicit developer verification.

@@ -147,11 +147,11 @@
                                              {{ __('Permissions Catalog') }}
                                         </h3>
                                         <x-badge variant="success" class="ms-1.5">
-                                            {{ __('Automated Engine') }}
+                                             {{ __('Static Registry') }}
                                         </x-badge>
                                     </div>
                                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                        {{ __('Managed automatically by the Schema Introspection Engine. Hidden by default for clean administration.') }}
+                                        {{ __('Managed automatically by the System Permissions Registry. Hidden by default for clean administration.') }}
                                     </p>
                                 </div>
                             </div>
@@ -242,11 +242,14 @@
                                 <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
                                     <svg class="w-5 h-5 text-indigo-500 shrink-0 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                                     <span>{{ __('Configured Roles') }}</span>
+                                    <x-badge variant="success" class="ms-1.5">
+                                        {{ __('Static Registry') }}
+                                    </x-badge>
                                 </h3>
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                    {{ __('Role definitions, functional scopes, and granted table privileges') }}
+                                    {{ __('Role definitions, functional scopes, and granted privileges') }}
                                     <span class="text-gray-400 dark:text-gray-500">&bull;</span>
-                                    <span class="font-mono text-[11px] text-gray-400">({{ __('RBAC Tables') }}: <code>roles</code>, <code>role_has_permissions</code>, <code>model_has_roles</code>)</span>
+                                    <span class="font-mono text-[11px] text-gray-400">({{ __('Static Registry') }}: <code>config/permissions.php</code>)</span>
                                 </p>
                             </div>
                             <x-primary-button type="button" @click="showRoleModal = true" class="py-1.5 px-3 text-xs rounded-lg flex items-center gap-1.5">
@@ -312,13 +315,13 @@
                                     {{-- Privileges Scope --}}
                                     <x-table.td>
                                         @if($isSuper)
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                                 {{ __('All System Privileges') }} ({{ $role->permissions->count() }})
                                             </span>
                                         @else
                                             <div class="flex items-center gap-1.5 flex-wrap">
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-700/60">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
                                                     {{ $role->permissions->count() }} {{ __('Permissions') }}
                                                 </span>
                                                 @foreach($role->permissions->take(3) as $perm)
@@ -422,13 +425,13 @@
                                 <div>
                                     <x-input-label :value="__('Permission Matrix by Entity')" />
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ __('Assign fine-grained CRUD privileges grouped automatically by database table.') }}
+                                        {{ __('Assign fine-grained CRUD privileges grouped by system module.') }}
                                     </p>
                                 </div>
                                 <div class="flex items-center gap-2 text-xs">
                                     <button type="button"
                                             @click="selectAllCreate()"
-                                            class="font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 hover:underline">
+                                            class="font-semibold text-brand-700 hover:text-brand-800 dark:text-brand-400 hover:underline">
                                         {{ __('Select All') }}
                                     </button>
                                     <span class="text-gray-300 dark:text-gray-600">&bull;</span>
@@ -441,49 +444,125 @@
                             </div>
 
                             <!-- Matrix Table Container -->
-                            <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm max-h-64 overflow-y-auto">
+                            <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm max-h-80 overflow-y-auto">
                                 <table class="w-full text-xs text-start border-collapse">
                                     <thead class="sticky top-0 bg-gray-50 dark:bg-gray-900/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 z-10">
                                         <tr>
-                                            <th class="py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-200 text-start">{{ __('Table / Entity') }}</th>
+                                            <th class="py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-200 text-start">{{ __('Module / Entity') }}</th>
                                             <th class="py-2.5 px-2 font-semibold text-center text-emerald-600 dark:text-emerald-400 w-16">{{ __('View') }}</th>
-                                            <th class="py-2.5 px-2 font-semibold text-center text-orange-600 dark:text-orange-400 w-16">{{ __('Create') }}</th>
+                                            <th class="py-2.5 px-2 font-semibold text-center text-brand-700 dark:text-brand-400 w-16">{{ __('Create') }}</th>
                                             <th class="py-2.5 px-2 font-semibold text-center text-amber-600 dark:text-amber-400 w-16">{{ __('Edit') }}</th>
                                             <th class="py-2.5 px-2 font-semibold text-center text-rose-600 dark:text-rose-400 w-16">{{ __('Delete') }}</th>
                                             <th class="py-2.5 px-3 font-semibold text-end text-gray-500 w-28">{{ __('Toggle Row') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700/60">
-                                        @forelse($permissionMatrix['entities'] as $entity => $actions)
-                                            <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-700/30 transition-colors">
-                                                <td class="py-2.5 px-3 font-medium text-gray-900 dark:text-white">
+                                        @forelse($permissionMatrix['modules'] as $moduleKey => $module)
+                                            <!-- Category Group Header -->
+                                            <tr class="bg-gray-100/95 dark:bg-gray-800/95 border-y border-gray-200 dark:border-gray-700 sticky top-9 z-[5] backdrop-blur-sm">
+                                                <td colspan="5" class="py-2 px-3">
                                                     <div class="flex items-center gap-2">
-                                                        <span class="w-2 h-2 rounded-full bg-orange-500 shrink-0"></span>
-                                                        <span class="font-mono capitalize font-bold text-xs">{{ $entity }}</span>
+                                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider
+                                                            @if($module['color'] === 'rose') bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/25
+                                                            @elseif($module['color'] === 'indigo') bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/25
+                                                            @elseif($module['color'] === 'amber') bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25
+                                                            @elseif($module['color'] === 'blue') bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/25
+                                                            @elseif($module['color'] === 'emerald') bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25
+                                                            @else bg-gray-500/15 text-gray-700 dark:text-gray-300 border border-gray-500/25
+                                                            @endif">
+                                                            @if($module['color'] === 'rose')
+                                                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                                            @elseif($module['color'] === 'indigo')
+                                                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                                                            @elseif($module['color'] === 'amber')
+                                                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                                            @elseif($module['color'] === 'blue')
+                                                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                                                            @elseif($module['color'] === 'emerald')
+                                                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                                                            @endif
+                                                            <span>{{ __($module['name']) }}</span>
+                                                        </span>
+                                                        <span class="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
+                                                            ({{ count($module['entities']) }} {{ __('entities') }})
+                                                        </span>
                                                     </div>
                                                 </td>
-                                                @foreach(['view', 'create', 'edit', 'delete'] as $act)
-                                                    <td class="py-2.5 px-2 text-center align-middle">
-                                                        @if(isset($actions[$act]))
-                                                            <input type="checkbox"
-                                                                   name="permissions[]"
-                                                                   value="{{ $actions[$act] }}"
-                                                                   x-model="createRolePermissions"
-                                                                   class="rounded border-gray-300 dark:border-gray-600 text-orange-500 focus:ring-orange-500 cursor-pointer w-4 h-4"
-                                                                   title="{{ $actions[$act] }}">
-                                                        @else
-                                                            <span class="text-gray-300 dark:text-gray-600 text-xs">&mdash;</span>
-                                                        @endif
-                                                    </td>
-                                                @endforeach
-                                                <td class="py-2.5 px-3 text-end align-middle">
+                                                <td class="py-2 px-3 text-end">
                                                     <button type="button"
-                                                            @click="toggleCreateEntityAll({{ json_encode(array_values($actions)) }})"
-                                                            class="text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 px-2.5 py-1 rounded border border-indigo-200/60 dark:border-indigo-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors whitespace-nowrap">
-                                                        {{ __('Toggle All') }}
+                                                            @click="toggleCreateEntityAll({{ json_encode($module['all_permissions']) }})"
+                                                            class="text-[11px] font-semibold text-brand-700 hover:text-brand-800 dark:text-brand-400 hover:underline whitespace-nowrap">
+                                                        {{ __('Toggle Category') }}
                                                     </button>
                                                 </td>
                                             </tr>
+                                            {{-- Module-level access permission row (e.g. "view metrology") --}}
+                                            @if(!empty($module['view_permission']))
+                                                <tr class="bg-gray-50/60 dark:bg-gray-700/20">
+                                                    <td class="py-2 px-3 ps-5">
+                                                        <label class="flex items-center gap-2 cursor-pointer group">
+                                                            <input type="checkbox"
+                                                                   name="permissions[]"
+                                                                   value="{{ $module['view_permission'] }}"
+                                                                   x-model="createRolePermissions"
+                                                                   class="rounded border-gray-300 dark:border-gray-600 text-brand-600 focus:ring-brand-600 cursor-pointer w-4 h-4"
+                                                                   title="{{ $module['view_permission'] }}">
+                                                            <span class="inline-flex items-center gap-1 text-[11px] font-semibold
+                                                                @if($module['color'] === 'rose') text-rose-700 dark:text-rose-300
+                                                                @elseif($module['color'] === 'indigo') text-indigo-700 dark:text-indigo-300
+                                                                @elseif($module['color'] === 'amber') text-amber-700 dark:text-amber-300
+                                                                @elseif($module['color'] === 'blue') text-blue-700 dark:text-blue-300
+                                                                @elseif($module['color'] === 'emerald') text-emerald-700 dark:text-emerald-300
+                                                                @else text-gray-600 dark:text-gray-400
+                                                                @endif">
+                                                                <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                                                {{ __($module['view_permission']) }}
+                                                            </span>
+                                                        </label>
+                                                    </td>
+                                                    <td colspan="4" class="py-2 px-3">
+                                                        <span class="text-[10px] text-gray-400 dark:text-gray-500 italic">{{ __('Module access permission') }}</span>
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                            @foreach($module['entities'] as $entity => $entityData)
+                                                <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-700/30 transition-colors">
+                                                    <td class="py-2.5 px-3 ps-6 font-medium text-gray-900 dark:text-white">
+                                                        <div class="flex items-center gap-2">
+                                                            <span class="w-1.5 h-1.5 rounded-full shrink-0
+                                                                @if($module['color'] === 'rose') bg-rose-500
+                                                                @elseif($module['color'] === 'indigo') bg-indigo-500
+                                                                @elseif($module['color'] === 'amber') bg-amber-500
+                                                                @elseif($module['color'] === 'blue') bg-blue-500
+                                                                @elseif($module['color'] === 'emerald') bg-emerald-500
+                                                                @else bg-brand-600
+                                                                @endif"></span>
+                                                            <span class="font-mono capitalize font-bold text-xs">{{ __($entityData['display_name']) }}</span>
+                                                        </div>
+                                                    </td>
+                                                    @foreach(['view', 'create', 'edit', 'delete'] as $act)
+                                                        <td class="py-2.5 px-2 text-center align-middle">
+                                                            @if(isset($entityData['actions'][$act]))
+                                                                <input type="checkbox"
+                                                                       name="permissions[]"
+                                                                       value="{{ $entityData['actions'][$act] }}"
+                                                                       x-model="createRolePermissions"
+                                                                       class="rounded border-gray-300 dark:border-gray-600 text-brand-600 focus:ring-brand-600 cursor-pointer w-4 h-4"
+                                                                       title="{{ $entityData['actions'][$act] }}">
+                                                            @else
+                                                                <span class="text-gray-300 dark:text-gray-600 text-xs">&mdash;</span>
+                                                            @endif
+                                                        </td>
+                                                    @endforeach
+                                                    <td class="py-2.5 px-3 text-end align-middle">
+                                                        <button type="button"
+                                                                @click="toggleCreateEntityAll({{ json_encode(array_values($entityData['actions'])) }})"
+                                                                class="text-[11px] font-medium text-brand-700 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 px-2.5 py-1 rounded border border-indigo-200/60 dark:border-indigo-800/60 hover:bg-indigo-500/10 dark:hover:bg-indigo-500/20 transition-colors whitespace-nowrap">
+                                                            {{ __('Toggle Row') }}
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                         @empty
                                             <tr>
                                                 <td colspan="6" class="py-4 text-center text-gray-400 italic">
@@ -506,7 +585,7 @@
                                                        name="permissions[]"
                                                        value="{{ $customPerm }}"
                                                        x-model="createRolePermissions"
-                                                       class="rounded border-gray-300 dark:border-gray-600 text-orange-500 focus:ring-orange-500 w-4 h-4">
+                                                       class="rounded border-gray-300 dark:border-gray-600 text-brand-600 focus:ring-brand-600 w-4 h-4">
                                                 <span class="font-mono text-gray-700 dark:text-gray-300">{{ $customPerm }}</span>
                                             </label>
                                         @endforeach
@@ -595,13 +674,13 @@
                                 <div>
                                     <x-input-label :value="__('Permission Matrix by Entity')" />
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ __('Assign fine-grained CRUD privileges grouped automatically by database table.') }}
+                                        {{ __('Assign fine-grained CRUD privileges grouped by system module.') }}
                                     </p>
                                 </div>
                                 <div class="flex items-center gap-2 text-xs">
                                     <button type="button"
                                             @click="selectAllEdit()"
-                                            class="font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 hover:underline">
+                                            class="font-semibold text-brand-700 hover:text-brand-800 dark:text-brand-400 hover:underline">
                                         {{ __('Select All') }}
                                     </button>
                                     <span class="text-gray-300 dark:text-gray-600">&bull;</span>
@@ -614,49 +693,125 @@
                             </div>
 
                             <!-- Matrix Table Container -->
-                            <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm max-h-64 overflow-y-auto">
+                            <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm max-h-80 overflow-y-auto">
                                 <table class="w-full text-xs text-start border-collapse">
                                     <thead class="sticky top-0 bg-gray-50 dark:bg-gray-900/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 z-10">
                                         <tr>
-                                            <th class="py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-200 text-start">{{ __('Table / Entity') }}</th>
+                                            <th class="py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-200 text-start">{{ __('Module / Entity') }}</th>
                                             <th class="py-2.5 px-2 font-semibold text-center text-emerald-600 dark:text-emerald-400 w-16">{{ __('View') }}</th>
-                                            <th class="py-2.5 px-2 font-semibold text-center text-orange-600 dark:text-orange-400 w-16">{{ __('Create') }}</th>
+                                            <th class="py-2.5 px-2 font-semibold text-center text-brand-700 dark:text-brand-400 w-16">{{ __('Create') }}</th>
                                             <th class="py-2.5 px-2 font-semibold text-center text-amber-600 dark:text-amber-400 w-16">{{ __('Edit') }}</th>
                                             <th class="py-2.5 px-2 font-semibold text-center text-rose-600 dark:text-rose-400 w-16">{{ __('Delete') }}</th>
                                             <th class="py-2.5 px-3 font-semibold text-end text-gray-500 w-28">{{ __('Toggle Row') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700/60">
-                                        @forelse($permissionMatrix['entities'] as $entity => $actions)
-                                            <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-700/30 transition-colors">
-                                                <td class="py-2.5 px-3 font-medium text-gray-900 dark:text-white">
+                                        @forelse($permissionMatrix['modules'] as $moduleKey => $module)
+                                            <!-- Category Group Header -->
+                                            <tr class="bg-gray-100/95 dark:bg-gray-800/95 border-y border-gray-200 dark:border-gray-700 sticky top-9 z-[5] backdrop-blur-sm">
+                                                <td colspan="5" class="py-2 px-3">
                                                     <div class="flex items-center gap-2">
-                                                        <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
-                                                        <span class="font-mono capitalize font-bold text-xs">{{ $entity }}</span>
+                                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider
+                                                            @if($module['color'] === 'rose') bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/25
+                                                            @elseif($module['color'] === 'indigo') bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/25
+                                                            @elseif($module['color'] === 'amber') bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25
+                                                            @elseif($module['color'] === 'blue') bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/25
+                                                            @elseif($module['color'] === 'emerald') bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25
+                                                            @else bg-gray-500/15 text-gray-700 dark:text-gray-300 border border-gray-500/25
+                                                            @endif">
+                                                            @if($module['color'] === 'rose')
+                                                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                                            @elseif($module['color'] === 'indigo')
+                                                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                                                            @elseif($module['color'] === 'amber')
+                                                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                                            @elseif($module['color'] === 'blue')
+                                                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                                                            @elseif($module['color'] === 'emerald')
+                                                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                                                            @endif
+                                                            <span>{{ __($module['name']) }}</span>
+                                                        </span>
+                                                        <span class="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
+                                                            ({{ count($module['entities']) }} {{ __('entities') }})
+                                                        </span>
                                                     </div>
                                                 </td>
-                                                @foreach(['view', 'create', 'edit', 'delete'] as $act)
-                                                    <td class="py-2.5 px-2 text-center align-middle">
-                                                        @if(isset($actions[$act]))
-                                                            <input type="checkbox"
-                                                                   name="permissions[]"
-                                                                   value="{{ $actions[$act] }}"
-                                                                   x-model="editRolePermissions"
-                                                                   class="rounded border-gray-300 dark:border-gray-600 text-orange-500 focus:ring-orange-500 cursor-pointer w-4 h-4"
-                                                                   title="{{ $actions[$act] }}">
-                                                        @else
-                                                            <span class="text-gray-300 dark:text-gray-600 text-xs">&mdash;</span>
-                                                        @endif
-                                                    </td>
-                                                @endforeach
-                                                <td class="py-2.5 px-3 text-end align-middle">
+                                                <td class="py-2 px-3 text-end">
                                                     <button type="button"
-                                                            @click="toggleEditEntityAll({{ json_encode(array_values($actions)) }})"
-                                                            class="text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 px-2.5 py-1 rounded border border-indigo-200/60 dark:border-indigo-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors whitespace-nowrap">
-                                                        {{ __('Toggle All') }}
+                                                            @click="toggleEditEntityAll({{ json_encode($module['all_permissions']) }})"
+                                                            class="text-[11px] font-semibold text-brand-700 hover:text-brand-800 dark:text-brand-400 hover:underline whitespace-nowrap">
+                                                        {{ __('Toggle Category') }}
                                                     </button>
                                                 </td>
                                             </tr>
+                                            {{-- Module-level access permission row (e.g. "view metrology") --}}
+                                            @if(!empty($module['view_permission']))
+                                                <tr class="bg-gray-50/60 dark:bg-gray-700/20">
+                                                    <td class="py-2 px-3 ps-5">
+                                                        <label class="flex items-center gap-2 cursor-pointer group">
+                                                            <input type="checkbox"
+                                                                   name="permissions[]"
+                                                                   value="{{ $module['view_permission'] }}"
+                                                                   x-model="editRolePermissions"
+                                                                   class="rounded border-gray-300 dark:border-gray-600 text-brand-600 focus:ring-brand-600 cursor-pointer w-4 h-4"
+                                                                   title="{{ $module['view_permission'] }}">
+                                                            <span class="inline-flex items-center gap-1 text-[11px] font-semibold
+                                                                @if($module['color'] === 'rose') text-rose-700 dark:text-rose-300
+                                                                @elseif($module['color'] === 'indigo') text-indigo-700 dark:text-indigo-300
+                                                                @elseif($module['color'] === 'amber') text-amber-700 dark:text-amber-300
+                                                                @elseif($module['color'] === 'blue') text-blue-700 dark:text-blue-300
+                                                                @elseif($module['color'] === 'emerald') text-emerald-700 dark:text-emerald-300
+                                                                @else text-gray-600 dark:text-gray-400
+                                                                @endif">
+                                                                <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                                                {{ __($module['view_permission']) }}
+                                                            </span>
+                                                        </label>
+                                                    </td>
+                                                    <td colspan="4" class="py-2 px-3">
+                                                        <span class="text-[10px] text-gray-400 dark:text-gray-500 italic">{{ __('Module access permission') }}</span>
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                            @foreach($module['entities'] as $entity => $entityData)
+                                                <tr class="hover:bg-gray-50/70 dark:hover:bg-gray-700/30 transition-colors">
+                                                    <td class="py-2.5 px-3 ps-6 font-medium text-gray-900 dark:text-white">
+                                                        <div class="flex items-center gap-2">
+                                                            <span class="w-1.5 h-1.5 rounded-full shrink-0
+                                                                @if($module['color'] === 'rose') bg-rose-500
+                                                                @elseif($module['color'] === 'indigo') bg-indigo-500
+                                                                @elseif($module['color'] === 'amber') bg-amber-500
+                                                                @elseif($module['color'] === 'blue') bg-blue-500
+                                                                @elseif($module['color'] === 'emerald') bg-emerald-500
+                                                                @else bg-brand-600
+                                                                @endif"></span>
+                                                            <span class="font-mono capitalize font-bold text-xs">{{ __($entityData['display_name']) }}</span>
+                                                        </div>
+                                                    </td>
+                                                    @foreach(['view', 'create', 'edit', 'delete'] as $act)
+                                                        <td class="py-2.5 px-2 text-center align-middle">
+                                                            @if(isset($entityData['actions'][$act]))
+                                                                <input type="checkbox"
+                                                                       name="permissions[]"
+                                                                       value="{{ $entityData['actions'][$act] }}"
+                                                                       x-model="editRolePermissions"
+                                                                       class="rounded border-gray-300 dark:border-gray-600 text-brand-600 focus:ring-brand-600 cursor-pointer w-4 h-4"
+                                                                       title="{{ $entityData['actions'][$act] }}">
+                                                            @else
+                                                                <span class="text-gray-300 dark:text-gray-600 text-xs">&mdash;</span>
+                                                            @endif
+                                                        </td>
+                                                    @endforeach
+                                                    <td class="py-2.5 px-3 text-end align-middle">
+                                                        <button type="button"
+                                                                @click="toggleEditEntityAll({{ json_encode(array_values($entityData['actions'])) }})"
+                                                                class="text-[11px] font-medium text-brand-700 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 px-2.5 py-1 rounded border border-indigo-200/60 dark:border-indigo-800/60 hover:bg-indigo-500/10 dark:hover:bg-indigo-500/20 transition-colors whitespace-nowrap">
+                                                            {{ __('Toggle Row') }}
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                         @empty
                                             <tr>
                                                 <td colspan="6" class="py-4 text-center text-gray-400 italic">
@@ -679,7 +834,7 @@
                                                        name="permissions[]"
                                                        value="{{ $customPerm }}"
                                                        x-model="editRolePermissions"
-                                                       class="rounded border-gray-300 dark:border-gray-600 text-orange-500 focus:ring-orange-500 w-4 h-4">
+                                                       class="rounded border-gray-300 dark:border-gray-600 text-brand-600 focus:ring-brand-600 w-4 h-4">
                                                 <span class="font-mono text-gray-700 dark:text-gray-300">{{ $customPerm }}</span>
                                             </label>
                                         @endforeach

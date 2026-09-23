@@ -40,8 +40,9 @@ class PermissionDiscoveryServiceTest extends TestCase
         $this->assertNotContains('jobs', $tables);
         $this->assertNotContains('failed_jobs', $tables);
         $this->assertNotContains('activity_log', $tables);
-        $this->assertNotContains('roles', $tables);
-        $this->assertNotContains('permissions', $tables);
+        // Ensure statically registered entities are discovered
+        $this->assertContains('roles', $tables);
+        $this->assertContains('permissions', $tables);
     }
 
     public function test_it_generates_standard_crud_permissions_for_tables(): void
@@ -76,23 +77,28 @@ class PermissionDiscoveryServiceTest extends TestCase
 
     public function test_it_builds_grouped_permission_matrix(): void
     {
-        Permission::create(['name' => 'view devices', 'guard_name' => 'web']);
-        Permission::create(['name' => 'create devices', 'guard_name' => 'web']);
-        Permission::create(['name' => 'edit devices', 'guard_name' => 'web']);
-        Permission::create(['name' => 'delete devices', 'guard_name' => 'web']);
+        Permission::create(['name' => 'view roles', 'guard_name' => 'web']);
+        Permission::create(['name' => 'create roles', 'guard_name' => 'web']);
+        Permission::create(['name' => 'edit roles', 'guard_name' => 'web']);
+        Permission::create(['name' => 'delete roles', 'guard_name' => 'web']);
         Permission::create(['name' => 'special_audit_access', 'guard_name' => 'web']);
 
         $matrix = $this->service->getGroupedPermissionMatrix(autoSync: false);
 
         $this->assertArrayHasKey('entities', $matrix);
-        $this->assertArrayHasKey('devices', $matrix['entities']);
-        $this->assertEquals('view devices', $matrix['entities']['devices']['view']);
-        $this->assertEquals('create devices', $matrix['entities']['devices']['create']);
-        $this->assertEquals('edit devices', $matrix['entities']['devices']['edit']);
-        $this->assertEquals('delete devices', $matrix['entities']['devices']['delete']);
+        $this->assertArrayHasKey('roles', $matrix['entities']);
+        $this->assertEquals('view roles', $matrix['entities']['roles']['view']);
+        $this->assertEquals('create roles', $matrix['entities']['roles']['create']);
+        $this->assertEquals('edit roles', $matrix['entities']['roles']['edit']);
+        $this->assertEquals('delete roles', $matrix['entities']['roles']['delete']);
 
         $this->assertArrayHasKey('custom', $matrix);
         $this->assertContains('special_audit_access', $matrix['custom']);
+
+        $this->assertArrayHasKey('modules', $matrix);
+        $this->assertArrayHasKey('system', $matrix['modules']);
+        $this->assertEquals('System Security & Administration', $matrix['modules']['system']['name']);
+        $this->assertArrayHasKey('roles', $matrix['modules']['system']['entities']);
     }
 
     public function test_it_automatically_syncs_permissions_when_building_matrix_with_autosync(): void

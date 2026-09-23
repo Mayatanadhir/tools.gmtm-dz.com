@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -36,7 +36,7 @@
                 <div class="flex flex-wrap items-center gap-2 p-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/60 shadow-sm">
                     <button type="button"
                             @click="currentTab = 'jobs'"
-                            :class="currentTab === 'jobs' ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'"
+                            :class="currentTab === 'jobs' ? 'bg-brand-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'"
                             class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition">
                         {{ __('Pending Jobs') }} (<code>jobs</code>: {{ $jobs->total() }})
                     </button>

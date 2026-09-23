@@ -1,0 +1,1 @@
+@include('metrology.certificates.index')

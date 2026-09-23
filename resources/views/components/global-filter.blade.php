@@ -1,4 +1,4 @@
-@props([
+﻿@props([
     'action' => request()->url(),
     'method' => 'GET',
     'search' => true,
@@ -56,7 +56,7 @@ $hasActiveFilters = $activeQueryParams->isNotEmpty();
                        name="{{ $searchName }}"
                        x-model="searchQuery"
                        placeholder="{{ $searchPlaceholder }}"
-                       class="w-full ps-8 pe-8 py-1.5 text-xs rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/80 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:focus:border-orange-500 transition-colors shadow-sm" />
+                       class="w-full ps-8 pe-8 py-1.5 text-xs rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/80 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 focus:border-brand-600 focus:ring-1 focus:ring-brand-600 dark:focus:border-brand-600 transition-colors shadow-sm" />
 
                 {{-- Clear Search Input Button --}}
                 <button type="button"
@@ -100,7 +100,7 @@ $hasActiveFilters = $activeQueryParams->isNotEmpty();
         @if($hasActiveFilters)
             <a href="{{ $resolvedResetUrl }}"
                title="{{ __('Reset Filters') }}"
-               class="inline-flex items-center gap-1 py-1.5 px-2.5 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700/60 hover:bg-gray-200 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 transition-colors shrink-0 shadow-sm focus:outline-none focus:ring-1 focus:ring-orange-500">
+               class="inline-flex items-center gap-1 py-1.5 px-2.5 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700/60 hover:bg-gray-200 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 transition-colors shrink-0 shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-600">
                 <svg class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                 </svg>
